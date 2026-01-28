@@ -731,7 +731,7 @@ export default function Home() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
-  const [mintStep, setMintStep] = useState<'idle' | 'generating' | 'uploading' | 'deploying'>('idle');
+  const [mintStep, setMintStep] = useState<'idle' | 'generating' | 'generating_nft' | 'uploading' | 'deploying' | 'minting_nft'>('idle');
   const [showCreature, setShowCreature] = useState(false);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
   const [farcasterData, setFarcasterData] = useState<FarcasterData | null>(null);
@@ -969,8 +969,10 @@ export default function Home() {
     setIsMinting(true);
     setMintStep('generating');
     
+    let nftTokenId: string | undefined;
+    
     try {
-      // Generate and upload image
+      // Step 1: Generate and upload base image
       const generateResponse = await fetch('/api/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -980,9 +982,29 @@ export default function Home() {
       const { imageUrl } = await generateResponse.json();
       creature.imageURI = imageUrl;
       
+      // Step 2: Generate evolution NFT art (all 7 tiers) - background if enabled
+      if (process.env.NEXT_PUBLIC_EVOLUTION_NFT_ENABLED === 'true') {
+        try {
+          setMintStep('generating_nft');
+          
+          const nftArtResponse = await fetch('/api/evolution/generate-art', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ creature, clankerToken: 'pending' }),
+          });
+          
+          if (nftArtResponse.ok) {
+            const nftData = await nftArtResponse.json();
+            console.log('Evolution NFT art generated:', nftData);
+          }
+        } catch (nftError) {
+          console.error('NFT art generation failed (non-critical):', nftError);
+        }
+      }
+      
       setMintStep('deploying');
       
-      // Deploy based on mode
+      // Step 3: Deploy Clanker token
       const endpoint = inputMode === 'wallet' ? '/api/deploy' : '/api/deploy-farcaster';
       const body = inputMode === 'wallet' 
         ? { creature, creatorAddress: address, simulate: false }
@@ -999,7 +1021,32 @@ export default function Home() {
       if (result.success) {
         setDeployResult(result);
 
-        // Save to Clankdex
+        // Step 4: Mint Evolution NFT
+        if (process.env.NEXT_PUBLIC_EVOLUTION_NFT_ENABLED === 'true' && address) {
+          try {
+            setMintStep('minting_nft');
+            
+            const mintResponse = await fetch('/api/evolution/mint', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: address,
+                clankerToken: result.tokenAddress,
+                creatureName: creature.name
+              }),
+            });
+            
+            if (mintResponse.ok) {
+              const mintData = await mintResponse.json();
+              nftTokenId = mintData.tokenId;
+              console.log('Evolution NFT minted:', nftTokenId);
+            }
+          } catch (nftMintError) {
+            console.error('NFT mint failed (non-critical):', nftMintError);
+          }
+        }
+
+        // Step 5: Save to Clankdex
         const newEntry: ClankdexEntry = {
           entryNumber: getNextEntryNumber(clankdexEntries),
           creature: { ...creature, imageURI: imageUrl },
@@ -1009,6 +1056,7 @@ export default function Home() {
           launchedAt: new Date().toISOString(),
           inputMode: inputMode,
           identifier: inputMode === 'wallet' ? (address || '') : farcasterInput,
+          nftTokenId,
         };
         const updatedEntries = saveClankdexEntry(newEntry);
         setClankdexEntries(updatedEntries);
@@ -1686,16 +1734,21 @@ function StatsPanel({
             <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
             <span className="text-sm text-white">
               {mintStep === 'generating' && 'Generating pixel art...'}
+              {mintStep === 'generating_nft' && 'Creating evolution art (7 tiers)...'}
               {mintStep === 'uploading' && 'Uploading to IPFS...'}
               {mintStep === 'deploying' && 'Launching on Clanker...'}
+              {mintStep === 'minting_nft' && 'Minting evolution NFT...'}
             </span>
           </div>
           <div className="w-full bg-gray-600 rounded-full h-2">
             <div 
               className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
               style={{ 
-                width: mintStep === 'generating' ? '33%' : 
-                       mintStep === 'uploading' ? '66%' : '90%' 
+                width: mintStep === 'generating' ? '20%' : 
+                       mintStep === 'generating_nft' ? '40%' :
+                       mintStep === 'uploading' ? '60%' : 
+                       mintStep === 'deploying' ? '80%' :
+                       mintStep === 'minting_nft' ? '95%' : '90%' 
               }}
             />
           </div>
