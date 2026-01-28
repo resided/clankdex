@@ -45,39 +45,40 @@ const POKEMON_STYLE_GUIDE = {
 };
 
 // ============================================
-// POKEMON-STYLE NAME GENERATION
+// ORIGINAL POKEMON-STYLE NAME GENERATION
+// (No actual Pokemon names - all original)
 // ============================================
 const NAME_SYLLABLES = {
-  // Pokemon-sounding prefixes (2-3 syllables)
+  // Prefixes (2-3 syllables, Pokemon-sounding but original)
   prefixes: [
-    // Classic Pokemon vibes
-    'Pika', 'Char', 'Bulba', 'Squi', 'Jiggly', 'Meow', 'Psy', 'Abra', 'Kada', 'Ala',
-    'Ratta', 'Spear', 'Ekans', 'Arbok', 'Sand', 'Nido', 'Vulpix', 'Nineta', 'Zubat', 'Golbat',
-    'Oddish', 'Gloom', 'Vile', 'Para', 'Venon', 'Dig', 'Meowth', 'Persian', 'Psyduck', 'Golduck',
-    'Mankey', 'Prime', 'Growl', 'Arcan', 'Poliwag', 'Poly', 'Kadabra', 'Machop', 'Machoke', 'Bellsprout',
     // Blockchain themed
     'Block', 'Chain', 'Hash', 'Ether', 'Crypto', 'Token', 'Coin', 'Ledger', 'Node', 'Mine',
     'Stake', 'Yield', 'Swap', 'Mint', 'Vault', 'Asset', 'Trade', 'Pool', 'Gas', 'Nonce',
-    // Cute extensions
-    'Fluff', 'Spark', 'Bubb', 'Giggly', 'Snor', 'Lap', 'Eevee', 'Vapore', 'Jolt', 'Flareon',
-    'Pory', 'Omany', 'Kaba', 'Aero', 'Snorl', 'Drati', 'Mew', 'Chiko', 'Cynda', 'Toto',
+    'Byte', 'Data', 'Net', 'Web', 'Cyber', 'Digi', 'Neo', 'Flux', 'Nex', 'Verse',
+    // Element themed
+    'Pyro', 'Hydro', 'Terra', 'Volt', 'Cryo', 'Aero', 'Lumo', 'Umbro', 'Fero', 'Glacio',
+    'Ignis', 'Aqua', 'Flora', 'Fulgo', 'Gelo', 'Ventus', 'Tene', 'Lux', 'Metallo', 'Spirit',
+    // Cute/creature themed (original)
+    'Fluff', 'Spark', 'Bubb', 'Zap', 'Bolt', 'Wing', 'Fin', 'Claw', 'Fang', 'Tail',
+    'Puff', 'Buzz', 'Zip', 'Flash', 'Volt', 'Core', 'Wave', 'Drift', 'Mist', 'Dust',
+    'Nova', 'Star', 'Comet', 'Nebula', 'Quasar', 'Cosmo', 'Astro', 'Luna', 'Solar', 'Void',
+    'Quark', 'Photon', 'Ion', 'Neutro', 'Proton', 'Electron', 'Quantum', 'Vector', 'Matrix', 'Cipher',
   ],
   
-  // Pokemon-sounding suffixes
+  // Suffixes (Pokemon-sounding structure but original)
   suffixes: [
-    // Classic suffixes
-    'chu', 'mander', 'saur', 'rtle', 'puff', 'duck', 'der', 'bra', 'bok', 'shrew',
-    'queen', 'king', 'dude', 'drill', 'pan', 'ape', 'pix', 'tales', 'bat', 'bone',
-    'lash', 'trike', 'pod', 'bug', 'cruel', 'tung', 'duo', 'drio', 'dewgong', 'grimer',
-    'muk', 'shell', 'cruel', 'gastly', 'haunter', 'gengar', 'onix', 'drowzee', 'hypno', 'krabby',
-    'kingler', 'voltorb', 'electrode', 'exeggcute', 'cubone', 'marowak', 'hitmon', 'lickitung', 'koffing', 'weezing',
-    'rhyhorn', 'chansey', 'tangela', 'kangas', 'horsea', 'seadra', 'goldeen', 'seaking', 'staryu', 'starmie',
-    'mr-mime', 'scyther', 'jynx', 'electabuzz', 'magmar', 'pinsir', 'tauros', 'magikarp', 'gyarados', 'lapras',
-    'ditto', 'eevee', 'porygon', 'omanyte', 'kabuto', 'aerodactyl', 'snorlax', 'articuno', 'zapdos', 'moltres',
-    'dratini', 'dragonair', 'dragonite', 'mewtwo', 'mew',
-    // Generic creature suffixes
-    'mon', 'ling', 'oid', 'ite', 'eon', 'py', 'by', 'ny', 'saur', 'rex',
-    'dactyl', 'nax', 'thyst', 'gon', 'nix', 'pix', 'lux', 'vex', 'max', 'jax',
+    // Classic creature endings
+    'mon', 'ling', 'oid', 'ite', 'eon', 'py', 'by', 'ny', 'rex', 'gon',
+    'nix', 'pix', 'lux', 'vex', 'max', 'jax', 'lox', 'rox', 'tex', 'vex',
+    // Element/type themed
+    'saur', 'mander', 'rtle', 'chu', 'puff', 'duck', 'der', 'bra', 'bok', 'shrew',
+    'dude', 'drill', 'pan', 'ape', 'pix', 'tales', 'bone', 'lash', 'trike', 'pod',
+    // Cute endings
+    'let', 'pet', 'kin', 'bit', 'bot', 'dot', 'lot', 'pot', 'tot', 'cot',
+    'wing', 'tail', 'fin', 'claw', 'fang', 'horn', 'shell', 'scale', 'pelt', 'mane',
+    // Power endings
+    'tor', 'zor', 'xor', 'kor', 'mor', 'nor', 'por', 'ror', 'sor', 'vor',
+    'tron', 'ron', 'don', 'con', 'von', 'xon', 'yon', 'zon', 'jon', 'hon',
   ]
 };
 
