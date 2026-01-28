@@ -1025,21 +1025,43 @@ export default function Home() {
     return entries;
   }, [clankdexEntries, searchQuery, filterElement, filterTier, sortBy, priceDataCache]);
 
-  // Keyboard navigation for rolodex
+  // Keyboard navigation - Game Boy style controls
   useEffect(() => {
-    if (screenMode !== 'collection') return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        setCurrentEntryIndex(prev => Math.max(0, prev - 1));
-      } else if (e.key === 'ArrowRight') {
-        setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1));
+      // Menu navigation
+      if (screenMode === 'menu') {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setMenuIndex(i => Math.max(0, i - 1));
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setMenuIndex(i => Math.min(3, i + 1));
+        } else if (e.key === 'Enter' || e.key === ' ' || e.key.toLowerCase() === 'a') {
+          e.preventDefault();
+          setScreenMode(menuItems[menuIndex]);
+        }
+        return;
+      }
+
+      // B button / Escape - go back to menu from any screen
+      if (e.key === 'Escape' || e.key.toLowerCase() === 'b') {
+        setScreenMode('menu');
+        return;
+      }
+
+      // Collection-specific navigation
+      if (screenMode === 'collection') {
+        if (e.key === 'ArrowLeft') {
+          setCurrentEntryIndex(prev => Math.max(0, prev - 1));
+        } else if (e.key === 'ArrowRight') {
+          setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1));
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [screenMode, filteredEntries.length]);
+  }, [screenMode, filteredEntries.length, menuIndex, menuItems]);
 
   // Reset index when search changes
   useEffect(() => {
@@ -1320,23 +1342,23 @@ export default function Home() {
 
         {/* Navigation Bar - shows current mode with back to menu */}
         {screenMode !== 'menu' && (
-          <div className="flex justify-center gap-3 mb-6">
+          <div className="flex justify-center items-center gap-4 mb-6">
             <motion.button
               onClick={() => setScreenMode('menu')}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-full text-gray-300 hover:text-white transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className="gb-btn gb-btn-b text-xs"
+              whileTap={{ scale: 0.95 }}
+              title="Press B or Escape to go back"
             >
-              <ChevronLeft className="w-4 h-4" />
-              Menu
+              B
             </motion.button>
-            <div className="flex items-center gap-2 px-4 py-2 bg-pokedex-red/20 rounded-full text-pokedex-red border border-pokedex-red/30">
-              {screenMode === 'scan' && <><ScanLine className="w-4 h-4" /> Scan</>}
-              {screenMode === 'collection' && <><BookOpen className="w-4 h-4" /> Rolodex</>}
-              {screenMode === 'faq' && <><Activity className="w-4 h-4" /> FAQ</>}
-              {screenMode === 'how-it-works' && <><Sparkles className="w-4 h-4" /> How It Works</>}
-              {screenMode === 'creature' && <><Eye className="w-4 h-4" /> Creature</>}
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/80 rounded-lg text-white border border-gray-700">
+              {screenMode === 'scan' && <><ScanLine className="w-4 h-4 text-blue-400" /> <span className="font-pixel text-xs">SCAN</span></>}
+              {screenMode === 'collection' && <><BookOpen className="w-4 h-4 text-yellow-400" /> <span className="font-pixel text-xs">ROLODEX</span></>}
+              {screenMode === 'faq' && <><Activity className="w-4 h-4 text-green-400" /> <span className="font-pixel text-xs">FAQ</span></>}
+              {screenMode === 'how-it-works' && <><Sparkles className="w-4 h-4 text-purple-400" /> <span className="font-pixel text-xs">HOW IT WORKS</span></>}
+              {screenMode === 'creature' && <><Eye className="w-4 h-4 text-red-400" /> <span className="font-pixel text-xs">CREATURE</span></>}
             </div>
+            <span className="text-[10px] text-gray-500">Press B to go back</span>
           </div>
         )}
 
@@ -1396,23 +1418,44 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* D-pad and buttons */}
-                <div className="flex items-center justify-between">
+                {/* Game Boy Controls */}
+                <div className="flex items-center justify-between mt-4">
+                  {/* D-Pad */}
                   <div className="dpad">
-                    <button className="dpad-up" onClick={() => setMenuIndex(i => Math.max(0, i - 1))} />
-                    <div className="dpad-left" />
-                    <div className="dpad-center" />
-                    <div className="dpad-right" />
-                    <button className="dpad-down" onClick={() => setMenuIndex(i => Math.min(3, i + 1))} />
-                  </div>
-                  <div className="flex gap-3">
                     <button
-                      onClick={() => setScreenMode(menuItems[menuIndex])}
-                      className="pixel-btn text-white"
-                    >
-                      SELECT
-                    </button>
+                      className="dpad-up"
+                      onClick={() => setMenuIndex(i => Math.max(0, i - 1))}
+                      aria-label="Up"
+                    />
+                    <button className="dpad-left" aria-label="Left" />
+                    <div className="dpad-center" />
+                    <button className="dpad-right" aria-label="Right" />
+                    <button
+                      className="dpad-down"
+                      onClick={() => setMenuIndex(i => Math.min(3, i + 1))}
+                      aria-label="Down"
+                    />
                   </div>
+
+                  {/* A/B Buttons */}
+                  <div className="flex gap-4 items-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <button
+                        onClick={() => setScreenMode(menuItems[menuIndex])}
+                        className="gb-btn"
+                      >
+                        A
+                      </button>
+                      <span className="text-[10px] text-gray-500 font-pixel">SELECT</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Keyboard hints */}
+                <div className="mt-4 text-center">
+                  <p className="text-[10px] text-gray-500">
+                    Use arrow keys + Enter or A key
+                  </p>
                 </div>
               </div>
             </motion.div>

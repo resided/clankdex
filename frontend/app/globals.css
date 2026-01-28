@@ -241,6 +241,52 @@
   .dpad-down { @apply bottom-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-b; }
   .dpad-left { @apply left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-l; }
   .dpad-right { @apply right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-r; }
+
+  .dpad-up:active, .dpad-down:active, .dpad-left:active, .dpad-right:active {
+    background: #555;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Game Boy A/B Buttons */
+  .gb-btn {
+    @apply w-12 h-12 rounded-full font-bold text-sm cursor-pointer transition-all;
+    background: linear-gradient(145deg, #9b1d20, #7a171a);
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 4px 0 #500000,
+      inset 0 2px 4px rgba(255, 255, 255, 0.2),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .gb-btn:hover {
+    background: linear-gradient(145deg, #a82225, #8a1a1d);
+  }
+
+  .gb-btn:active {
+    transform: translateY(2px);
+    box-shadow:
+      0 2px 0 #500000,
+      inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .gb-btn-b {
+    background: linear-gradient(145deg, #4a4a4a, #333);
+    box-shadow:
+      0 4px 0 #222,
+      inset 0 2px 4px rgba(255, 255, 255, 0.1),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .gb-btn-b:hover {
+    background: linear-gradient(145deg, #555, #3a3a3a);
+  }
+
+  .gb-btn-b:active {
+    box-shadow:
+      0 2px 0 #222,
+      inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
   
   /* Stat Bar */
   .stat-bar {
