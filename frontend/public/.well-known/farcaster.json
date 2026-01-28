@@ -12,7 +12,7 @@
     "imageUrl": "https://frontend-weld-mu-91.vercel.app/og-image.png",
     "buttonTitle": "Launch ClankDex",
     "splashImageUrl": "https://frontend-weld-mu-91.vercel.app/splash.png",
-    "splashBackgroundColor":="#1a0a2e",
+    "splashBackgroundColor": "#1a0a2e",
     "webhookUrl": "https://frontend-weld-mu-91.vercel.app/api/webhook"
   }
 }
