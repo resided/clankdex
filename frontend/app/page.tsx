@@ -38,7 +38,9 @@ import {
   DollarSign,
   BarChart3,
   Crown,
-  Star
+  Star,
+  Egg,
+  Baby
 } from 'lucide-react';
 
 // Contract ABI for Registry
@@ -141,13 +143,13 @@ interface PriceData {
 
 // Evolution tiers based on market cap
 const EVOLUTION_TIERS = [
-  { name: 'Egg', minCap: 0, maxCap: 1000, color: 'text-gray-400', icon: '🥒', hpMultiplier: 1 },
-  { name: 'Baby', minCap: 1000, maxCap: 10000, color: 'text-green-400', icon: '🐣', hpMultiplier: 1.5 },
-  { name: 'Basic', minCap: 10000, maxCap: 50000, color: 'text-blue-400', icon: '⭐', hpMultiplier: 2 },
-  { name: 'Stage 1', minCap: 50000, maxCap: 100000, color: 'text-purple-400', icon: '🌟', hpMultiplier: 3 },
-  { name: 'Stage 2', minCap: 100000, maxCap: 500000, color: 'text-yellow-400', icon: '💫', hpMultiplier: 5 },
-  { name: 'Mega', minCap: 500000, maxCap: 1000000, color: 'text-orange-400', icon: '🔥', hpMultiplier: 10 },
-  { name: 'Legendary', minCap: 1000000, maxCap: Infinity, color: 'text-red-400', icon: '👑', hpMultiplier: 20 },
+  { name: 'Egg', minCap: 0, maxCap: 1000, color: 'text-gray-400', icon: Egg, hpMultiplier: 1 },
+  { name: 'Baby', minCap: 1000, maxCap: 10000, color: 'text-green-400', icon: Baby, hpMultiplier: 1.5 },
+  { name: 'Basic', minCap: 10000, maxCap: 50000, color: 'text-blue-400', icon: Star, hpMultiplier: 2 },
+  { name: 'Stage 1', minCap: 50000, maxCap: 100000, color: 'text-purple-400', icon: Sparkles, hpMultiplier: 3 },
+  { name: 'Stage 2', minCap: 100000, maxCap: 500000, color: 'text-yellow-400', icon: Zap, hpMultiplier: 5 },
+  { name: 'Mega', minCap: 500000, maxCap: 1000000, color: 'text-orange-400', icon: Flame, hpMultiplier: 10 },
+  { name: 'Legendary', minCap: 1000000, maxCap: Infinity, color: 'text-red-400', icon: Crown, hpMultiplier: 20 },
 ];
 
 const getEvolutionTier = (marketCap: number) => {
@@ -1329,8 +1331,11 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
 
       {/* Evolution Tier Badge */}
       {priceData && (
-        <div className={`absolute -top-3 -right-3 px-3 py-1.5 rounded-lg font-pixel text-xs font-bold ${evolutionTier.color} bg-gray-900 border-2 border-current z-10`}>
-          <span className="mr-1">{evolutionTier.icon}</span>
+        <div className={`absolute -top-3 -right-3 px-3 py-1.5 rounded-lg font-pixel text-xs font-bold ${evolutionTier.color} bg-gray-900 border-2 border-current z-10 flex items-center gap-1`}>
+          {(() => {
+            const IconComponent = evolutionTier.icon;
+            return <IconComponent className="w-3 h-3" />;
+          })()}
           {evolutionTier.name}
         </div>
       )}
