@@ -327,62 +327,137 @@ async function generateCreatureFromWallet(address: string, neynarData: any | nul
   
   const colorPalette = colorPalettes[element] || colorPalettes.Fire;
   
-  // Generate lore description based on archetype
-  const loreDescriptions: Record<string, string[]> = {
-    ORACLE: [
-      `Born from the foresight of ${neynarData?.username || 'an oracle'}. This ${element.toLowerCase()} being sees patterns before they form.`,
-      `A ${element.toLowerCase()} manifestation of prescience. It channels the predictive powers of its origin wallet.`,
-      `Forged in the fires of foresight. This entity ${name} guards the wisdom of ${neynarData?.username || 'its creator'}.`,
-    ],
-    INFLUENCER: [
-      `Radiates the charisma of ${neynarData?.username || 'a star'}. This ${element.toLowerCase()} entity commands attention effortlessly.`,
-      `A ${element.toLowerCase()} being that shines bright like its origin. ${name} amplifies presence wherever it goes.`,
-      `Born from viral energy. This ${element.toLowerCase()} form reflects the magnetic pull of ${neynarData?.username || 'its creator'}.`,
-    ],
-    CONNECTOR: [
-      `Weaves connections like ${neynarData?.username || 'a weaver'}. This ${element.toLowerCase()} entity bridges worlds.`,
-      `A ${element.toLowerCase()} manifestation of unity. ${name} binds disparate forces together.`,
-      `Forged in the fires of community. This being carries the linking essence of ${neynarData?.username || 'its origin'}.`,
-    ],
-    LURKER: [
-      `Watches from shadows like ${neynarData?.username || 'a phantom'}. This ${element.toLowerCase()} entity sees without being seen.`,
-      `A ${element.toLowerCase()} being of quiet power. ${name} observes the world from hidden vantage points.`,
-      `Born from silent observation. This ${element.toLowerCase()} form reflects the patient gaze of ${neynarData?.username || 'its creator'}.`,
-    ],
-    BUILDER: [
-      `Shaped by the relentless craft of ${neynarData?.username || 'a builder'}. This ${element.toLowerCase()} entity creates without rest.`,
-      `A ${element.toLowerCase()} manifestation of creation. ${name} forges reality with determined will.`,
-      `Forged in the fires of making. This being embodies the constructive spirit of ${neynarData?.username || 'its origin'}.`,
-    ],
-    DEGEN: [
-      `Wild and unpredictable like ${neynarData?.username || 'a storm'}. This ${element.toLowerCase()} entity thrives on chaos.`,
-      `A ${element.toLowerCase()} being of pure volatility. ${name} risks everything for glory.`,
-      `Born from calculated madness. This ${element.toLowerCase()} form channels the reckless energy of ${neynarData?.username || 'its creator'}.`,
-    ],
-    WHALE: [
-      `Massive and deep like ${neynarData?.username || 'the ocean'}. This ${element.toLowerCase()} entity moves markets with a thought.`,
-      `A ${element.toLowerCase()} manifestation of magnitude. ${name} carries the weight of great power.`,
-      `Forged in the depths of abundance. This being represents the vast holdings of ${neynarData?.username || 'its origin'}.`,
-    ],
-    SAGE: [
-      `Ancient and wise like ${neynarData?.username || 'an elder'}. This ${element.toLowerCase()} entity holds timeless knowledge.`,
-      `A ${element.toLowerCase()} being of accumulated wisdom. ${name} speaks only truth.`,
-      `Born from patient persistence. This ${element.toLowerCase()} form reflects the steady presence of ${neynarData?.username || 'its creator'}.`,
-    ],
-    NOMAD: [
-      `Restless and wandering like ${neynarData?.username || 'the wind'}. This ${element.toLowerCase()} entity never settles.`,
-      `A ${element.toLowerCase()} manifestation of journey. ${name} explores all paths.`,
-      `Forged in the fires of exploration. This being carries the wandering spirit of ${neynarData?.username || 'its origin'}.`,
-    ],
-    GUARDIAN: [
-      `Steadfast and protective like ${neynarData?.username || 'a shield'}. This ${element.toLowerCase()} entity defends without question.`,
-      `A ${element.toLowerCase()} being of absolute protection. ${name} stands as an unbreakable wall.`,
-      `Born from the duty of care. This ${element.toLowerCase()} form embodies the protective will of ${neynarData?.username || 'its creator'}.`,
-    ],
-  };
+  // Generate stat-focused description that explains WHY the creature has these stats
+  function generateStatDescription(): string {
+    const parts: string[] = [];
+    
+    // Opening based on archetype
+    const openings: Record<string, string> = {
+      ORACLE: `${name} emerged from the blockchain with the gift of foresight. `,
+      INFLUENCER: `${name} burst onto the chain with undeniable magnetism. `,
+      CONNECTOR: `${name} formed from the web of connections that bind the network. `,
+      LURKER: `${name} manifested in the shadows, watching and waiting. `,
+      BUILDER: `${name} was forged through countless hours of creation. `,
+      DEGEN: `${name} exploded into existence through sheer force of will. `,
+      WHALE: `${name} rose from the depths with immense power. `,
+      SAGE: `${name} awakened after ages of silent observation. `,
+      NOMAD: `${name} wandered in from beyond the known chains. `,
+      GUARDIAN: `${name} materialized as a protector of the realm. `,
+    };
+    parts.push(openings[archetypeKey] || `${name} emerged from the digital ether. `);
+    
+    // Explain highest stat
+    const stats = [
+      { name: 'HP', value: hp, desc: 'vitality and endurance' },
+      { name: 'Attack', value: attack, desc: 'offensive power' },
+      { name: 'Defense', value: defense, desc: 'resilience and protection' },
+      { name: 'Speed', value: speed, desc: 'agility and reflexes' },
+      { name: 'Special', value: special, desc: 'unique abilities and intuition' },
+    ];
+    stats.sort((a, b) => b.value - a.value);
+    const highest = stats[0];
+    
+    const statExplanations: Record<string, Record<string, string>> = {
+      ORACLE: {
+        HP: 'Its longevity comes from seeing danger before it strikes.',
+        Attack: 'It strikes with the precision of knowledge.',
+        Defense: 'Its wisdom shields it from harm.',
+        Speed: 'It moves swiftly to intercept fate.',
+        Special: 'Its psychic powers are unmatched.',
+      },
+      INFLUENCER: {
+        HP: 'Its fame gives it lasting presence.',
+        Attack: 'Its words cut deep and true.',
+        Defense: 'Its followers shield it from criticism.',
+        Speed: 'Trends move fast, and so does it.',
+        Special: 'Its charisma bends reality.',
+      },
+      CONNECTOR: {
+        HP: 'Its network sustains it through any storm.',
+        Attack: 'It leverages relationships as weapons.',
+        Defense: 'Many allies mean many shields.',
+        Speed: 'Information travels fast through its web.',
+        Special: 'It understands the space between all things.',
+      },
+      LURKER: {
+        HP: 'Its silence preserves its energy.',
+        Attack: 'It strikes from unseen angles.',
+        Defense: 'You cannot hit what you cannot see.',
+        Speed: 'Shadows move faster than light.',
+        Special: 'It knows secrets that others miss.',
+      },
+      BUILDER: {
+        HP: 'Its creations endure the test of time.',
+        Attack: 'Each project hits harder than the last.',
+        Defense: 'Solid foundations resist all attacks.',
+        Speed: 'Rapid iteration beats perfect planning.',
+        Special: 'Innovation is its greatest weapon.',
+      },
+      DEGEN: {
+        HP: 'High risk means high reward... usually.',
+        Attack: 'It goes all-in every single time.',
+        Defense: 'Reckless abandon is its shield.',
+        Speed: 'FOMO waits for no one.',
+        Special: 'Luck favors the bold.',
+      },
+      WHALE: {
+        HP: 'Its vast reserves provide endless stamina.',
+        Attack: 'Markets move at its command.',
+        Defense: 'Wealth is the ultimate armor.',
+        Speed: 'When it moves, the chain trembles.',
+        Special: 'Its presence alone shifts trends.',
+      },
+      SAGE: {
+        HP: 'Time has tested and tempered it.',
+        Attack: 'Experience makes every strike count.',
+        Defense: 'Patience is the ultimate defense.',
+        Speed: 'It acts only at the perfect moment.',
+        Special: 'Ancient knowledge flows through it.',
+      },
+      NOMAD: {
+        HP: 'Surviving across chains builds resilience.',
+        Attack: 'It brings techniques from foreign lands.',
+        Defense: 'No single chain can contain it.',
+        Speed: 'It travels faster than transactions.',
+        Special: 'It sees patterns across all networks.',
+      },
+      GUARDIAN: {
+        HP: 'Its duty sustains it through all battles.',
+        Attack: 'It strikes only to protect.',
+        Defense: 'None shall pass its watch.',
+        Speed: 'It intercepts threats instantly.',
+        Special: 'Its shield absorbs all harm.',
+      },
+    };
+    
+    parts.push(`Its ${highest.name} (${highest.value}) reflects ${highest.desc}—${statExplanations[archetypeKey]?.[highest.name] || 'its natural strength.'} `);
+    
+    // Explain element affinity
+    const elementDescs: Record<string, string> = {
+      Fire: 'The flames within fuel its passion.',
+      Water: 'Flowing like the tides, it adapts.',
+      Grass: 'Rooted deep, it draws power from the earth.',
+      Electric: 'Lightning courses through its veins.',
+      Ice: 'Cold calculation guides its actions.',
+      Fighting: 'It seeks challenges to grow stronger.',
+      Poison: 'Its methods are subtle but effective.',
+      Ground: 'Steady and unmovable as bedrock.',
+      Flying: 'It sees what others cannot from above.',
+      Psychic: 'The mind is its true battlefield.',
+      Bug: 'Small but relentless in numbers.',
+      Rock: 'Unyielding, it waits for the right moment.',
+      Ghost: 'Between worlds, it knows many secrets.',
+      Dragon: 'Ancient power sleeps within.',
+      Dark: 'It thrives where light fears to tread.',
+      Steel: 'Forged in pressure, unbreakable now.',
+      Fairy: 'Wonder and mischief guide its path.',
+    };
+    parts.push(elementDescs[element] || 'Its nature is mysterious.');
+    
+    return parts.join('');
+  }
   
-  const descriptions = loreDescriptions[archetypeKey] || loreDescriptions.ORACLE;
-  const description = descriptions[getHashValue(hash, 14, descriptions.length)];
+  const description = generateStatDescription();
   
   // Generate DNA from address
   const dna = BigInt('0x' + hash.slice(0, 16)).toString();
