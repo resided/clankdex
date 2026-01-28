@@ -22,6 +22,7 @@ import {
   Loader2,
   CheckCircle2,
   TrendingUp,
+  TrendingDown,
   Coins,
   ExternalLink,
   Rocket,
@@ -33,7 +34,11 @@ import {
   LogOut,
   Search,
   BookOpen,
-  ScanLine
+  ScanLine,
+  DollarSign,
+  BarChart3,
+  Crown,
+  Star
 } from 'lucide-react';
 
 // Contract ABI for Registry
@@ -124,6 +129,79 @@ interface ClankdexEntry {
   inputMode: 'wallet' | 'farcaster';
   identifier: string;
 }
+
+interface PriceData {
+  price: number;
+  marketCap: number;
+  volume24h: number;
+  priceChange24h: number;
+  source: string;
+  lastUpdated: string;
+}
+
+// Evolution tiers based on market cap
+const EVOLUTION_TIERS = [
+  { name: 'Egg', minCap: 0, maxCap: 1000, color: 'text-gray-400', icon: '🥒', hpMultiplier: 1 },
+  { name: 'Baby', minCap: 1000, maxCap: 10000, color: 'text-green-400', icon: '🐣', hpMultiplier: 1.5 },
+  { name: 'Basic', minCap: 10000, maxCap: 50000, color: 'text-blue-400', icon: '⭐', hpMultiplier: 2 },
+  { name: 'Stage 1', minCap: 50000, maxCap: 100000, color: 'text-purple-400', icon: '🌟', hpMultiplier: 3 },
+  { name: 'Stage 2', minCap: 100000, maxCap: 500000, color: 'text-yellow-400', icon: '💫', hpMultiplier: 5 },
+  { name: 'Mega', minCap: 500000, maxCap: 1000000, color: 'text-orange-400', icon: '🔥', hpMultiplier: 10 },
+  { name: 'Legendary', minCap: 1000000, maxCap: Infinity, color: 'text-red-400', icon: '👑', hpMultiplier: 20 },
+];
+
+const getEvolutionTier = (marketCap: number) => {
+  return EVOLUTION_TIERS.find(tier => marketCap >= tier.minCap && marketCap < tier.maxCap) || EVOLUTION_TIERS[0];
+};
+
+const formatMarketCap = (cap: number): string => {
+  if (cap >= 1000000) return `$${(cap / 1000000).toFixed(2)}M`;
+  if (cap >= 1000) return `$${(cap / 1000).toFixed(1)}K`;
+  return `$${cap.toFixed(2)}`;
+};
+
+const formatPrice = (price: number): string => {
+  if (price < 0.00001) return `$${price.toExponential(2)}`;
+  if (price < 0.01) return `$${price.toFixed(6)}`;
+  if (price < 1) return `$${price.toFixed(4)}`;
+  return `$${price.toFixed(2)}`;
+};
+
+// Hook to fetch price data
+const usePriceData = (tokenAddress: string | null) => {
+  const [priceData, setPriceData] = useState<PriceData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!tokenAddress) return;
+
+    const fetchPrice = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`/api/price?address=${tokenAddress}`);
+        if (!response.ok) {
+          throw new Error('Price not available');
+        }
+        const data = await response.json();
+        setPriceData(data);
+      } catch (err) {
+        setError((err as Error).message);
+        setPriceData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrice();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchPrice, 30000);
+    return () => clearInterval(interval);
+  }, [tokenAddress]);
+
+  return { priceData, loading, error };
+};
 
 type ViewMode = 'scan' | 'collection';
 
@@ -1217,6 +1295,15 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
   const { creature, entryNumber, imageBase64, tokenAddress, tokenSymbol, launchedAt, inputMode, identifier } = entry;
   const totalStats = creature.hp + creature.attack + creature.defense + creature.speed + creature.special;
 
+  // Fetch live price data
+  const { priceData, loading: priceLoading } = usePriceData(tokenAddress);
+  const evolutionTier = priceData ? getEvolutionTier(priceData.marketCap) : EVOLUTION_TIERS[0];
+
+  // Calculate HP based on market cap (logarithmic scale for better visualization)
+  const marketCapHP = priceData
+    ? Math.min(100, Math.max(1, Math.log10(priceData.marketCap + 1) * 15))
+    : 0;
+
   const getRarity = (element: string) => {
     const rarities: Record<string, string> = {
       Fire: 'common', Water: 'common', Grass: 'common', Fighting: 'common', Ground: 'common', Bug: 'common',
@@ -1240,6 +1327,14 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
         {formatEntryNumber(entryNumber)}
       </div>
 
+      {/* Evolution Tier Badge */}
+      {priceData && (
+        <div className={`absolute -top-3 -right-3 px-3 py-1.5 rounded-lg font-pixel text-xs font-bold ${evolutionTier.color} bg-gray-900 border-2 border-current z-10`}>
+          <span className="mr-1">{evolutionTier.icon}</span>
+          {evolutionTier.name}
+        </div>
+      )}
+
       {/* Top Section */}
       <div className="flex items-start justify-between mb-4">
         <div>
@@ -1259,8 +1354,38 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
         </div>
       </div>
 
+      {/* Live Price Banner */}
+      {priceData && (
+        <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-green-400" />
+              <span className="font-pixel text-lg text-green-400">
+                {formatPrice(priceData.price)}
+              </span>
+              {priceData.priceChange24h !== 0 && (
+                <span className={`flex items-center text-xs ${priceData.priceChange24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {priceData.priceChange24h > 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                  {priceData.priceChange24h > 0 ? '+' : ''}{priceData.priceChange24h.toFixed(2)}%
+                </span>
+              )}
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-500">via {priceData.source}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {priceLoading && (
+        <div className="mb-4 p-3 rounded-lg bg-gray-800/50 border border-gray-700 flex items-center justify-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+          <span className="text-gray-400 text-sm">Fetching live price...</span>
+        </div>
+      )}
+
       {/* Creature Display */}
-      <div className="rolodex-screen mb-4">
+      <div className={`rolodex-screen mb-4 relative ${evolutionTier.name === 'Legendary' ? 'ring-4 ring-yellow-400/50 animate-pulse' : ''}`}>
         {imageBase64 ? (
           <img
             src={imageBase64}
@@ -1278,6 +1403,54 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
           </div>
         )}
       </div>
+
+      {/* Market Cap HP Bar */}
+      {priceData && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-gray-400 flex items-center gap-1">
+              <Crown className="w-3 h-3 text-yellow-400" />
+              MARKET CAP HP
+            </span>
+            <span className="font-pixel text-sm text-yellow-400">
+              {formatMarketCap(priceData.marketCap)}
+            </span>
+          </div>
+          <div className="h-4 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${marketCapHP}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className={`h-full rounded-full ${
+                evolutionTier.name === 'Legendary' ? 'bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 animate-pulse' :
+                evolutionTier.name === 'Mega' ? 'bg-gradient-to-r from-orange-400 to-red-500' :
+                evolutionTier.name === 'Stage 2' ? 'bg-gradient-to-r from-yellow-400 to-orange-400' :
+                evolutionTier.name === 'Stage 1' ? 'bg-gradient-to-r from-purple-400 to-pink-400' :
+                evolutionTier.name === 'Basic' ? 'bg-gradient-to-r from-blue-400 to-cyan-400' :
+                evolutionTier.name === 'Baby' ? 'bg-gradient-to-r from-green-400 to-emerald-400' :
+                'bg-gray-500'
+              }`}
+            />
+          </div>
+          <div className="flex justify-between mt-1 text-xs text-gray-500">
+            <span>$0</span>
+            <span>$1M+</span>
+          </div>
+        </div>
+      )}
+
+      {/* Volume 24h */}
+      {priceData && priceData.volume24h > 0 && (
+        <div className="mb-4 flex items-center justify-between p-2 bg-gray-800/50 rounded-lg">
+          <span className="text-xs text-gray-400 flex items-center gap-1">
+            <BarChart3 className="w-3 h-3" />
+            24h Volume
+          </span>
+          <span className="font-pixel text-sm text-white">
+            {formatMarketCap(priceData.volume24h)}
+          </span>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-5 gap-2 mb-4">
