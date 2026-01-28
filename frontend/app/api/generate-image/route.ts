@@ -1,15 +1,121 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
-// Generate a Pokemon-style SVG image based on creature stats
-function generateCreatureSVG(creature: any): string {
+// Lazy initialization of OpenAI client
+let openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
+
+// ============================================
+// POKEMON STYLE GUIDE - Must be followed
+// ============================================
+const STYLE_GUIDE = {
+  // Visual baseline for DALL-E prompts
+  visualRules: [
+    "Cute, chibi-style creature design",
+    "Round, friendly eyes with expressive pupils",
+    "Proportional body parts (large head, small body - classic Pokemon proportions)",
+    "Smooth, clean lines without excessive detail",
+    "Vibrant, saturated colors matching the element type",
+    "Pure white background",
+    "No text, no watermarks, no signatures, no borders",
+    "Front-facing or 3/4 view pose",
+    "Cell-shaded or soft-shaded rendering style",
+    "Consistent soft lighting from upper left",
+  ],
+  
+  // Art style modifiers
+  artStyle: "digital art, Pokemon official artwork style, Ken Sugimori inspired, clean vector-like illustration, game asset, high quality render",
+  
+  // Element visual traits for prompts
+  elementTraits: {
+    Fire: "flame accents on body, warm color palette (red/orange/yellow), smoke or ember particles, heat waves",
+    Water: "flowing fins, aquatic features, blue/cyan palette, droplet or bubble effects, smooth skin",
+    Grass: "leaf or flower decorations, plant-like features, green/brown palette, pollen particles, bark texture",
+    Electric: "bolt patterns, spiky fur or scales, yellow/orange palette, spark effects, crackling energy",
+    Ice: "crystalline features, snow accents, blue/white palette, frost breath effect, icicle details",
+    Fighting: "muscular build, bandages or belts, red/brown palette, determined expression, combat stance",
+    Poison: "slime trails, gas clouds, purple/green palette, toxic bubble effects, dripping venom",
+    Ground: "rocky armor, earth tones, brown/tan palette, dust particle effects, dirt textures",
+    Flying: "wing features, cloud accents, sky blue/white palette, wind swirl effects, feather details",
+    Psychic: "mystical aura, gem-like eyes, pink/purple palette, energy wave effects, floating objects",
+    Bug: "exoskeleton features, antennae, green/yellow palette, wing flutter effects, compound eyes",
+    Rock: "stone skin, crystal growths, gray/brown palette, gravel particle effects, mineral veins",
+    Ghost: "translucent body, ethereal wisps, purple/black palette, spirit flame effects, floating",
+    Dragon: "scale patterns, horn features, deep color palette, ancient energy aura, reptilian features",
+    Dark: "shadow accents, red eyes, dark purple/black palette, darkness swirl effects, stealthy pose",
+    Steel: "metallic plating, gear or bolt details, silver/gray palette, shine reflections, mechanical parts",
+    Fairy: "sparkle effects, pastel colors, wing or ribbon features, heart/star motifs, magical aura",
+  },
+  
+  // Size classifications for creature design
+  sizeClasses: {
+    tiny: "tiny size, fits in palm, baby-like proportions",
+    small: "small size, compact body, cute proportions",
+    medium: "medium size, balanced proportions",
+    large: "large size, imposing presence, powerful build",
+  }
+};
+
+// Build DALL-E prompt from creature traits
+function buildDallePrompt(creature: any): string {
+  const { 
+    name, 
+    element, 
+    species, 
+    hp, 
+    attack, 
+    defense, 
+    speed, 
+    special,
+    visualTraits,
+    description 
+  } = creature;
+  
+  // Determine size class based on stats
+  const avgStat = (hp + attack + defense + speed + special) / 5;
+  let sizeClass = 'small';
+  if (avgStat < 60) sizeClass = 'tiny';
+  else if (avgStat < 80) sizeClass = 'small';
+  else if (avgStat < 100) sizeClass = 'medium';
+  else sizeClass = 'large';
+  
+  // Get element-specific visual traits
+  const elementVisuals = STYLE_GUIDE.elementTraits[element as keyof typeof STYLE_GUIDE.elementTraits] || '';
+  const sizeVisuals = STYLE_GUIDE.sizeClasses[sizeClass as keyof typeof STYLE_GUIDE.sizeClasses];
+  
+  // Build the prompt
+  const prompt = `A Pokemon-style creature called "${name}" the ${species}, ${element}-type. 
+
+Physical description:
+- ${sizeVisuals}
+- ${elementVisuals}
+- ${visualTraits || elementVisuals}
+
+Design rules (MUST FOLLOW):
+- ${STYLE_GUIDE.visualRules.join('\n- ')}
+
+Style: ${STYLE_GUIDE.artStyle}
+
+The creature should look like an official Pokemon from the game series, with the playful, appealing aesthetic that Pokemon are known for. Name: ${name}, Element: ${element}.`;
+
+  return prompt;
+}
+
+// Generate fallback SVG if DALL-E fails
+function generateFallbackSVG(creature: any): string {
   const { name, element, hp, attack, defense, speed, special, colorPalette } = creature;
   
-  // Create a deterministic pattern based on stats
   const primaryColor = colorPalette[0];
   const secondaryColor = colorPalette[1] || colorPalette[0];
   const accentColor = colorPalette[2] || '#FFFFFF';
   
-  // Generate SVG with Pokemon-style card design
   const svg = `
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -79,12 +185,12 @@ function generateCreatureSVG(creature: any): string {
   <g transform="translate(80, 450)">
     <text x="0" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666">HP</text>
     <rect x="30" y="-10" width="100" height="12" fill="#E0E0E0" rx="6"/>
-    <rect x="30" y="-10" width="${hp}" height="12" fill="#FF5722" rx="6"/>
+    <rect x="30" y="-10" width="${Math.min(hp, 100)}" height="12" fill="#FF5722" rx="6"/>
     <text x="140" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${hp}</text>
     
     <text x="200" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666">ATK</text>
     <rect x="230" y="-10" width="100" height="12" fill="#E0E0E0" rx="6"/>
-    <rect x="230" y="-10" width="${attack}" height="12" fill="#F44336" rx="6"/>
+    <rect x="230" y="-10" width="${Math.min(attack, 100)}" height="12" fill="#F44336" rx="6"/>
     <text x="340" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${attack}</text>
   </g>
 </svg>`;
@@ -95,7 +201,7 @@ function generateCreatureSVG(creature: any): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { creature } = body;
+    const { creature, useDalle = true } = body;
     
     if (!creature) {
       return NextResponse.json(
@@ -104,40 +210,56 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Generate SVG image
-    const svg = generateCreatureSVG(creature);
-    
-    // Convert SVG to base64
+    // Always generate fallback SVG first
+    const svg = generateFallbackSVG(creature);
     const base64 = Buffer.from(svg).toString('base64');
-    const imageBase64 = `data:image/svg+xml;base64,${base64}`;
+    const fallbackImageBase64 = `data:image/svg+xml;base64,${base64}`;
     
-    // Also try to generate with AI if possible (Pollinations.ai is free)
-    let aiImageUrl = null;
-    try {
-      const prompt = encodeURIComponent(
-        `Pokemon-style creature named "${creature.name}", ${creature.element}-type, ${creature.species}, ` +
-        `cute monster with stats HP:${creature.hp} ATK:${creature.attack} DEF:${creature.defense}, ` +
-        `colors: ${creature.colorPalette.join(', ')}, white background, digital art style`
-      );
-      aiImageUrl = `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&nologo=true&seed=${creature.dna.slice(0, 10)}`;
-    } catch (e) {
-      console.log('AI image generation not available, using SVG');
+    // Try DALL-E if enabled and API key is available
+    let dalleImageUrl = null;
+    
+    const openaiClient = getOpenAI();
+    if (useDalle && openaiClient) {
+      try {
+        const prompt = buildDallePrompt(creature);
+        
+        console.log('Generating DALL-E image with prompt:', prompt.slice(0, 200) + '...');
+        
+        const response = await openaiClient.images.generate({
+          model: "dall-e-3",
+          prompt: prompt,
+          n: 1,
+          size: "1024x1024",
+          quality: "standard",
+          style: "vivid",
+        });
+        
+        dalleImageUrl = response.data?.[0]?.url || null;
+        
+        console.log('DALL-E image generated successfully');
+      } catch (dalleError) {
+        console.error('DALL-E generation failed:', dalleError);
+        // Fall back to SVG
+      }
     }
     
+    // Return both the DALL-E URL (if successful) and fallback SVG
     return NextResponse.json({
-      imageUrl: aiImageUrl || imageBase64,
-      imageBase64,
+      imageUrl: dalleImageUrl || fallbackImageBase64,
+      imageBase64: fallbackImageBase64,
+      dallePrompt: useDalle ? buildDallePrompt(creature) : null,
+      usedDalle: !!dalleImageUrl,
       metadata: {
         name: creature.name,
         description: creature.description,
-        image: aiImageUrl || imageBase64,
+        image: dalleImageUrl || fallbackImageBase64,
       },
     });
   } catch (error) {
     console.error('Generate image API error:', error);
     
     return NextResponse.json(
-      { error: 'Failed to generate image' },
+      { error: 'Failed to generate image', details: (error as Error).message },
       { status: 500 }
     );
   }

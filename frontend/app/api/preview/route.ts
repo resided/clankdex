@@ -1,29 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-// Creature name components
-const NAME_PREFIXES = [
-  'Clank', 'Block', 'Chain', 'Ether', 'Crypto', 'Pixel', 'Data', 'Net', 'Cyber', 'Digi',
-  'Neo', 'Quantum', 'Flux', 'Nova', 'Star', 'Cosmo', 'Astro', 'Meta', 'Hyper', 'Ultra',
-  'Thunder', 'Storm', 'Fire', 'Ice', 'Shadow', 'Light', 'Dark', 'Solar', 'Lunar', 'Void'
-];
+// ============================================
+// POKEMON STYLE GUIDE - All characters must follow
+// ============================================
+const POKEMON_STYLE_GUIDE = {
+  // Visual baseline for DALL-E prompts
+  visualRules: [
+    "Cute, chibi-style creature design",
+    "Round, friendly eyes with expressive pupils",
+    "Proportional body parts (large head, small body)",
+    "Smooth, clean lines without excessive detail",
+    "Vibrant, saturated colors matching the element type",
+    "White or simple gradient background",
+    "No text, no watermarks, no signatures",
+    "Front-facing or 3/4 view pose",
+    "Cell-shaded or soft-shaded rendering style",
+    "Consistent lighting from upper left",
+  ],
+  
+  // Art style modifiers
+  artStyle: "digital art, Pokemon official artwork style, Ken Sugimori inspired, clean vector-like illustration, game asset",
+  
+  // Element visual traits
+  elementTraits: {
+    Fire: "flame accents on body, warm color palette (red/orange/yellow), smoke or ember particles",
+    Water: "flowing fins, aquatic features, blue/cyan palette, droplet or bubble effects",
+    Grass: "leaf or flower decorations, plant-like features, green/brown palette, pollen particles",
+    Electric: "bolt patterns, spiky fur/scales, yellow/orange palette, spark/arc effects",
+    Ice: "crystalline features, snow accents, blue/white palette, frost breath effect",
+    Fighting: "muscular build, bandages or belts, red/brown palette, determined expression",
+    Poison: "slime trails, gas clouds, purple/green palette, toxic bubble effects",
+    Ground: "rocky armor, earth tones, brown/tan palette, dust particle effects",
+    Flying: "wing features, cloud accents, sky blue/white palette, wind swirl effects",
+    Psychic: "mystical aura, gem-like eyes, pink/purple palette, energy wave effects",
+    Bug: "exoskeleton features, antennae, green/yellow palette, wing flutter effects",
+    Rock: "stone skin, crystal growths, gray/brown palette, gravel particle effects",
+    Ghost: "translucent body, ethereal wisps, purple/black palette, spirit flame effects",
+    Dragon: "scale patterns, horn features, deep color palette, ancient energy aura",
+    Dark: "shadow accents, red eyes, dark purple/black palette, darkness swirl effects",
+    Steel: "metallic plating, gear or bolt details, silver/gray palette, shine reflections",
+    Fairy: "sparkle effects, pastel colors, wing or ribbon features, heart/star motifs",
+  }
+};
 
-const NAME_SUFFIXES = [
-  'mon', 'beast', 'ling', 'oid', 'tron', 'bot', 'byte', 'bit', 'chip', 'node',
-  'rex', 'gon', 'wing', 'tail', 'fang', 'claw', 'horn', 'scale', 'shell', 'fin',
-  'puff', 'buzz', 'zip', 'spark', 'flash', 'bolt', 'volt', 'core', 'flux', 'wave'
-];
+// ============================================
+// POKEMON-STYLE NAME GENERATION
+// ============================================
+const NAME_SYLLABLES = {
+  // Pokemon-sounding prefixes (2-3 syllables)
+  prefixes: [
+    // Classic Pokemon vibes
+    'Pika', 'Char', 'Bulba', 'Squi', 'Jiggly', 'Meow', 'Psy', 'Abra', 'Kada', 'Ala',
+    'Ratta', 'Spear', 'Ekans', 'Arbok', 'Sand', 'Nido', 'Vulpix', 'Nineta', 'Zubat', 'Golbat',
+    'Oddish', 'Gloom', 'Vile', 'Para', 'Venon', 'Dig', 'Meowth', 'Persian', 'Psyduck', 'Golduck',
+    'Mankey', 'Prime', 'Growl', 'Arcan', 'Poliwag', 'Poly', 'Kadabra', 'Machop', 'Machoke', 'Bellsprout',
+    // Blockchain themed
+    'Block', 'Chain', 'Hash', 'Ether', 'Crypto', 'Token', 'Coin', 'Ledger', 'Node', 'Mine',
+    'Stake', 'Yield', 'Swap', 'Mint', 'Vault', 'Asset', 'Trade', 'Pool', 'Gas', 'Nonce',
+    // Cute extensions
+    'Fluff', 'Spark', 'Bubb', 'Giggly', 'Snor', 'Lap', 'Eevee', 'Vapore', 'Jolt', 'Flareon',
+    'Pory', 'Omany', 'Kaba', 'Aero', 'Snorl', 'Drati', 'Mew', 'Chiko', 'Cynda', 'Toto',
+  ],
+  
+  // Pokemon-sounding suffixes
+  suffixes: [
+    // Classic suffixes
+    'chu', 'mander', 'saur', 'rtle', 'puff', 'duck', 'der', 'bra', 'bok', 'shrew',
+    'queen', 'king', 'dude', 'drill', 'pan', 'ape', 'pix', 'tales', 'bat', 'bone',
+    'lash', 'trike', 'pod', 'bug', 'cruel', 'tung', 'duo', 'drio', 'dewgong', 'grimer',
+    'muk', 'shell', 'cruel', 'gastly', 'haunter', 'gengar', 'onix', 'drowzee', 'hypno', 'krabby',
+    'kingler', 'voltorb', 'electrode', 'exeggcute', 'cubone', 'marowak', 'hitmon', 'lickitung', 'koffing', 'weezing',
+    'rhyhorn', 'chansey', 'tangela', 'kangas', 'horsea', 'seadra', 'goldeen', 'seaking', 'staryu', 'starmie',
+    'mr-mime', 'scyther', 'jynx', 'electabuzz', 'magmar', 'pinsir', 'tauros', 'magikarp', 'gyarados', 'lapras',
+    'ditto', 'eevee', 'porygon', 'omanyte', 'kabuto', 'aerodactyl', 'snorlax', 'articuno', 'zapdos', 'moltres',
+    'dratini', 'dragonair', 'dragonite', 'mewtwo', 'mew',
+    // Generic creature suffixes
+    'mon', 'ling', 'oid', 'ite', 'eon', 'py', 'by', 'ny', 'saur', 'rex',
+    'dactyl', 'nax', 'thyst', 'gon', 'nix', 'pix', 'lux', 'vex', 'max', 'jax',
+  ]
+};
 
 const ELEMENTS = [
   'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting', 'Poison', 'Ground', 
   'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
-];
-
-const SPECIES_TYPES = [
-  'Blockchain Beast', 'Hash Hound', 'Crypto Critter', 'Ether Entity', 'Token Titan',
-  'Wallet Wyrm', 'DeFi Dragon', 'Smart Contract Slime', 'Ledger Leviathan', 'Gas Ghost',
-  'Nonce Knight', 'Block Basilisk', 'Chain Chimera', 'Node Naga', 'Protocol Phoenix',
-  'Consensus Chimera', 'Validator Viper', 'Stake Sphinx', 'Yield Yeti', 'Liquidity Lizard'
 ];
 
 // Hash function for deterministic generation
@@ -37,27 +97,111 @@ function getHashValue(hash: string, position: number, max: number): number {
   return parseInt(segment, 16) % max;
 }
 
-// Generate unique creature from wallet address
-function generateCreatureFromWallet(address: string) {
+// Generate Pokemon-style name
+function generatePokemonName(address: string): string {
   const hash = hashString(address);
   
-  // Generate name
-  const prefix = NAME_PREFIXES[getHashValue(hash, 0, NAME_PREFIXES.length)];
-  const suffix = NAME_SUFFIXES[getHashValue(hash, 1, NAME_SUFFIXES.length)];
-  const name = `${prefix}${suffix}`;
+  // 70% chance of classic Pokemon name structure
+  const useClassic = getHashValue(hash, 0, 100) < 70;
+  
+  if (useClassic) {
+    // Prefix + Suffix structure
+    const prefix = NAME_SYLLABLES.prefixes[getHashValue(hash, 1, NAME_SYLLABLES.prefixes.length)];
+    const suffix = NAME_SYLLABLES.suffixes[getHashValue(hash, 2, NAME_SYLLABLES.suffixes.length)];
+    
+    // Sometimes add a middle syllable for longer names
+    if (getHashValue(hash, 3, 100) < 30) {
+      const middle = NAME_SYLLABLES.prefixes[getHashValue(hash, 4, NAME_SYLLABLES.prefixes.length)].slice(0, 3);
+      return `${prefix}${middle}${suffix}`;
+    }
+    
+    return `${prefix}${suffix}`;
+  } else {
+    // Creative compound name
+    const part1 = NAME_SYLLABLES.prefixes[getHashValue(hash, 1, NAME_SYLLABLES.prefixes.length)];
+    const part2 = NAME_SYLLABLES.prefixes[getHashValue(hash, 5, NAME_SYLLABLES.prefixes.length)];
+    return `${part1}${part2.toLowerCase()}`;
+  }
+}
+
+// Fetch wallet data from Neynar
+async function fetchWalletData(address: string) {
+  try {
+    const apiKey = process.env.NEYNAR_API_KEY;
+    if (!apiKey) {
+      console.log('Neynar API key not configured, using hash-based generation');
+      return null;
+    }
+    
+    // Fetch user data by custody address
+    const response = await fetch(`https://api.neynar.com/v2/farcaster/user/custody-address?custody_address=${address}`, {
+      headers: {
+        'accept': 'application/json',
+        'api_key': apiKey,
+      },
+    });
+    
+    if (!response.ok) {
+      console.log('Neynar fetch failed:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.user || null;
+  } catch (error) {
+    console.error('Neynar API error:', error);
+    return null;
+  }
+}
+
+// Generate creature from wallet with Neynar data
+async function generateCreatureFromWallet(address: string, neynarData: any | null) {
+  const hash = hashString(address);
+  
+  // Generate Pokemon-style name
+  const name = generatePokemonName(address);
   
   // Generate element
-  const element = ELEMENTS[getHashValue(hash, 2, ELEMENTS.length)];
+  const element = ELEMENTS[getHashValue(hash, 10, ELEMENTS.length)];
   
-  // Generate species
-  const species = SPECIES_TYPES[getHashValue(hash, 3, SPECIES_TYPES.length)];
+  // Generate species based on element
+  const speciesTypes: Record<string, string[]> = {
+    Fire: ['Flame Pokemon', 'Ember Pokemon', 'Blaze Pokemon'],
+    Water: ['Aqua Pokemon', 'Torrent Pokemon', 'Bubble Pokemon'],
+    Grass: ['Seed Pokemon', 'Leaf Pokemon', 'Bloom Pokemon'],
+    Electric: ['Thunder Pokemon', 'Spark Pokemon', 'Volt Pokemon'],
+    Ice: ['Frost Pokemon', 'Snow Pokemon', 'Glacier Pokemon'],
+    Fighting: ['Fighting Pokemon', 'Combat Pokemon', 'Brawler Pokemon'],
+    Poison: ['Toxic Pokemon', 'Venom Pokemon', 'Poison Pokemon'],
+    Ground: ['Earth Pokemon', 'Terrain Pokemon', 'Burrow Pokemon'],
+    Flying: ['Wing Pokemon', 'Sky Pokemon', 'Gale Pokemon'],
+    Psychic: ['Psi Pokemon', 'Mind Pokemon', 'Mystic Pokemon'],
+    Bug: ['Insect Pokemon', 'Cocoon Pokemon', 'Swarm Pokemon'],
+    Rock: ['Stone Pokemon', 'Boulder Pokemon', 'Crag Pokemon'],
+    Ghost: ['Specter Pokemon', 'Spirit Pokemon', 'Shadow Pokemon'],
+    Dragon: ['Dragon Pokemon', 'Wyrm Pokemon', 'Drake Pokemon'],
+    Dark: ['Darkness Pokemon', 'Night Pokemon', 'Shadow Pokemon'],
+    Steel: ['Iron Pokemon', 'Metal Pokemon', 'Chrome Pokemon'],
+    Fairy: ['Fairy Pokemon', 'Pixie Pokemon', 'Enchant Pokemon'],
+  };
   
-  // Generate stats (50-150 range based on hash)
-  const hp = 50 + getHashValue(hash, 4, 100);
-  const attack = 50 + getHashValue(hash, 5, 100);
-  const defense = 50 + getHashValue(hash, 6, 100);
-  const speed = 50 + getHashValue(hash, 7, 100);
-  const special = 50 + getHashValue(hash, 8, 100);
+  const species = speciesTypes[element][getHashValue(hash, 11, 3)];
+  
+  // Generate stats influenced by Neynar data if available
+  let statModifier = 0;
+  if (neynarData) {
+    // Boost stats based on social activity
+    const followerCount = neynarData.follower_count || 0;
+    const followingCount = neynarData.following_count || 0;
+    statModifier = Math.min(30, Math.floor((followerCount + followingCount) / 100));
+  }
+  
+  // Generate stats (50-150 range based on hash + Neynar modifier)
+  const hp = 50 + getHashValue(hash, 12, 100) + statModifier;
+  const attack = 50 + getHashValue(hash, 13, 100) + statModifier;
+  const defense = 50 + getHashValue(hash, 14, 100) + statModifier;
+  const speed = 50 + getHashValue(hash, 15, 100) + statModifier;
+  const special = 50 + getHashValue(hash, 16, 100) + statModifier;
   
   // Generate color palette based on element
   const colorPalettes: Record<string, string[]> = {
@@ -84,16 +228,19 @@ function generateCreatureFromWallet(address: string) {
   
   // Generate description
   const descriptions = [
-    `A fierce ${element.toLowerCase()}-type creature born from blockchain transactions.`,
-    `This ${element.toLowerCase()}-type ${species.toLowerCase()} emerged from the depths of the chain.`,
-    `A mystical ${element.toLowerCase()} creature with powers drawn from wallet entropy.`,
-    `Born from the hash of countless transactions, this ${element.toLowerCase()}-type beast roams the blockchain.`,
-    `A legendary ${element.toLowerCase()}-type creature with stats determined by on-chain activity.`,
+    `The ${element} ${species.toLowerCase()}. It stores energy in its body from blockchain transactions.`,
+    `A ${element.toLowerCase()}-type creature discovered in the digital realm. Its power grows with wallet activity.`,
+    `This ${species.toLowerCase()} draws strength from on-chain entropy. Trainers value its ${element.toLowerCase()} abilities.`,
+    `Found deep within the blockchain. This ${element.toLowerCase()}-type ${name.toLowerCase()} evolves through transactions.`,
+    `A mysterious ${species.toLowerCase()} with ${element.toLowerCase()} powers. Its stats reflect the wallet's journey.`,
   ];
-  const description = descriptions[getHashValue(hash, 9, descriptions.length)];
+  const description = descriptions[getHashValue(hash, 17, descriptions.length)];
   
   // Generate DNA from address
   const dna = BigInt('0x' + hash.slice(0, 16)).toString();
+  
+  // Build visual traits for DALL-E
+  const visualTraits = POKEMON_STYLE_GUIDE.elementTraits[element as keyof typeof POKEMON_STYLE_GUIDE.elementTraits];
   
   return {
     name,
@@ -108,6 +255,13 @@ function generateCreatureFromWallet(address: string) {
     special,
     description,
     colorPalette,
+    visualTraits,
+    neynarData: neynarData ? {
+      username: neynarData.username,
+      displayName: neynarData.display_name,
+      followerCount: neynarData.follower_count,
+      followingCount: neynarData.following_count,
+    } : null,
   };
 }
 
@@ -126,26 +280,36 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Fetch Neynar data if we have an address
+    let neynarData = null;
+    if (address) {
+      neynarData = await fetchWalletData(address);
+    }
+    
     // Generate creature from wallet/Farcaster identifier
-    const creature = generateCreatureFromWallet(seed);
+    const creature = await generateCreatureFromWallet(seed, neynarData);
     
     // Generate image URL using our image generation API
     const imageResponse = await fetch(new URL('/api/generate-image', request.url).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ creature }),
+      body: JSON.stringify({ creature, useDalle: true }),
     });
     
+    let imageUrl = null;
     let imageBase64 = null;
     if (imageResponse.ok) {
       const imageData = await imageResponse.json();
+      imageUrl = imageData.imageUrl;
       imageBase64 = imageData.imageBase64;
     }
     
     return NextResponse.json({
       creature,
+      imageUrl,
       imageBase64,
-      farcasterData: identifier ? { username: identifier } : null,
+      styleGuide: POKEMON_STYLE_GUIDE,
+      farcasterData: creature.neynarData || (identifier ? { username: identifier } : null),
     });
   } catch (error) {
     console.error('Preview API error:', error);

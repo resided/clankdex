@@ -1,30 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-// Generate unique token symbol from creature name
-function generateTokenSymbol(name: string, identifier: string): string {
-  // Take first 4 chars of name + first 2 chars of identifier
-  const prefix = name.slice(0, 4).toUpperCase();
-  const suffix = identifier.slice(0, 2).toUpperCase();
-  return `${prefix}${suffix}`;
+// ============================================
+// POKEMON-STYLE TOKEN SYMBOL GENERATION
+// ============================================
+
+function generateTokenSymbol(creature: any): string {
+  const { name, element } = creature;
+  
+  // Extract 2-4 letter prefix from creature name
+  let prefix = name.slice(0, 4).toUpperCase();
+  
+  // If name is short, pad with element abbreviation
+  if (prefix.length < 3) {
+    const elementAbbr: Record<string, string> = {
+      Fire: 'FR', Water: 'WT', Grass: 'GR', Electric: 'EL', Ice: 'IC',
+      Fighting: 'FG', Poison: 'PS', Ground: 'GD', Flying: 'FL', Psychic: 'PS',
+      Bug: 'BG', Rock: 'RK', Ghost: 'GH', Dragon: 'DG', Dark: 'DK', Steel: 'ST', Fairy: 'FY',
+    };
+    prefix = `${prefix}${elementAbbr[element] || 'MN'}`;
+  }
+  
+  // Ensure 3-5 characters
+  prefix = prefix.slice(0, 5);
+  
+  return prefix;
 }
 
-// Generate token metadata URI
-function generateMetadataURI(creature: any): string {
+function generateMetadataURI(creature: any, identifier: string): string {
   const metadata = {
     name: creature.name,
     description: creature.description,
     image: creature.imageURI || '',
+    external_url: `https://clankdex.io/creature/${creature.dna.slice(0, 16)}`,
     attributes: [
       { trait_type: 'Element', value: creature.element },
       { trait_type: 'Species', value: creature.species },
-      { trait_type: 'Level', value: creature.level },
-      { trait_type: 'HP', value: creature.hp },
-      { trait_type: 'Attack', value: creature.attack },
-      { trait_type: 'Defense', value: creature.defense },
-      { trait_type: 'Speed', value: creature.speed },
-      { trait_type: 'Special', value: creature.special },
+      { trait_type: 'Level', value: creature.level, display_type: 'number' },
+      { trait_type: 'HP', value: creature.hp, display_type: 'number' },
+      { trait_type: 'Attack', value: creature.attack, display_type: 'number' },
+      { trait_type: 'Defense', value: creature.defense, display_type: 'number' },
+      { trait_type: 'Speed', value: creature.speed, display_type: 'number' },
+      { trait_type: 'Special', value: creature.special, display_type: 'number' },
+      { trait_type: 'Total Stats', value: creature.hp + creature.attack + creature.defense + creature.speed + creature.special, display_type: 'number' },
+      { trait_type: 'Origin', value: 'Farcaster' },
+      { trait_type: 'Creator', value: identifier },
     ],
+    properties: {
+      category: 'Pokemon-style Creature',
+      creators: [{ address: identifier, share: 100 }],
+    }
   };
   
   const json = JSON.stringify(metadata);
@@ -62,8 +87,8 @@ export async function POST(request: NextRequest) {
       creatureData = previewData.creature;
     }
     
-    // Generate unique token symbol
-    const symbol = generateTokenSymbol(creatureData.name, identifier);
+    // Generate Pokemon-style token symbol
+    const symbol = generateTokenSymbol(creatureData);
     
     // Generate deterministic token address
     const hash = crypto.createHash('sha256')
@@ -72,7 +97,7 @@ export async function POST(request: NextRequest) {
     const tokenAddress = `0x${hash.slice(0, 40)}`;
     
     // Generate metadata URI
-    const metadataURI = generateMetadataURI(creatureData);
+    const metadataURI = generateMetadataURI(creatureData, identifier);
     
     const result = {
       success: true,
