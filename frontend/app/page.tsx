@@ -443,8 +443,25 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-pokemon-world py-8 px-4 relative">
+      {/* Animated Background Elements */}
+      <div className="gradient-orb gradient-orb-1" />
+      <div className="gradient-orb gradient-orb-2" />
+      <div className="gradient-orb gradient-orb-3" />
+      <div className="particles">
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+        <div className="particle" />
+      </div>
+
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <header className="text-center mb-8">
           <motion.div
