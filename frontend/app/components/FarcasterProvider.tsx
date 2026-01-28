@@ -1,47 +1,29 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import sdk, { Context } from '@farcaster/miniapp-sdk';
 
-// Types for Farcaster Frame SDK
-interface FarcasterContext {
-  user: {
-    fid: number;
-    username?: string;
-    displayName?: string;
-    pfpUrl?: string;
-    custodyAddress?: string;
-    verifiedAddresses?: string[];
-  } | null;
-}
-
-interface FrameSDK {
-  context: FarcasterContext;
-  actions: {
-    ready: (options?: { disableNativeGestures?: boolean }) => Promise<void>;
-    close: () => Promise<void>;
-    openUrl: (url: string) => Promise<void>;
-    composeCast: (params: { text?: string; embeds?: string[] }) => Promise<void>;
-    addFrame: () => Promise<void>;
-  };
-  wallet: {
-    ethProvider: any;
-  };
-}
+type MiniAppContext = Context.MiniAppContext;
+type UserContext = Context.UserContext;
 
 interface FarcasterContextType {
-  sdk: FrameSDK | null;
+  context: MiniAppContext | null;
   isFrameContext: boolean;
-  user: FarcasterContext['user'];
+  user: UserContext | null;
   isReady: boolean;
   composeCast: (text: string, embeds?: string[]) => Promise<void>;
+  openUrl: (url: string) => Promise<void>;
+  close: () => Promise<void>;
 }
 
 const FarcasterCtx = createContext<FarcasterContextType>({
-  sdk: null,
+  context: null,
   isFrameContext: false,
   user: null,
   isReady: false,
   composeCast: async () => {},
+  openUrl: async () => {},
+  close: async () => {},
 });
 
 export function useFarcaster() {
@@ -49,40 +31,37 @@ export function useFarcaster() {
 }
 
 export function FarcasterProvider({ children }: { children: ReactNode }) {
-  const [sdk, setSdk] = useState<FrameSDK | null>(null);
+  const [context, setContext] = useState<MiniAppContext | null>(null);
   const [isFrameContext, setIsFrameContext] = useState(false);
-  const [user, setUser] = useState<FarcasterContext['user']>(null);
+  const [user, setUser] = useState<UserContext | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const initFarcaster = async () => {
       try {
-        // Only import in browser
+        // Only run in browser
         if (typeof window === 'undefined') return;
 
-        // Dynamic import of the Frame SDK
-        const { sdk: frameSdk } = await import('@farcaster/frame-sdk');
+        // Get the context from the miniapp SDK
+        const miniAppContext = await sdk.context;
 
-        // Check if we're in a frame context
-        const context = await frameSdk.context;
-
-        if (context && context.user) {
-          console.log('Running in Farcaster frame context');
+        if (miniAppContext && miniAppContext.user) {
+          console.log('Running in Farcaster miniapp context', miniAppContext);
           setIsFrameContext(true);
-          setUser(context.user);
-          setSdk(frameSdk as unknown as FrameSDK);
+          setContext(miniAppContext);
+          setUser(miniAppContext.user);
 
-          // Signal that the app is ready
-          await frameSdk.actions.ready({ disableNativeGestures: false });
-          console.log('Farcaster SDK ready');
+          // Signal that the app is ready to be displayed
+          await sdk.actions.ready();
+          console.log('Farcaster miniapp SDK ready');
         } else {
-          console.log('Not in Farcaster frame context, running standalone');
+          console.log('Not in Farcaster miniapp context, running standalone');
           setIsFrameContext(false);
         }
 
         setIsReady(true);
       } catch (error) {
-        console.log('Farcaster SDK not available:', error);
+        console.log('Farcaster miniapp SDK not available:', error);
         setIsFrameContext(false);
         setIsReady(true);
       }
@@ -91,22 +70,60 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
     initFarcaster();
   }, []);
 
-  const composeCast = async (text: string, embeds?: string[]) => {
-    if (sdk && isFrameContext) {
-      await sdk.actions.composeCast({ text, embeds });
-    } else {
-      // Fallback to Warpcast web
-      const params = new URLSearchParams({ text });
-      if (embeds?.length) {
-        params.append('embeds[]', embeds[0]);
+  const composeCast = useCallback(async (text: string, embeds?: string[]) => {
+    if (isFrameContext) {
+      try {
+        // SDK expects embeds as tuple: [] | [string] | [string, string]
+        let embedsTuple: [] | [string] | [string, string] | undefined;
+        if (embeds && embeds.length > 0) {
+          if (embeds.length === 1) {
+            embedsTuple = [embeds[0]];
+          } else {
+            embedsTuple = [embeds[0], embeds[1]];
+          }
+        }
+        await sdk.actions.composeCast({
+          text,
+          embeds: embedsTuple,
+        });
+      } catch (error) {
+        console.error('Failed to compose cast:', error);
+        openWarpcastCompose(text, embeds);
       }
-      window.open(`https://warpcast.com/~/compose?${params.toString()}`, '_blank');
+    } else {
+      openWarpcastCompose(text, embeds);
     }
-  };
+  }, [isFrameContext]);
+
+  const openUrl = useCallback(async (url: string) => {
+    if (isFrameContext) {
+      try {
+        await sdk.actions.openUrl(url);
+      } catch (error) {
+        window.open(url, '_blank');
+      }
+    } else {
+      window.open(url, '_blank');
+    }
+  }, [isFrameContext]);
+
+  const close = useCallback(async () => {
+    if (isFrameContext) {
+      await sdk.actions.close();
+    }
+  }, [isFrameContext]);
 
   return (
-    <FarcasterCtx.Provider value={{ sdk, isFrameContext, user, isReady, composeCast }}>
+    <FarcasterCtx.Provider value={{ context, isFrameContext, user, isReady, composeCast, openUrl, close }}>
       {children}
     </FarcasterCtx.Provider>
   );
+}
+
+function openWarpcastCompose(text: string, embeds?: string[]) {
+  const params = new URLSearchParams({ text });
+  if (embeds?.length) {
+    embeds.forEach(embed => params.append('embeds[]', embed));
+  }
+  window.open(`https://warpcast.com/~/compose?${params.toString()}`, '_blank');
 }
