@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useContractWrite, useWaitForTransaction, useContractRead } from 'wagmi';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useFarcaster } from './components/FarcasterProvider';
@@ -29,7 +28,8 @@ import {
   AtSign,
   User,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  LogOut
 } from 'lucide-react';
 
 // Contract ABI for Registry
@@ -149,6 +149,8 @@ const RARITY_COLORS: Record<string, string> = {
 
 export default function Home() {
   const { address, isConnected } = useAccount();
+  const { connect, connectors, isPending: isConnecting } = useConnect();
+  const { disconnect } = useDisconnect();
   const { isFrameContext, user: frameUser, isReady: farcasterReady, composeCast } = useFarcaster();
   const [inputMode, setInputMode] = useState<InputMode>('wallet');
   const [farcasterInput, setFarcasterInput] = useState('');
@@ -419,11 +421,33 @@ export default function Home() {
         {/* Wallet Connect */}
         {inputMode === 'wallet' && (
           <div className="flex justify-center mb-8">
-            <ConnectButton 
-              showBalance={false}
-              accountStatus="address"
-              chainStatus="icon"
-            />
+            {isConnected ? (
+              <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-white font-mono text-sm">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </span>
+                <button
+                  onClick={() => disconnect()}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => connect({ connector: connectors[0] })}
+                disabled={isConnecting}
+                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-full transition-colors disabled:opacity-50"
+              >
+                {isConnecting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Wallet className="w-5 h-5" />
+                )}
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+              </button>
+            )}
           </div>
         )}
 
