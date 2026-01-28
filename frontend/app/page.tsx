@@ -698,7 +698,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
           <motion.img
             src={imageBase64}
             alt={creature?.name}
-            className="w-full h-full object-contain max-h-48"
+            className="w-full h-full object-contain max-h-72 md:max-h-80"
             animate={{ 
               y: [0, -8, 0],
               rotate: [0, 2, -2, 0]
@@ -711,7 +711,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
           />
         ) : (
           <motion.div
-            className="w-32 h-32 rounded-lg flex items-center justify-center"
+            className="w-48 h-48 md:w-56 md:h-56 rounded-lg flex items-center justify-center"
             style={{ backgroundColor: creature?.colorPalette[0] }}
             animate={{
               boxShadow: [
@@ -723,7 +723,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
             transition={{ duration: 2, repeat: Infinity }}
           >
             <motion.span 
-              className="text-6xl"
+              className="text-8xl"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             >
@@ -1477,7 +1477,7 @@ export default function Home() {
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                className="pokedex aspect-[3/4] max-w-sm mx-auto md:max-w-none"
+                className="pokedex aspect-[3/4] max-w-md mx-auto md:max-w-lg"
               >
                 {/* Top Section with LEDs */}
                 <div className="flex items-center gap-3 mb-4">
@@ -1490,8 +1490,8 @@ export default function Home() {
                   </span>
                 </div>
 
-                {/* Screen */}
-                <div className="pokedex-screen aspect-square mb-4 scanlines relative overflow-hidden">
+                {/* Screen - wider for bigger creature display */}
+                <div className="pokedex-screen aspect-[4/3] mb-4 scanlines relative overflow-hidden">
                   <div className="crt-overlay" />
 
                   {!showCreature ? (
