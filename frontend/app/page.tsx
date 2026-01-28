@@ -40,7 +40,21 @@ import {
   Crown,
   Star,
   Egg,
-  Baby
+  Baby,
+  Menu,
+  X,
+  RotateCcw,
+  Filter,
+  ArrowUpDown,
+  Target,
+  Crosshair,
+  Hexagon,
+  Triangle,
+  Circle,
+  Square,
+  Pentagon,
+  Octagon,
+  Diamond
 } from 'lucide-react';
 
 // Contract ABI for Registry
@@ -77,6 +91,229 @@ const REGISTRY_ABI = [
 
 const REGISTRY_ADDRESS = (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
 const CLANKER_URL = 'https://clanker.world';
+
+// Animation Components
+const AnimatedButton = ({ children, onClick, className, disabled, variant = 'primary' }: { 
+  children: React.ReactNode; 
+  onClick?: () => void; 
+  className?: string; 
+  disabled?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger' | 'success';
+}) => {
+  const variants = {
+    primary: 'bg-pokedex-red hover:bg-red-600',
+    secondary: 'bg-gray-700 hover:bg-gray-600',
+    danger: 'bg-red-700 hover:bg-red-600',
+    success: 'bg-green-600 hover:bg-green-500',
+  };
+
+  return (
+    <motion.button
+      whileHover={{ scale: disabled ? 1 : 1.02, y: disabled ? 0 : -2 }}
+      whileTap={{ scale: disabled ? 1 : 0.95, y: disabled ? 0 : 2 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      onClick={onClick}
+      disabled={disabled}
+      className={`btn-press relative px-6 py-3 font-pixel text-xs uppercase tracking-wider rounded-xl disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden ${variants[variant]} ${className}`}
+    >
+      <motion.div
+        className="absolute inset-0 bg-white/20"
+        initial={{ x: '-100%', opacity: 0 }}
+        whileHover={{ x: '100%', opacity: [0, 0.3, 0] }}
+        transition={{ duration: 0.6 }}
+      />
+      {children}
+    </motion.button>
+  );
+};
+
+const PokeballLoader = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
+  const sizes = { sm: 'w-8 h-8', md: 'w-12 h-12', lg: 'w-16 h-16' };
+  return (
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      className={`${sizes[size]} relative`}
+    >
+      <div className="absolute inset-0 rounded-full border-4 border-white overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1/2 bg-red-500" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-white" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 h-1/3 bg-white rounded-full border-4 border-black" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/6 h-1/6 bg-black rounded-full" />
+      </div>
+    </motion.div>
+  );
+};
+
+const TypewriterText = ({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) => {
+  const [displayText, setDisplayText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i <= text.length) {
+          setDisplayText(text.slice(0, i));
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => setShowCursor(false), 500);
+        }
+      }, 30);
+      return () => clearInterval(interval);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [text, delay]);
+  
+  return (
+    <span className={`font-pixel ${className} animate-cursor`}>
+      {displayText}
+      {showCursor && <span className="inline-block w-2 h-4 bg-current ml-0.5 animate-pulse" />}
+    </span>
+  );
+};
+
+const AnimatedStatBar = ({ value, max = 255, color = 'green', delay = 0 }: { value: number; max?: number; color?: string; delay?: number }) => {
+  const percentage = Math.min((value / max) * 100, 100);
+  const colors: Record<string, string> = {
+    green: 'from-green-400 to-green-600',
+    red: 'from-red-400 to-red-600',
+    blue: 'from-blue-400 to-blue-600',
+    yellow: 'from-yellow-400 to-yellow-600',
+    purple: 'from-purple-400 to-purple-600',
+  };
+  
+  return (
+    <div className="h-3 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${percentage}%` }}
+        transition={{ duration: 1, delay, ease: "easeOut" }}
+        className={`h-full bg-gradient-to-r ${colors[color]} relative overflow-hidden`}
+      >
+        <motion.div
+          className="absolute inset-0 bg-white/30"
+          animate={{ x: ['-100%', '100%'] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+        />
+      </motion.div>
+    </div>
+  );
+};
+
+const FloatingElement = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
+  <motion.div
+    animate={{ y: [0, -8, 0], rotate: [0, 1, -1, 0] }}
+    transition={{ duration: 4, delay, repeat: Infinity, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
+const CardFlip = ({ children, isFlipped = false }: { children: React.ReactNode; isFlipped?: boolean }) => (
+  <motion.div
+    initial={false}
+    animate={{ rotateY: isFlipped ? 180 : 0 }}
+    transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+    style={{ transformStyle: "preserve-3d" }}
+  >
+    {children}
+  </motion.div>
+);
+
+const StaggerContainer = ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  <motion.div
+    initial="hidden"
+    animate="visible"
+    variants={{
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1 }
+      }
+    }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
+
+const StaggerItem = ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  <motion.div
+    variants={{
+      hidden: { opacity: 0, y: 20, scale: 0.9 },
+      visible: { 
+        opacity: 1, 
+        y: 0, 
+        scale: 1,
+        transition: { type: "spring", stiffness: 300, damping: 24 }
+      }
+    }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
+
+const Badge = ({ children, color = 'blue', animate = true }: { children: React.ReactNode; color?: string; animate?: boolean }) => {
+  const colors: Record<string, string> = {
+    blue: 'bg-blue-500/20 border-blue-500 text-blue-400',
+    green: 'bg-green-500/20 border-green-500 text-green-400',
+    red: 'bg-red-500/20 border-red-500 text-red-400',
+    yellow: 'bg-yellow-500/20 border-yellow-500 text-yellow-400',
+    purple: 'bg-purple-500/20 border-purple-500 text-purple-400',
+    gray: 'bg-gray-500/20 border-gray-500 text-gray-400',
+  };
+  
+  return (
+    <motion.span
+      initial={animate ? { scale: 0, rotate: -10 } : false}
+      animate={{ scale: 1, rotate: 0 }}
+      transition={{ type: "spring", stiffness: 500, damping: 15 }}
+      whileHover={{ scale: 1.05, rotate: 2 }}
+      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${colors[color]}`}
+    >
+      {children}
+    </motion.span>
+  );
+};
+
+const MenuSlide = ({ children, isOpen, from = 'bottom' }: { children: React.ReactNode; isOpen: boolean; from?: 'bottom' | 'right' | 'left' | 'top' }) => {
+  const directions = {
+    bottom: { hidden: { y: '100%', opacity: 0 }, visible: { y: 0, opacity: 1 } },
+    top: { hidden: { y: '-100%', opacity: 0 }, visible: { y: 0, opacity: 1 } },
+    left: { hidden: { x: '-100%', opacity: 0 }, visible: { x: 0, opacity: 1 } },
+    right: { hidden: { x: '100%', opacity: 0 }, visible: { x: 0, opacity: 1 } },
+  };
+  
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={directions[from].hidden}
+          animate={directions[from].visible}
+          exit={directions[from].hidden}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="fixed inset-x-0 bottom-0 z-50 bg-gray-900/95 backdrop-blur-lg border-t border-gray-700 rounded-t-3xl p-6 max-h-[80vh] overflow-auto"
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const PageTransition = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 1.05 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
 
 type InputMode = 'wallet' | 'farcaster';
 
@@ -542,91 +779,152 @@ export default function Home() {
       </div>
 
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header */}
+        {/* Header with floating animation */}
         <header className="text-center mb-8">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ scale:0.9, opacity: 0, y: -20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
             className="inline-block"
           >
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-2xl">⚡</span>
-              <h1 className="font-pixel text-4xl md:text-6xl text-white drop-shadow-lg">
-                <span className="text-pokedex-red">CLANK</span>
-                <span className="text-pokedex-yellow">DEX</span>
-              </h1>
-              <span className="text-2xl">⚡</span>
-            </div>
-            <p className="text-gray-300 text-sm md:text-base">
+            <FloatingElement>
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Zap className="w-8 h-8 text-yellow-400" />
+                </motion.div>
+                <h1 className="font-pixel text-4xl md:text-6xl text-white drop-shadow-lg">
+                  <motion.span 
+                    className="text-pokedex-red inline-block"
+                    whileHover={{ scale: 1.1, rotate: -3 }}
+                  >
+                    CLANK
+                  </motion.span>
+                  <motion.span 
+                    className="text-pokedex-yellow inline-block"
+                    whileHover={{ scale: 1.1, rotate: 3 }}
+                  >
+                    DEX
+                  </motion.span>
+                </h1>
+                <motion.div
+                  animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                >
+                  <Zap className="w-8 h-8 text-yellow-400" />
+                </motion.div>
+              </div>
+            </FloatingElement>
+            <motion.p 
+              className="text-gray-300 text-sm md:text-base"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               Wallet Pokedex powered by <span className="text-yellow-400 font-bold">Clanker</span>
-            </p>
+            </motion.p>
           </motion.div>
         </header>
 
-        {/* View Mode Toggle */}
+        {/* View Mode Toggle with sliding indicator */}
         <div className="flex justify-center mb-6">
-          <div className="bg-gray-800/50 rounded-full p-1 flex gap-1">
-            <button
+          <div className="bg-gray-800/50 rounded-full p-1 flex gap-1 relative">
+            <motion.div
+              className="absolute inset-y-1 rounded-full bg-pokedex-red"
+              initial={false}
+              animate={{
+                x: viewMode === 'scan' ? 0 : '100%',
+                width: '50%',
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              style={{ left: 4 }}
+            />
+            <motion.button
               onClick={() => setViewMode('scan')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
-                viewMode === 'scan'
-                  ? 'bg-pokedex-red text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
+              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
+                viewMode === 'scan' ? 'text-white' : 'text-gray-400 hover:text-white'
               }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <ScanLine className="w-4 h-4" />
               Scan
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={() => setViewMode('collection')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
-                viewMode === 'collection'
-                  ? 'bg-pokedex-yellow text-black shadow-lg'
-                  : 'text-gray-400 hover:text-white'
+              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
+                viewMode === 'collection' ? 'text-black' : 'text-gray-400 hover:text-white'
               }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <BookOpen className="w-4 h-4" />
               Collection
               {clankdexEntries.length > 0 && (
-                <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">
+                <motion.span 
+                  className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                >
                   {clankdexEntries.length}
-                </span>
+                </motion.span>
               )}
-            </button>
+            </motion.button>
           </div>
         </div>
 
-        {viewMode === 'scan' && (
-          <>
+        <AnimatePresence mode="wait">
+          {viewMode === 'scan' && (
+          <motion.div
+            key="scan-view"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.3 }}
+          >
             {/* Input Mode Toggle */}
             <div className="flex justify-center mb-6">
-              <div className="bg-gray-800/50 rounded-full p-1 flex gap-1">
-                <button
+              <div className="bg-gray-800/50 rounded-full p-1 flex gap-1 relative">
+                <motion.div
+                  className="absolute inset-y-1 rounded-full bg-blue-600"
+                  initial={false}
+                  animate={{
+                    x: inputMode === 'wallet' ? 0 : '100%',
+                    width: '50%',
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  style={{ left: 4 }}
+                />
+                <motion.button
                   onClick={() => setInputMode('wallet')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    inputMode === 'wallet'
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-400 hover:text-white'
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
+                    inputMode === 'wallet' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Wallet className="w-4 h-4" />
                   Wallet
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => setInputMode('farcaster')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    inputMode === 'farcaster'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-400 hover:text-white'
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
+                    inputMode === 'farcaster' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <AtSign className="w-4 h-4" />
                   Farcaster
-                </button>
+                </motion.button>
               </div>
             </div>
-          </>
+          </motion.div>
         )}
+        </AnimatePresence>
 
         {/* Farcaster Input */}
         {viewMode === 'scan' && inputMode === 'farcaster' && (
@@ -687,10 +985,18 @@ export default function Home() {
         )}
 
         {/* Main Content */}
-        {viewMode === 'scan' ? (
-          // SCAN MODE
-          (inputMode === 'wallet' && isConnected) || inputMode === 'farcaster' ? (
-            <div className="grid md:grid-cols-2 gap-6">
+        <AnimatePresence mode="wait">
+          {viewMode === 'scan' ? (
+            // SCAN MODE
+            <motion.div
+              key="scan-mode"
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.3 }}
+            >
+            {(inputMode === 'wallet' && isConnected) || inputMode === 'farcaster' ? (
+              <div className="grid md:grid-cols-2 gap-6">
               {/* Pokedex Device */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
@@ -837,20 +1143,30 @@ export default function Home() {
             </div>
           ) : (
             <NotConnectedState inputMode={inputMode} />
-          )
-        ) : (
+          )}
+            </motion.div>
+          ) : (
           // COLLECTION MODE - Rolodex
-          <Rolodex
-            entries={filteredEntries}
-            currentIndex={currentEntryIndex}
-            onPrev={() => setCurrentEntryIndex(prev => Math.max(0, prev - 1))}
-            onNext={() => setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1))}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            totalEntries={clankdexEntries.length}
-            onScanNew={() => setViewMode('scan')}
-          />
+          <motion.div
+            key="collection-mode"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Rolodex
+              entries={filteredEntries}
+              currentIndex={currentEntryIndex}
+              onPrev={() => setCurrentEntryIndex(prev => Math.max(0, prev - 1))}
+              onNext={() => setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1))}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              totalEntries={clankdexEntries.length}
+              onScanNew={() => setViewMode('scan')}
+            />
+          </motion.div>
         )}
+        </AnimatePresence>
 
         {/* Info Cards */}
         <div className="grid md:grid-cols-3 gap-4 mt-12">
@@ -1207,55 +1523,108 @@ function Rolodex({
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto"
     >
-      {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+      {/* Search Bar with animation */}
+      <motion.div 
+        className="mb-6"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="relative group">
+          <motion.div
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            animate={{ rotate: searchQuery ? [0, 360] : 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Search className="w-5 h-5" />
+          </motion.div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by name, element, or entry #..."
-            className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm"
+            className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm transition-all"
           />
+          <AnimatePresence>
+            {searchQuery && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0 }}
+                onClick={() => onSearchChange('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                whileHover={{ scale: 1.2, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <X className="w-5 h-5" />
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
 
       {entries.length === 0 ? (
-        // Empty State
-        <div className="rolodex-container p-8">
+        // Empty State with animation
+        <motion.div 
+          className="rolodex-container p-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 200 }}
+        >
           <div className="text-center py-12">
-            <BookOpen className="w-20 h-20 text-gray-600 mx-auto mb-6" />
-            <h3 className="font-pixel text-xl text-white mb-3">
+            <motion.div
+              animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <BookOpen className="w-20 h-20 text-gray-600 mx-auto mb-6" />
+            </motion.div>
+            <motion.h3 
+              className="font-pixel text-xl text-white mb-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
               {totalEntries === 0 ? 'NO ENTRIES YET' : 'NO MATCHES FOUND'}
-            </h3>
-            <p className="text-gray-400 mb-6">
+            </motion.h3>
+            <motion.p 
+              className="text-gray-400 mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               {totalEntries === 0
                 ? 'Scan your wallet or Farcaster account to create your first creature!'
                 : 'Try a different search term'}
-            </p>
+            </motion.p>
             {totalEntries === 0 && (
-              <button
+              <motion.button
                 onClick={onScanNew}
                 className="pixel-btn text-white"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
               >
                 START SCANNING
-              </button>
+              </motion.button>
             )}
           </div>
-        </div>
+        </motion.div>
       ) : (
         <>
           {/* Rolodex Card Browser */}
           <div className="flex items-center gap-4">
-            {/* Prev Button */}
-            <button
+            {/* Prev Button with animation */}
+            <motion.button
               onClick={onPrev}
               disabled={currentIndex === 0}
               className="rolodex-nav flex-shrink-0 disabled:opacity-30"
+              whileHover={currentIndex > 0 ? { scale: 1.1, x: -3 } : {}}
+              whileTap={currentIndex > 0 ? { scale: 0.9 } : {}}
             >
               <ChevronLeft className="w-8 h-8" />
-            </button>
+            </motion.button>
 
             {/* Main Card */}
             <div className="flex-1">
@@ -1264,38 +1633,64 @@ function Rolodex({
               </AnimatePresence>
             </div>
 
-            {/* Next Button */}
-            <button
+            {/* Next Button with animation */}
+            <motion.button
               onClick={onNext}
               disabled={currentIndex === entries.length - 1}
               className="rolodex-nav flex-shrink-0 disabled:opacity-30"
+              whileHover={currentIndex < entries.length - 1 ? { scale: 1.1, x: 3 } : {}}
+              whileTap={currentIndex < entries.length - 1 ? { scale: 0.9 } : {}}
             >
               <ChevronRight className="w-8 h-8" />
-            </button>
+            </motion.button>
           </div>
 
-          {/* Entry Counter */}
-          <div className="text-center mt-6">
-            <p className="text-gray-400 text-sm">
-              Showing <span className="text-pokedex-yellow font-bold">{formatEntryNumber(currentEntry.entryNumber)}</span>
+          {/* Entry Counter with animation */}
+          <motion.div 
+            className="text-center mt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.p 
+              className="text-gray-400 text-sm"
+              key={currentEntry.entryNumber}
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+            >
+              Showing <motion.span 
+                className="text-pokedex-yellow font-bold"
+                initial={{ scale: 1.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                {formatEntryNumber(currentEntry.entryNumber)}
+              </motion.span>
               {' '}&bull;{' '}
               <span className="text-white">{currentIndex + 1}</span> of <span className="text-white">{entries.length}</span>
               {searchQuery && ` (filtered from ${totalEntries})`}
-            </p>
-            <p className="text-gray-500 text-xs mt-2">
-              Use arrow keys to navigate
-            </p>
-          </div>
+            </motion.p>
+            <motion.p 
+              className="text-gray-500 text-xs mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Use ← → arrow keys to navigate
+            </motion.p>
+          </motion.div>
         </>
       )}
     </motion.div>
   );
 }
 
-// Rolodex Card Component
+// Rolodex Card Component with Rich Animations
 function RolodexCard({ entry }: { entry: ClankdexEntry }) {
   const { creature, entryNumber, imageBase64, tokenAddress, tokenSymbol, launchedAt, inputMode, identifier } = entry;
   const totalStats = creature.hp + creature.attack + creature.defense + creature.speed + creature.special;
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   // Fetch live price data
   const { priceData, loading: priceLoading } = usePriceData(tokenAddress);
@@ -1305,6 +1700,11 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
   const marketCapHP = priceData
     ? Math.min(100, Math.max(1, Math.log10(priceData.marketCap + 1) * 15))
     : 0;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowStats(true), 300);
+    return () => clearTimeout(timer);
+  }, [entry]);
 
   const getRarity = (element: string) => {
     const rarities: Record<string, string> = {
@@ -1318,184 +1718,342 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
 
   return (
     <motion.div
-      initial={{ rotateY: -90, opacity: 0 }}
-      animate={{ rotateY: 0, opacity: 1 }}
-      exit={{ rotateY: 90, opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="rolodex-card"
+      initial={{ rotateY: -90, opacity: 0, scale: 0.8 }}
+      animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+      exit={{ rotateY: 90, opacity: 0, scale: 0.8 }}
+      transition={{ duration: 0.4, type: "spring", stiffness: 200, damping: 20 }}
+      className={`rolodex-card hover-lift ${evolutionTier.name === 'Legendary' ? 'animate-legendary' : ''}`}
     >
-      {/* Entry Number Badge */}
-      <div className="entry-number">
+      {/* Entry Number Badge with bounce */}
+      <motion.div 
+        className="entry-number"
+        initial={{ scale: 0, rotate: -20 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.2 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
+      >
         {formatEntryNumber(entryNumber)}
-      </div>
+      </motion.div>
 
-      {/* Evolution Tier Badge */}
-      {priceData && (
-        <div className={`absolute -top-3 -right-3 px-3 py-1.5 rounded-lg font-pixel text-xs font-bold ${evolutionTier.color} bg-gray-900 border-2 border-current z-10 flex items-center gap-1`}>
-          {(() => {
-            const IconComponent = evolutionTier.icon;
-            return <IconComponent className="w-3 h-3" />;
-          })()}
-          {evolutionTier.name}
-        </div>
-      )}
+      {/* Evolution Tier Badge with pop animation */}
+      <AnimatePresence>
+        {priceData && (
+          <motion.div 
+            initial={{ scale: 0, y: -20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0, y: -20 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.3 }}
+            className={`absolute -top-3 -right-3 px-3 py-1.5 rounded-lg font-pixel text-xs font-bold ${evolutionTier.color} bg-gray-900 border-2 border-current z-10 flex items-center gap-1 shadow-lg`}
+          >
+            {(() => {
+              const IconComponent = evolutionTier.icon;
+              return <IconComponent className="w-3 h-3" />;
+            })()}
+            {evolutionTier.name}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Top Section */}
-      <div className="flex items-start justify-between mb-4">
+      {/* Top Section with stagger */}
+      <motion.div 
+        className="flex items-start justify-between mb-4"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
         <div>
-          <h2 className="font-pixel text-2xl text-white">
+          <motion.h2 
+            className="font-pixel text-2xl text-white"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             {creature.name}
-          </h2>
-          <p className="text-gray-400 text-sm">{creature.species}</p>
+          </motion.h2>
+          <motion.p 
+            className="text-gray-400 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            {creature.species}
+          </motion.p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className={`element-badge ${ELEMENT_COLORS[creature.element]} text-white`}>
+        <motion.div 
+          className="flex flex-col items-end gap-2"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Badge color={creature.element.toLowerCase() === 'fire' ? 'red' : creature.element.toLowerCase() === 'water' ? 'blue' : creature.element.toLowerCase() === 'grass' ? 'green' : 'blue'}>
             {ELEMENT_ICONS[creature.element]}
             {creature.element}
-          </span>
-          <span className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(creature.element)]}`}>
+          </Badge>
+          <motion.span 
+            className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(creature.element)]}`}
+            whileHover={{ scale: 1.1 }}
+          >
             {getRarity(creature.element)}
-          </span>
-        </div>
-      </div>
+          </motion.span>
+        </motion.div>
+      </motion.div>
 
-      {/* Live Price Banner */}
-      {priceData && (
-        <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-green-400" />
-              <span className="font-pixel text-lg text-green-400">
-                {formatPrice(priceData.price)}
-              </span>
-              {priceData.priceChange24h !== 0 && (
-                <span className={`flex items-center text-xs ${priceData.priceChange24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {priceData.priceChange24h > 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                  {priceData.priceChange24h > 0 ? '+' : ''}{priceData.priceChange24h.toFixed(2)}%
+      {/* Live Price Banner with slide-in */}
+      <AnimatePresence>
+        {priceData && (
+          <motion.div 
+            initial={{ opacity: 0, x: -50, height: 0 }}
+            animate={{ opacity: 1, x: 0, height: 'auto' }}
+            exit={{ opacity: 0, x: 50, height: 0 }}
+            className="mb-4 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/30 overflow-hidden"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  <DollarSign className="w-4 h-4 text-green-400" />
+                </motion.div>
+                <span className="font-pixel text-lg text-green-400">
+                  {formatPrice(priceData.price)}
                 </span>
-              )}
+                {priceData.priceChange24h !== 0 && (
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className={`flex items-center text-xs ${priceData.priceChange24h > 0 ? 'text-green-400' : 'text-red-400'}`}
+                  >
+                    {priceData.priceChange24h > 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                    {priceData.priceChange24h > 0 ? '+' : ''}{priceData.priceChange24h.toFixed(2)}%
+                  </motion.span>
+                )}
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500">via {priceData.source}</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-500">via {priceData.source}</p>
-            </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {priceLoading && (
-        <div className="mb-4 p-3 rounded-lg bg-gray-800/50 border border-gray-700 flex items-center justify-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-          <span className="text-gray-400 text-sm">Fetching live price...</span>
-        </div>
-      )}
+      <AnimatePresence>
+        {priceLoading && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 p-3 rounded-lg bg-gray-800/50 border border-gray-700 flex items-center justify-center gap-2"
+          >
+            <PokeballLoader size="sm" />
+            <span className="text-gray-400 text-sm">Fetching live price...</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Creature Display */}
-      <div className={`rolodex-screen mb-4 relative ${evolutionTier.name === 'Legendary' ? 'ring-4 ring-yellow-400/50 animate-pulse' : ''}`}>
+      {/* Creature Display with idle animation */}
+      <motion.div 
+        className={`rolodex-screen mb-4 relative overflow-hidden ${evolutionTier.name === 'Legendary' ? 'ring-4 ring-yellow-400/50 animate-legendary' : ''}`}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+        whileHover={{ scale: 1.02 }}
+      >
+        {/* Shimmer effect for legendary */}
+        {evolutionTier.name === 'Legendary' && (
+          <div className="absolute inset-0 animate-rainbow pointer-events-none z-10" />
+        )}
+        
         {imageBase64 ? (
-          <img
-            src={imageBase64}
-            alt={creature.name}
-            className="w-full h-full object-contain"
-          />
+          <motion.div className="relative w-full h-full">
+            <motion.img
+              src={imageBase64}
+              alt={creature.name}
+              className="w-full h-full object-contain"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: imageLoaded ? 1 : 0 }}
+              onLoad={() => setImageLoaded(true)}
+            />
+            {!imageLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <PokeballLoader />
+              </div>
+            )}
+            {/* Idle floating animation */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
         ) : (
-          <div
+          <motion.div
             className="w-full h-full flex items-center justify-center"
             style={{ backgroundColor: creature.colorPalette?.[0] || '#333' }}
+            animate={{ 
+              backgroundColor: [creature.colorPalette?.[0] || '#333', creature.colorPalette?.[1] || '#444', creature.colorPalette?.[0] || '#333']
+            }}
+            transition={{ duration: 4, repeat: Infinity }}
           >
-            <span className="text-6xl">
+            <motion.span 
+              className="text-6xl"
+              animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
               {ELEMENT_ICONS[creature.element]}
-            </span>
-          </div>
+            </motion.span>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
-      {/* Market Cap HP Bar */}
-      {priceData && (
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-400 flex items-center gap-1">
-              <Crown className="w-3 h-3 text-yellow-400" />
-              MARKET CAP HP
-            </span>
-            <span className="font-pixel text-sm text-yellow-400">
-              {formatMarketCap(priceData.marketCap)}
-            </span>
-          </div>
-          <div className="h-4 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${marketCapHP}%` }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className={`h-full rounded-full ${
-                evolutionTier.name === 'Legendary' ? 'bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 animate-pulse' :
-                evolutionTier.name === 'Mega' ? 'bg-gradient-to-r from-orange-400 to-red-500' :
-                evolutionTier.name === 'Stage 2' ? 'bg-gradient-to-r from-yellow-400 to-orange-400' :
-                evolutionTier.name === 'Stage 1' ? 'bg-gradient-to-r from-purple-400 to-pink-400' :
-                evolutionTier.name === 'Basic' ? 'bg-gradient-to-r from-blue-400 to-cyan-400' :
-                evolutionTier.name === 'Baby' ? 'bg-gradient-to-r from-green-400 to-emerald-400' :
-                'bg-gray-500'
-              }`}
+      {/* Market Cap HP Bar with enhanced animation */}
+      <AnimatePresence>
+        {priceData && showStats && (
+          <motion.div 
+            className="mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400 flex items-center gap-1">
+                <Crown className="w-3 h-3 text-yellow-400" />
+                MARKET CAP HP
+              </span>
+              <motion.span 
+                className="font-pixel text-sm text-yellow-400"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                {formatMarketCap(priceData.marketCap)}
+              </motion.span>
+            </div>
+            <AnimatedStatBar 
+              value={marketCapHP} 
+              max={100} 
+              color={evolutionTier.name === 'Legendary' ? 'yellow' : evolutionTier.name === 'Mega' ? 'red' : 'green'}
+              delay={0.3}
             />
-          </div>
-          <div className="flex justify-between mt-1 text-xs text-gray-500">
-            <span>$0</span>
-            <span>$1M+</span>
-          </div>
-        </div>
-      )}
+            <div className="flex justify-between mt-1 text-xs text-gray-500">
+              <span>$0</span>
+              <span>$1M+</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Volume 24h */}
-      {priceData && priceData.volume24h > 0 && (
-        <div className="mb-4 flex items-center justify-between p-2 bg-gray-800/50 rounded-lg">
-          <span className="text-xs text-gray-400 flex items-center gap-1">
-            <BarChart3 className="w-3 h-3" />
-            24h Volume
-          </span>
-          <span className="font-pixel text-sm text-white">
-            {formatMarketCap(priceData.volume24h)}
-          </span>
-        </div>
-      )}
+      {/* Volume 24h with slide */}
+      <AnimatePresence>
+        {priceData && priceData.volume24h > 0 && showStats && (
+          <motion.div 
+            className="mb-4 flex items-center justify-between p-2 bg-gray-800/50 rounded-lg"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ scale: 1.02, backgroundColor: 'rgba(55, 65, 81, 0.8)' }}
+          >
+            <span className="text-xs text-gray-400 flex items-center gap-1">
+              <BarChart3 className="w-3 h-3" />
+              24h Volume
+            </span>
+            <span className="font-pixel text-sm text-white">
+              {formatMarketCap(priceData.volume24h)}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-5 gap-2 mb-4">
-        <div className="text-center">
-          <p className="text-gray-500 text-xs">HP</p>
-          <p className="font-pixel text-green-400">{creature.hp}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-gray-500 text-xs">ATK</p>
-          <p className="font-pixel text-red-400">{creature.attack}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-gray-500 text-xs">DEF</p>
-          <p className="font-pixel text-blue-400">{creature.defense}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-gray-500 text-xs">SPD</p>
-          <p className="font-pixel text-yellow-400">{creature.speed}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-gray-500 text-xs">SPC</p>
-          <p className="font-pixel text-purple-400">{creature.special}</p>
-        </div>
-      </div>
+      {/* Stats Grid with stagger animation */}
+      <motion.div 
+        className="grid grid-cols-5 gap-2 mb-4"
+        initial="hidden"
+        animate={showStats ? "visible" : "hidden"}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.05, delayChildren: 0.3 }
+          }
+        }}
+      >
+        {[
+          { label: 'HP', value: creature.hp, color: 'text-green-400' },
+          { label: 'ATK', value: creature.attack, color: 'text-red-400' },
+          { label: 'DEF', value: creature.defense, color: 'text-blue-400' },
+          { label: 'SPD', value: creature.speed, color: 'text-yellow-400' },
+          { label: 'SPC', value: creature.special, color: 'text-purple-400' },
+        ].map((stat) => (
+          <motion.div 
+            key={stat.label}
+            className="text-center"
+            variants={{
+              hidden: { opacity: 0, y: 20, scale: 0.5 },
+              visible: { 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                transition: { type: "spring", stiffness: 400, damping: 15 }
+              }
+            }}
+            whileHover={{ scale: 1.15, y: -2 }}
+          >
+            <p className="text-gray-500 text-xs">{stat.label}</p>
+            <motion.p 
+              className={`font-pixel ${stat.color}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {stat.value}
+            </motion.p>
+          </motion.div>
+        ))}
+      </motion.div>
 
-      {/* Total & Token Info */}
-      <div className="border-t border-gray-700 pt-4 grid grid-cols-2 gap-4">
-        <div>
+      {/* Total & Token Info with slide-up */}
+      <motion.div 
+        className="border-t border-gray-700 pt-4 grid grid-cols-2 gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+      >
+        <motion.div whileHover={{ scale: 1.05 }}>
           <p className="text-gray-500 text-xs mb-1">TOTAL STATS</p>
-          <p className="font-pixel text-xl text-white">{totalStats}</p>
-        </div>
-        <div>
+          <motion.p 
+            className="font-pixel text-xl text-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            {totalStats}
+          </motion.p>
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.05 }}>
           <p className="text-gray-500 text-xs mb-1">TOKEN</p>
-          <p className="font-pixel text-pokedex-yellow">${tokenSymbol}</p>
-        </div>
-      </div>
+          <motion.p 
+            className="font-pixel text-pokedex-yellow"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            ${tokenSymbol}
+          </motion.p>
+        </motion.div>
+      </motion.div>
 
-      {/* Footer */}
-      <div className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between text-xs">
-        <span className="text-gray-500">
+      {/* Footer with fade */}
+      <motion.div 
+        className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between text-xs"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+      >
+        <motion.span 
+          className="text-gray-500"
+          whileHover={{ color: '#fff' }}
+        >
           {inputMode === 'wallet' ? (
             <span className="flex items-center gap-1">
               <Wallet className="w-3 h-3" />
@@ -1507,33 +2065,42 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
               {identifier}
             </span>
           )}
-        </span>
+        </motion.span>
         <span className="text-gray-500">
           {new Date(launchedAt).toLocaleDateString()}
         </span>
-      </div>
+      </motion.div>
 
-      {/* Action Buttons */}
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <a
+      {/* Action Buttons with press effect */}
+      <motion.div 
+        className="mt-4 grid grid-cols-2 gap-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
+        <motion.a
           href={`${CLANKER_URL}/token/${tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm transition-colors"
+          className="flex items-center justify-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm"
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95, y: 0 }}
         >
           <Coins className="w-4 h-4" />
           Clanker
-        </a>
-        <a
+        </motion.a>
+        <motion.a
           href={`https://basescan.org/token/${tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition-colors"
+          className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm"
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95, y: 0 }}
         >
           <ExternalLink className="w-4 h-4" />
           BaseScan
-        </a>
-      </div>
+        </motion.a>
+      </motion.div>
     </motion.div>
   );
 }

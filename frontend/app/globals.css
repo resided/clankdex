@@ -391,6 +391,269 @@
   animation: sparkle 2s ease-in-out infinite;
 }
 
+/* Card Flip Animation */
+@keyframes card-flip-in {
+  0% {
+    transform: perspective(1000px) rotateY(-90deg) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: perspective(1000px) rotateY(-10deg) scale(1.02);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-card-flip {
+  animation: card-flip-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Bounce/Idle Animation for Creatures */
+@keyframes creature-idle {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-4px); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(-2px); }
+}
+
+.animate-idle {
+  animation: creature-idle 2s ease-in-out infinite;
+}
+
+/* Pokemon-style shake animation */
+@keyframes pokemon-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px) rotate(-2deg); }
+  20%, 40%, 60%, 80% { transform: translateX(4px) rotate(2deg); }
+}
+
+.animate-shake {
+  animation: pokemon-shake 0.5s ease-in-out;
+}
+
+/* Glow pulse for legendary items */
+@keyframes legendary-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.4), 0 0 90px rgba(255, 215, 0, 0.2);
+  }
+}
+
+.animate-legendary {
+  animation: legendary-glow 2s ease-in-out infinite;
+}
+
+/* Rainbow shimmer for rare items */
+@keyframes rainbow-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-rainbow {
+  background: linear-gradient(
+    90deg,
+    rgba(255,0,0,0.3) 0%,
+    rgba(255,165,0,0.3) 20%,
+    rgba(255,255,0,0.3) 40%,
+    rgba(0,255,0,0.3) 60%,
+    rgba(0,0,255,0.3) 80%,
+    rgba(238,130,238,0.3) 100%
+  );
+  background-size: 200% 100%;
+  animation: rainbow-shimmer 3s linear infinite;
+}
+
+/* Menu slide-in from bottom (Game Boy style) */
+@keyframes menu-slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-menu-up {
+  animation: menu-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Battle transition flash */
+@keyframes battle-flash {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.animate-flash {
+  animation: battle-flash 0.2s ease-in-out 3;
+}
+
+/* HP bar fill animation */
+@keyframes hp-fill {
+  0% { width: 0%; }
+}
+
+.animate-hp-fill {
+  animation: hp-fill 1s ease-out forwards;
+}
+
+/* Stat number count up */
+@keyframes count-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count-up {
+  animation: count-up 0.5s ease-out forwards;
+}
+
+/* Typewriter cursor blink */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor::after {
+  content: '▋';
+  animation: cursor-blink 0.8s infinite;
+}
+
+/* Pokeball wiggle */
+@keyframes pokeball-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-15deg); }
+  40% { transform: rotate(15deg); }
+  60% { transform: rotate(-10deg); }
+  80% { transform: rotate(10deg); }
+}
+
+.animate-wiggle {
+  animation: pokeball-wiggle 0.6s ease-in-out;
+}
+
+/* Float/hover animation */
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(1deg); }
+  66% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+.animate-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+/* Page transition wipe */
+@keyframes page-wipe {
+  0% { clip-path: circle(0% at 50% 50%); }
+  100% { clip-path: circle(150% at 50% 50%); }
+}
+
+.animate-page-wipe {
+  animation: page-wipe 0.6s ease-out forwards;
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn-press:active {
+  transform: scale(0.95) translateY(2px);
+}
+
+/* Search expand animation */
+@keyframes search-expand {
+  0% {
+    width: 40px;
+    opacity: 0;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.animate-search-expand {
+  animation: search-expand 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Tag pop-in */
+@keyframes tag-pop {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-tag-pop {
+  animation: tag-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger children animation helper */
+.stagger-children > * {
+  opacity: 0;
+  animation: fade-in-up 0.4s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Magnetic button effect base */
+.magnetic-btn {
+  transition: transform 0.2s ease-out;
+}
+
+/* Loading dots */
+@keyframes loading-dots {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+.loading-dot {
+  animation: loading-dots 1.4s ease-in-out infinite both;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+.loading-dot:nth-child(3) { animation-delay: 0s; }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
