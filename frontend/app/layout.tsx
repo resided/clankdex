@@ -2,7 +2,40 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from './providers';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://clankdex.io';
+const APP_URL = 'https://frontend-weld-mu-91.vercel.app';
+const OG_IMAGE_URL = `${APP_URL}/og`;  // Dynamic OG image
+
+// Miniapp embed configuration
+const miniappEmbed = {
+  version: "1",
+  imageUrl: OG_IMAGE_URL,
+  button: {
+    title: "🎮 Launch ClankDex",
+    action: {
+      type: "launch_miniapp",
+      url: APP_URL,
+      name: "ClankDex",
+      splashImageUrl: `${APP_URL}/splash.png`,
+      splashBackgroundColor: "#1a0a2e"
+    }
+  }
+};
+
+// Backward compatible frame config
+const frameEmbed = {
+  version: "1",
+  imageUrl: OG_IMAGE_URL,
+  button: {
+    title: "🎮 Launch ClankDex",
+    action: {
+      type: "launch_frame",
+      url: APP_URL,
+      name: "ClankDex",
+      splashImageUrl: `${APP_URL}/splash.png`,
+      splashBackgroundColor: "#1a0a2e"
+    }
+  }
+};
 
 export const metadata: Metadata = {
   title: 'ClankDex - Wallet Pokedex',
@@ -12,21 +45,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ClankDex - Wallet Pokedex',
     description: 'Generate a unique Pokemon-style creature from your wallet or Farcaster profile and launch it as a Clanker token.',
-    images: ['/og-image.png'],
+    images: [OG_IMAGE_URL],
   },
   other: {
-    // Farcaster Mini App (v2 frame) meta tags
-    'fc:frame': 'vNext',
-    'fc:frame:image': `${APP_URL}/og-image.png`,
-    'fc:frame:image:aspect_ratio': '1:1',
-    'fc:frame:button:1': 'Launch ClankDex',
-    'fc:frame:button:1:action': 'launch_frame',
-    'fc:frame:button:1:target': APP_URL,
-    // Base Miniapp meta tags
-    'miniapp:title': 'ClankDex',
-    'miniapp:description': 'Wallet-powered creature generator with evolution tracking',
-    'miniapp:image': `${APP_URL}/og-image.png`,
-    'miniapp:url': APP_URL,
+    // Farcaster Mini App embed (new format)
+    'fc:miniapp': JSON.stringify(miniappEmbed),
+    // Backward compatibility
+    'fc:frame': JSON.stringify(frameEmbed),
   },
 };
 

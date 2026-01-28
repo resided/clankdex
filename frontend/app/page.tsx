@@ -1791,8 +1791,9 @@ function DeploySuccess({
       <button
         onClick={() => {
           const text = `I just summoned ${creature.name} on @clankdex! A ${creature.element}-type creature with ${creature.hp + creature.attack + creature.defense + creature.speed + creature.special} total stats.`;
-          const tokenUrl = `${CLANKER_URL}/token/${deployResult.tokenAddress}`;
-          onShare(text, [tokenUrl]);
+          // Share the miniapp URL which will render the embed
+          const miniappUrl = 'https://frontend-weld-mu-91.vercel.app';
+          onShare(text, [miniappUrl]);
         }}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-colors"
       >
