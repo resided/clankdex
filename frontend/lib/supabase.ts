@@ -1,15 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Create client only if credentials exist
-export const supabase = supabaseUrl && supabaseKey 
-  ? createClient(supabaseUrl, supabaseKey)
-  : null;
-
-// Helper to check if Supabase is configured
-export const isSupabaseConfigured = () => !!supabase;
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Types for evolution tracking
 export interface EvolutionRecord {
@@ -32,11 +27,6 @@ export interface TierHistoryEntry {
 
 // Fetch evolution data for a token
 export async function getEvolutionData(tokenAddress: string): Promise<EvolutionRecord | null> {
-  if (!supabase) {
-    console.warn('Supabase not configured, skipping evolution fetch');
-    return null;
-  }
-
   const { data, error } = await supabase
     .from('evolutions')
     .select('*')
@@ -57,11 +47,6 @@ export async function createEvolution(
   tokenAddress: string,
   entryNumber: number
 ): Promise<EvolutionRecord | null> {
-  if (!supabase) {
-    console.warn('Supabase not configured, skipping evolution creation');
-    return null;
-  }
-
   const { data, error } = await supabase
     .from('evolutions')
     .insert({
@@ -94,11 +79,6 @@ export async function updateEvolution(
   tierName: string,
   marketCap: number
 ): Promise<boolean> {
-  if (!supabase) {
-    console.warn('Supabase not configured, skipping evolution update');
-    return false;
-  }
-
   // First get current data
   const current = await getEvolutionData(tokenAddress);
   
@@ -131,7 +111,6 @@ export async function updateEvolution(
 
 // Get all evolutions for a user (by entry numbers)
 export async function getEvolutionsByEntries(entryNumbers: number[]): Promise<EvolutionRecord[]> {
-  if (!supabase) return [];
   if (entryNumbers.length === 0) return [];
   
   const { data, error } = await supabase
@@ -145,4 +124,19 @@ export async function getEvolutionsByEntries(entryNumbers: number[]): Promise<Ev
   }
 
   return data || [];
+}
+
+// Test connection
+export async function testConnection(): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('evolutions').select('id').limit(1);
+    if (error && error.code === 'PGRST116') {
+      // Table doesn't exist yet, but connection works
+      return true;
+    }
+    return !error;
+  } catch (e) {
+    console.error('Supabase connection test failed:', e);
+    return false;
+  }
 }
