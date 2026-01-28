@@ -13,74 +13,133 @@ function getOpenAI() {
 }
 
 // ============================================
-// POKEMON-INSPIRED CREATURE STYLE GUIDE
+// ENHANCED POKEMON-STYLE CREATURE GUIDE
 // ============================================
-const STYLE_GUIDE = {
-  // Core Pokemon design principles (original creatures)
-  visualRules: [
-    "Ken Sugimori Pokemon art style - official game artwork quality",
-    "Creature should have a distinctive, recognizable silhouette",
-    "Large expressive eyes with personality and emotion",
-    "Clean, confident line art with smooth curves",
-    "Bold, saturated colors appropriate to the element type",
-    "Simple white background - no environment",
-    "NO TEXT, NO WATERMARKS, NO SIGNATURES",
-    "Front-facing or 3/4 view showing personality",
-    "Cell-shaded rendering with soft gradients",
-    "Cute but cool aesthetic - appealing to all ages",
-    "Distinctive features that make it memorable",
-  ],
-  
-  // Enhanced art style for DALL-E
-  artStyle: "Pokemon official artwork by Ken Sugimori, creature design, clean vector-like illustration, cel-shaded, vibrant colors, game art, character design, appealing proportions, memorable silhouette",
-  
-  // Detailed element visual traits
-  elementTraits: {
-    Fire: "warm orange/red/yellow color scheme, flame patterns on body, smoke wisps, heat shimmer effect, passionate expression, ember particles",
-    Water: "cool blue/cyan color scheme, fin-like appendages, bubble details, droplet patterns, fluid graceful pose, wave-like forms",
-    Grass: "natural green/brown color scheme, leaf or petal accents, vine details, organic flowing shapes, gentle nature spirit vibe",
-    Electric: "bright yellow/orange color scheme, lightning bolt patterns, spiky fur or feathers, energetic dynamic pose, spark effects",
-    Ice: "icy blue/white color scheme, crystal formations, snowflake patterns, frosty breath, elegant crystalline features",
-    Fighting: "warm red/brown color scheme, muscular or tough build, bandage or belt details, determined confident stance",
-    Poison: "purple/green color scheme, toxic patterns, gas or bubble effects, mysterious slightly menacing look",
-    Ground: "earthy brown/tan color scheme, rocky or sandy textures, sturdy grounded build, desert or mountain motifs",
-    Flying: "sky blue/white color scheme, wing or feather details, cloud-like fluff, wind-swept features, airy lightweight build",
-    Psychic: "magenta/purple color scheme, mystical gems or orbs, third eye or forehead gem, mysterious wise expression",
-    Bug: "green/yellow color scheme, insectoid features, compound eyes, antennae, chitin shell patterns",
-    Rock: "gray/brown color scheme, rocky armor or skin, crystal formations, sturdy heavy build, mineral patterns",
-    Ghost: "purple/black color scheme, ethereal misty features, floating elements, mysterious translucent effects",
-    Dragon: "deep jewel-tone color scheme, scale patterns, horn or wing features, majestic powerful presence",
-    Dark: "dark purple/black color scheme, shadowy features, red eyes, mysterious sneaky appearance",
-    Steel: "silver/gray color scheme, metallic armor or skin, gear or mechanical details, industrial robotic features",
-    Fairy: "pink/white color scheme, sparkles and stars, wing or ribbon features, cute magical appearance",
+
+// Detailed element traits for consistent visual language
+const ELEMENT_VISUALS: Record<string, {
+  colors: string,
+  features: string,
+  vibe: string,
+  examples: string
+}> = {
+  Fire: {
+    colors: 'warm oranges, reds, yellows with black accents',
+    features: 'flame-shaped ears or tail, ember patterns on fur/scales, smoke wisps, warm glowing eyes',
+    vibe: 'passionate, energetic, fierce but friendly',
+    examples: 'like Charmander flame tail, Arcanine majestic mane'
   },
-  
-  // Body type based on stats
-  bodyTypes: {
-    tiny: "tiny cute creature, baby-like proportions, oversized head, fits in palm, chibi style",
-    small: "small compact creature, youthful proportions, playful energetic look,便携 size",
-    medium: "medium balanced creature, athletic proportions, adventure-ready appearance",
-    large: "large impressive creature, powerful proportions, commanding presence, evolved form look",
+  Water: {
+    colors: 'ocean blues, teals, aqua with white foam accents',
+    features: 'fin-like crests, bubble patterns, flowing aquatic shapes, fish-like or serpentine body',
+    vibe: 'graceful, flowing, adaptable, mysterious depths',
+    examples: 'like Vaporeon fins, Gyarados serpentine form'
+  },
+  Grass: {
+    colors: 'forest greens, leaf yellows, wood browns, flower pinks',
+    features: 'leaf collar or mane, vine tails, flower buds, bark-textured skin, pollen particles',
+    vibe: 'natural, growth, gentle but resilient, living plant aspects',
+    examples: 'like Bulbasaur bulb, Leafeon leaf details'
+  },
+  Electric: {
+    colors: 'bright yellow, electric orange, black stripes, white sparks',
+    features: 'spiky fur/feathers, lightning bolt patterns, cheek pouches, sparking tail tip',
+    vibe: 'hyperactive, fast, crackling with energy, excitable',
+    examples: 'like Pikachu cheek sparks, Jolteon spiky fur'
+  },
+  Ice: {
+    colors: 'ice blue, snow white, crystal clear, pale cyan',
+    features: 'crystalline formations, icicle horns, frost breath, snowflake patterns, sharp elegant edges',
+    vibe: 'elegant, cold beauty, graceful, crystalline perfection',
+    examples: 'like Glaceon crystal ears, Articuno elegant wings'
+  },
+  Fighting: {
+    colors: 'reddish-brown, bandage white, determined eye colors',
+    features: 'muscular definition, sweat band, wrapped fists, fighting stance, intense focused eyes',
+    vibe: 'determined, disciplined, ready for battle, honorable warrior',
+    examples: 'like Hitmonlee long legs, Machamp muscular build'
+  },
+  Poison: {
+    colors: 'toxic purple, sickly green, warning yellow patterns',
+    features: 'venomous features, gas clouds, warning color patterns, dripping glands, spiky toxic quills',
+    vibe: 'mysterious, dangerous but alluring, toxic beauty',
+    examples: 'like Nidoran spines, Grimer sludge body'
+  },
+  Ground: {
+    colors: 'earth brown, sand tan, rock gray, clay orange',
+    features: 'rocky armor plates, shovel claws, desert textures, sturdy厚重 build, mineral deposits',
+    vibe: 'steady, immovable, grounded, ancient earth connection',
+    examples: 'like Diglett drill nose, Marowak bone club'
+  },
+  Flying: {
+    colors: 'sky blue, cloud white, feather silver, wind gray',
+    features: 'large majestic wings, feathered crest, aerodynamic body, cloud-like fluff, wing patterns',
+    vibe: 'free, soaring, graceful in air, above it all',
+    examples: 'like Pidgeot crest, Charizard wing structure'
+  },
+  Psychic: {
+    colors: 'mystical purple, pink, cosmic blue, gem tones',
+    features: 'third eye gem, forehead crystal, mystical circles, spoon or pendulum, floating objects nearby',
+    vibe: 'mysterious, wise, otherworldly, mystical aura',
+    examples: 'like Alakazam spoons, Espeon gem forehead'
+  },
+  Bug: {
+    colors: 'chitin green, yellow warning stripes, shell brown, compound eye shine',
+    features: 'antennae, compound eyes, exoskeleton segments, wing cases, mandibles, segmented body',
+    vibe: 'swarm intelligence, transformation, persistent, hive mind',
+    examples: 'like Butterfree wings, Scyther blade arms'
+  },
+  Rock: {
+    colors: 'granite gray, mineral veins, crystal clear, stone brown',
+    features: 'rocky shell armor, crystal growths, mineral inclusions, sturdy厚重 build, gem encrusted',
+    vibe: 'ancient, unyielding, mineral beauty, geological time',
+    examples: 'like Onix rock snake, Geode crystal formations'
+  },
+  Ghost: {
+    colors: 'shadow purple, ectoplasm pink, midnight black, spirit white',
+    features: 'translucent body parts, ghostly tail instead of legs, floating, spirit flames, ethereal wisps',
+    vibe: 'mysterious, spooky but cute, between worlds, playful trickster',
+    examples: 'like Gastly gas body, Haunter floating hands'
+  },
+  Dragon: {
+    colors: 'deep jewel tones, scale iridescence, ancient gold, powerful reds/blues',
+    features: 'dragon scales, horn crests, powerful tail, wing membranes, ancient markings, reptilian features',
+    vibe: 'ancient power, majestic, legendary aura, primal strength',
+    examples: 'like Dragonite friendly dragon, Garchomp land shark'
+  },
+  Dark: {
+    colors: 'midnight black, shadow purple, ominous red eyes, eclipse dark',
+    features: 'shadowy aura, red glowing eyes, stealth features, jagged silhouette, darkness effects',
+    vibe: 'mysterious, misunderstood, edgy but cool, shadowy',
+    examples: 'like Umbreon ring patterns, Absol disaster sense'
+  },
+  Steel: {
+    colors: 'metallic silver, iron gray, rust orange accents, polished chrome',
+    features: 'metal plating, gear mechanisms, rivets, industrial design, metallic sheen, mechanical joints',
+    vibe: 'industrial strength, precision, unbreakable, technological',
+    examples: 'like Steelix metal snake, Scizor steel claws'
+  },
+  Fairy: {
+    colors: 'pastel pink, cotton candy blue, sparkle white, rainbow pastels',
+    features: 'ribbon-like feelers, wing shapes, star patterns, heart motifs, magical sparkles, ribbons',
+    vibe: 'whimsical, magical, cute wonder, enchanting, playful magic',
+    examples: 'like Clefairy moon motifs, Sylveon ribbon feelers'
   }
 };
 
-// Build DALL-E prompt from creature traits
+// Body type guidelines
+const BODY_TYPES: Record<string, string> = {
+  tiny: 'Tiny chibi creature (10-30cm), 2-3 heads tall, oversized head, stubby limbs, maximum cuteness, baby proportions, fits in palm',
+  small: 'Small creature (30-60cm), 2.5-3 heads tall, youthful proportions, energetic compact body, portable size',
+  medium: 'Medium creature (60-120cm), 3-4 heads tall, balanced proportions, athletic capable build, human child sized',
+  large: 'Large creature (120cm+), 4-5 heads tall, powerful imposing build, majestic presence, fully evolved look'
+};
+
+// Build comprehensive DALL-E prompt
 function buildDallePrompt(creature: any): string {
-  const { 
-    name, 
-    element, 
-    species, 
-    hp, 
-    attack, 
-    defense, 
-    speed, 
-    special,
-    description,
-    archetype,
-    archetypeLore 
-  } = creature;
+  const { name, element, hp, attack, defense, speed, special, archetype } = creature;
   
-  // Determine body type based on stats
+  // Determine body type
   const avgStat = (hp + attack + defense + speed + special) / 5;
   let bodyType = 'small';
   if (avgStat < 60) bodyType = 'tiny';
@@ -88,43 +147,84 @@ function buildDallePrompt(creature: any): string {
   else if (avgStat < 110) bodyType = 'medium';
   else bodyType = 'large';
   
-  // Get element-specific visual traits
-  const elementVisuals = STYLE_GUIDE.elementTraits[element as keyof typeof STYLE_GUIDE.elementTraits] || '';
-  const bodyTypeDesc = STYLE_GUIDE.bodyTypes[bodyType as keyof typeof STYLE_GUIDE.bodyTypes];
+  const elementData = ELEMENT_VISUALS[element] || ELEMENT_VISUALS.Fire;
+  const bodyDesc = BODY_TYPES[bodyType];
   
-  // Build the enhanced prompt
-  const prompt = `A Pokemon-style creature named "${name}" the ${element}-type ${species}.
+  // Determine dominant stat for visual emphasis
+  const stats = [
+    { name: 'HP', value: hp, visual: 'bulky, healthy, rounded body, sturdy build' },
+    { name: 'Attack', value: attack, visual: 'sharp claws, fierce stance, battle-ready pose, intimidating features' },
+    { name: 'Defense', value: defense, visual: 'armor, shell, thick skin, protective features, sturdy stance' },
+    { name: 'Speed', value: speed, visual: 'streamlined body, aerodynamic, agile pose, quick stance' },
+    { name: 'Special', value: special, visual: 'mystical aura, glowing parts, magical features, energy emanating' }
+  ];
+  stats.sort((a, b) => b.value - a.value);
+  const dominantStat = stats[0];
 
-CREATURE DESIGN:
-- ${bodyTypeDesc}
-- ${elementVisuals}
-- Distinctive features that make it instantly recognizable
-- Expressive eyes showing ${archetype.toLowerCase()} personality
+  return `Create an original Pokemon-style creature character named "${name}".
 
-ARCHETYPE INFLUENCE:
-The creature embodies the ${archetype} archetype: ${archetypeLore}
-This influences its pose, expression, and overall vibe.
+---
 
-BACKSTORY VISUALS:
-${description}
+VISUAL DESIGN SPECIFICATIONS:
 
-ART STYLE (CRITICAL - MUST FOLLOW):
-- Ken Sugimori Pokemon official artwork style
-- Clean confident line art
-- Bold saturated colors
-- Cel-shaded with soft gradients
-- Simple white background
-- NO TEXT, NO WATERMARKS
-- Memorable silhouette
-- Cute but cool aesthetic
-- Game-ready character design
+ELEMENT TYPE: ${element}
+- Color palette: ${elementData.colors}
+- Key features: ${elementData.features}
+- Personality vibe: ${elementData.vibe}
+- Reference style: ${elementData.examples}
 
-Create an original creature that looks like it could be in a Pokemon game. Make it appealing, memorable, and true to its ${element} type.`;
+BODY TYPE: ${bodyType}
+- Description: ${bodyDesc}
 
-  return prompt;
+STAT VISUAL EMPHASIS (Dominant: ${dominantStat.name} ${dominantStat.value}):
+- Visual characteristics: ${dominantStat.visual}
+
+ARCHETYPE: ${archetype}
+- This influences expression and pose attitude
+
+---
+
+ART STYLE REQUIREMENTS:
+
+✓ OFFICIAL POKEMON GAME ART STYLE (Ken Sugimori style)
+✓ Clean black outlines with confident line weight variation
+✓ Cel-shaded coloring with soft gradients for depth
+✓ Vibrant saturated colors appropriate to type
+✓ Large expressive eyes with personality
+✓ Memorable distinctive silhouette
+✓ Cute but cool aesthetic - appealing to all ages
+✓ Front-facing or 3/4 view showing character clearly
+✓ Simple pure white background (no environment)
+✓ Professional game asset quality
+✓ Creature fills most of frame, well-centered
+
+---
+
+COMPOSITION:
+- Full body visible, standing pose
+- Head at least 1/4 of image height
+- Character centered with slight breathing room
+- Dynamic but stable pose showing personality
+
+---
+
+CRITICAL NEGATIVE CONSTRAINTS:
+✗ NO text, words, letters, or typography
+✗ NO watermarks, signatures, or artist names
+✗ NO backgrounds, scenery, or environments
+✗ NOT photographic, 3D render, or realistic
+✗ NO gradient backgrounds - pure white only
+✗ NO multiple characters - single creature only
+✗ NO complex patterns that distract from character
+✗ NO human clothing or accessories (natural creature features only)
+✗ NOT abstract or vague - must be clearly defined creature
+
+---
+
+Create a single, high-quality creature character that looks like official Pokemon artwork. Make it appealing, memorable, and immediately recognizable as a ${element}-type creature.`;
 }
 
-// Generate fallback SVG if DALL-E fails
+// Generate enhanced fallback SVG
 function generateFallbackSVG(creature: any): string {
   const { name, element, hp, attack, defense, speed, special, colorPalette } = creature;
   
@@ -132,98 +232,90 @@ function generateFallbackSVG(creature: any): string {
   const secondaryColor = colorPalette[1] || colorPalette[0];
   const accentColor = colorPalette[2] || '#FFFFFF';
   
-  // Create a more interesting Pokemon-style abstract shape
-  const seed = name.split('').reduce((a: number, b: string) => a + b.charCodeAt(0), 0);
+  // Calculate size based on total stats
+  const totalStats = hp + attack + defense + speed + special;
+  const scale = 0.8 + (totalStats / 500);
   
   const svg = `
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:${primaryColor};stop-opacity:0.2" />
-      <stop offset="100%" style="stop-color:${secondaryColor};stop-opacity:0.1" />
-    </linearGradient>
     <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:${primaryColor}" />
       <stop offset="100%" style="stop-color:${secondaryColor}" />
     </linearGradient>
-    <radialGradient id="eyeGrad">
-      <stop offset="0%" style="stop-color:#FFF" />
-      <stop offset="100%" style="stop-color:${accentColor}" />
+    <radialGradient id="glowGrad" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:${accentColor};stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:${primaryColor};stop-opacity:0" />
     </radialGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
   
-  <!-- Background -->
-  <rect width="512" height="512" fill="white" rx="20"/>
-  <rect width="512" height="512" fill="url(#bgGrad)" rx="20"/>
+  <!-- Pure white background -->
+  <rect width="512" height="512" fill="white"/>
   
-  <!-- Main creature body - abstract representation -->
-  <g transform="translate(256, 280)">
-    <!-- Aura/Glow -->
-    <ellipse cx="0" cy="0" rx="${140 + special * 0.3}" ry="${120 + special * 0.25}" fill="${primaryColor}" opacity="0.1" filter="url(#glow)"/>
+  <!-- Creature centered -->
+  <g transform="translate(256, 280) scale(${scale})">
+    <!-- Glow aura -->
+    <ellipse cx="0" cy="20" rx="${100 + special * 0.3}" ry="${90 + special * 0.25}" fill="url(#glowGrad)"/>
     
-    <!-- Body shape based on defense stat -->
-    <ellipse cx="0" cy="${20 + defense * 0.1}" rx="${60 + defense * 0.3}" ry="${50 + defense * 0.2}" fill="url(#bodyGrad)" filter="url(#glow)"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="30" rx="${55 + defense * 0.25}" ry="${45 + defense * 0.2}" fill="url(#bodyGrad)" filter="url(#softGlow)"/>
     
-    <!-- Head based on HP -->
-    <circle cx="0" cy="${-40 - hp * 0.15}" r="${45 + hp * 0.2}" fill="${primaryColor}" opacity="0.95"/>
+    <!-- Head -->
+    <circle cx="0" cy="${-35 - hp * 0.1}" r="${40 + hp * 0.15}" fill="${primaryColor}"/>
     
     <!-- Eyes - large and expressive -->
-    <ellipse cx="${-18}" cy="${-45 - hp * 0.15}" rx="${12}" ry="${16}" fill="url(#eyeGrad)"/>
-    <ellipse cx="${18}" cy="${-45 - hp * 0.15}" rx="${12}" ry="${16}" fill="url(#eyeGrad)"/>
-    <circle cx="${-16}" cy="${-48 - hp * 0.15}" r="${6}" fill="#000"/>
-    <circle cx="${20}" cy="${-48 - hp * 0.15}" r="${6}" fill="#000"/>
-    <circle cx="${-18}" cy="${-52 - hp * 0.15}" r="${3}" fill="#FFF" opacity="0.8"/>
-    <circle cx="${18}" cy="${-52 - hp * 0.15}" r="${3}" fill="#FFF" opacity="0.8"/>
+    <g transform="translate(0, ${-40 - hp * 0.1})">
+      <!-- Left eye -->
+      <ellipse cx="${-18}" cy="0" rx="${14}" ry="${18}" fill="white"/>
+      <circle cx="${-16}" cy="2" r="${7}" fill="#1a1a1a"/>
+      <circle cx="${-18}" cy="${-2}" r="${3}" fill="white" opacity="0.8"/>
+      
+      <!-- Right eye -->
+      <ellipse cx="${18}" cy="0" rx="${14}" ry="${18}" fill="white"/>
+      <circle cx="${16}" cy="2" r="${7}" fill="#1a1a1a"/>
+      <circle cx="${18}" cy="${-2}" r="${3}" fill="white" opacity="0.8"/>
+    </g>
     
     <!-- Element symbol on forehead -->
-    <circle cx="0" cy="${-65 - hp * 0.15}" r="${8}" fill="${accentColor}" opacity="0.9"/>
+    <circle cx="0" cy="${-70 - hp * 0.1}" r="${10}" fill="${accentColor}" opacity="0.9"/>
     
-    <!-- Special power aura -->
-    <ellipse cx="0" cy="0" rx="${90 + special * 0.25}" ry="${80 + special * 0.2}" fill="none" stroke="${accentColor}" stroke-width="3" opacity="0.4" stroke-dasharray="8,4"/>
+    <!-- Special power aura rings -->
+    <ellipse cx="0" cy="0" rx="${80 + special * 0.2}" ry="${70 + special * 0.15}" 
+      fill="none" stroke="${accentColor}" stroke-width="2" opacity="0.4" stroke-dasharray="10,5"/>
     
-    <!-- Speed lines/effects -->
-    ${Array.from({ length: Math.min(8, Math.floor(speed / 15)) }, (_, i) => {
-      const angle = (i * 45) * Math.PI / 180;
-      const r1 = 100;
-      const r2 = 120 + speed * 0.2;
-      const x1 = Math.cos(angle) * r1;
-      const y1 = Math.sin(angle) * r1;
-      const x2 = Math.cos(angle) * r2;
-      const y2 = Math.sin(angle) * r2;
+    <!-- Speed lines -->
+    ${speed > 70 ? Array.from({ length: 6 }, (_, i) => {
+      const angle = i * 60;
+      const rad = angle * Math.PI / 180;
+      const r1 = 90;
+      const r2 = 110 + speed * 0.2;
+      const x1 = Math.cos(rad) * r1;
+      const y1 = Math.sin(rad) * r1;
+      const x2 = Math.cos(rad) * r2;
+      const y2 = Math.sin(rad) * r2;
       return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accentColor}" stroke-width="3" opacity="0.5" stroke-linecap="round"/>`;
-    }).join('')}
+    }).join('') : ''}
     
-    <!-- Attack claws/features -->
-    ${attack > 70 ? `
-    <path d="M ${-50 - attack * 0.2} ${30} L ${-70 - attack * 0.3} ${60} L ${-40 - attack * 0.2} ${50} Z" fill="${secondaryColor}" opacity="0.8"/>
-    <path d="M ${50 + attack * 0.2} ${30} L ${70 + attack * 0.3} ${60} L ${40 + attack * 0.2} ${50} Z" fill="${secondaryColor}" opacity="0.8"/>
+    <!-- Attack features -->
+    ${attack > 75 ? `
+    <path d="M ${-50 - attack * 0.15} 20 L ${-70 - attack * 0.2} 50 L ${-40 - attack * 0.15} 40 Z" fill="${secondaryColor}"/>
+    <path d="M ${50 + attack * 0.15} 20 L ${70 + attack * 0.2} 50 L ${40 + attack * 0.15} 40 Z" fill="${secondaryColor}"/>
     ` : ''}
   </g>
   
-  <!-- Name and info -->
-  <text x="256" y="420" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#333" text-anchor="middle">${name}</text>
+  <!-- Name -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#333" text-anchor="middle">${name}</text>
   
-  <!-- Element badge -->
-  <rect x="186" y="440" width="140" height="32" rx="16" fill="${primaryColor}" stroke="${secondaryColor}" stroke-width="2"/>
-  <text x="256" y="462" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFF" text-anchor="middle">${element} Type</text>
-  
-  <!-- Stats -->
-  <g transform="translate(100, 490)">
-    <text x="0" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666" font-weight="bold">HP</text>
-    <rect x="25" y="-12" width="${hp}" height="12" fill="#4CAF50" rx="6"/>
-    <text x="135" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${hp}</text>
-    
-    <text x="180" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666" font-weight="bold">ATK</text>
-    <rect x="205" y="-12" width="${attack}" height="12" fill="#F44336" rx="6"/>
-    <text x="315" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${attack}</text>
-  </g>
+  <!-- Type badge -->
+  <rect x="206" y="470" width="100" height="28" rx="14" fill="${primaryColor}" stroke="${secondaryColor}" stroke-width="2"/>
+  <text x="256" y="489" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">${element}</text>
 </svg>`;
   
   return svg;
@@ -274,7 +366,6 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Return both the DALL-E URL (if successful) and fallback SVG
     return NextResponse.json({
       imageUrl: dalleImageUrl || fallbackImageBase64,
       imageBase64: fallbackImageBase64,
