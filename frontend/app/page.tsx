@@ -1415,18 +1415,28 @@ export default function Home() {
                               <>
                                 <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#306230' }} />
                                 <button
-                                  onClick={() => {
-                                    // Find first available injected connector (MetaMask, etc)
-                                    const injectedConnector = connectors.find(c => 
-                                      c.id === 'injected' || c.id === 'metaMask' || c.type === 'injected'
-                                    );
+                                  onClick={async () => {
+                                    // Find injected connector
+                                    const injectedConnector = connectors.find(c => c.id === 'injected');
                                     if (injectedConnector) {
-                                      connect({ connector: injectedConnector });
+                                      try {
+                                        await connect({ connector: injectedConnector });
+                                      } catch (e) {
+                                        console.error('Connection failed:', e);
+                                        // Fallback: try to trigger wallet detection
+                                        if (typeof window !== 'undefined' && window.ethereum) {
+                                          try {
+                                            await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                          } catch (err) {
+                                            console.error('Direct ethereum request failed:', err);
+                                          }
+                                        }
+                                      }
                                     } else if (connectors.length > 0) {
                                       connect({ connector: connectors[0] });
                                     }
                                   }}
-                                  disabled={isConnecting || connectors.length === 0}
+                                  disabled={isConnecting}
                                   className="px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded disabled:opacity-50"
                                 >
                                   {isConnecting ? '...' : 'CONNECT WALLET'}

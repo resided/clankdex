@@ -16,8 +16,20 @@ const config = createConfig({
   },
   connectors: [
     farcasterFrame(),
-    injected({ target: 'metaMask' }),
-    injected(),
+    // Auto-detect any injected wallet (MetaMask, Rainbow, Backpack, etc.)
+    injected({ 
+      target: () => ({
+        id: 'injected',
+        name: 'Browser Wallet',
+        provider: () => {
+          if (typeof window !== 'undefined') {
+            // Return any available ethereum provider
+            return window.ethereum || (window as any).web3?.currentProvider;
+          }
+          return undefined;
+        },
+      }),
+    }),
     ...(process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ? [
       walletConnect({
         projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
