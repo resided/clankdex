@@ -18,6 +18,7 @@ import {
   Activity,
   Wallet,
   ChevronRight,
+  ChevronLeft,
   Loader2,
   CheckCircle2,
   TrendingUp,
@@ -29,7 +30,10 @@ import {
   User,
   ToggleLeft,
   ToggleRight,
-  LogOut
+  LogOut,
+  Search,
+  BookOpen,
+  ScanLine
 } from 'lucide-react';
 
 // Contract ABI for Registry
@@ -110,6 +114,48 @@ interface FarcasterData {
   };
 }
 
+interface ClankdexEntry {
+  entryNumber: number;
+  creature: Creature;
+  imageBase64: string | null;
+  tokenAddress: string;
+  tokenSymbol: string;
+  launchedAt: string;
+  inputMode: 'wallet' | 'farcaster';
+  identifier: string;
+}
+
+type ViewMode = 'scan' | 'collection';
+
+const CLANKDEX_STORAGE_KEY = 'clankdex_entries';
+
+// Storage utilities
+const loadClankdexEntries = (): ClankdexEntry[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem(CLANKDEX_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveClankdexEntry = (entry: ClankdexEntry): ClankdexEntry[] => {
+  const entries = loadClankdexEntries();
+  entries.push(entry);
+  localStorage.setItem(CLANKDEX_STORAGE_KEY, JSON.stringify(entries));
+  return entries;
+};
+
+const getNextEntryNumber = (entries: ClankdexEntry[]): number => {
+  if (entries.length === 0) return 1;
+  return Math.max(...entries.map(e => e.entryNumber)) + 1;
+};
+
+const formatEntryNumber = (num: number): string => {
+  return `#${num.toString().padStart(3, '0')}`;
+};
+
 const ELEMENT_ICONS: Record<string, React.ReactNode> = {
   Fire: <Flame className="w-4 h-4" />,
   Water: <Droplets className="w-4 h-4" />,
@@ -162,6 +208,50 @@ export default function Home() {
   const [showCreature, setShowCreature] = useState(false);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
   const [farcasterData, setFarcasterData] = useState<FarcasterData | null>(null);
+
+  // Rolodex state
+  const [viewMode, setViewMode] = useState<ViewMode>('scan');
+  const [clankdexEntries, setClankdexEntries] = useState<ClankdexEntry[]>([]);
+  const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Load entries from localStorage on mount
+  useEffect(() => {
+    setClankdexEntries(loadClankdexEntries());
+  }, []);
+
+  // Filter entries based on search
+  const filteredEntries = clankdexEntries.filter(entry => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      entry.creature.name.toLowerCase().includes(query) ||
+      entry.creature.element.toLowerCase().includes(query) ||
+      formatEntryNumber(entry.entryNumber).toLowerCase().includes(query) ||
+      entry.tokenSymbol.toLowerCase().includes(query)
+    );
+  });
+
+  // Keyboard navigation for rolodex
+  useEffect(() => {
+    if (viewMode !== 'collection') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setCurrentEntryIndex(prev => Math.max(0, prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewMode, filteredEntries.length]);
+
+  // Reset index when search changes
+  useEffect(() => {
+    setCurrentEntryIndex(0);
+  }, [searchQuery]);
 
   // Auto-detect Farcaster user when running in frame context
   useEffect(() => {
@@ -289,6 +379,21 @@ export default function Home() {
       
       if (result.success) {
         setDeployResult(result);
+
+        // Save to Clankdex
+        const newEntry: ClankdexEntry = {
+          entryNumber: getNextEntryNumber(clankdexEntries),
+          creature: { ...creature, imageURI: imageUrl },
+          imageBase64: imageBase64,
+          tokenAddress: result.tokenAddress,
+          tokenSymbol: result.config?.symbol || creature.name.slice(0, 6).toUpperCase(),
+          launchedAt: new Date().toISOString(),
+          inputMode: inputMode,
+          identifier: inputMode === 'wallet' ? (address || '') : farcasterInput,
+        };
+        const updatedEntries = saveClankdexEntry(newEntry);
+        setClankdexEntries(updatedEntries);
+
         confetti({
           particleCount: 200,
           spread: 80,
@@ -355,46 +460,79 @@ export default function Home() {
               </h1>
               <span className="text-2xl">⚡</span>
             </div>
-            <p className="text-gray-300 text-sm md:text-base mb-1">
+            <p className="text-gray-300 text-sm md:text-base">
               Wallet Pokedex powered by <span className="text-yellow-400 font-bold">Clanker</span>
             </p>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-              <span className="bg-gray-800 px-2 py-1 rounded">Farcaster</span>
-              <span className="bg-gray-800 px-2 py-1 rounded">Neynar</span>
-            </div>
           </motion.div>
         </header>
 
-        {/* Input Mode Toggle */}
+        {/* View Mode Toggle */}
         <div className="flex justify-center mb-6">
           <div className="bg-gray-800/50 rounded-full p-1 flex gap-1">
             <button
-              onClick={() => setInputMode('wallet')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                inputMode === 'wallet' 
-                  ? 'bg-blue-600 text-white' 
+              onClick={() => setViewMode('scan')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                viewMode === 'scan'
+                  ? 'bg-pokedex-red text-white shadow-lg'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Wallet className="w-4 h-4" />
-              Wallet
+              <ScanLine className="w-4 h-4" />
+              Scan
             </button>
             <button
-              onClick={() => setInputMode('farcaster')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                inputMode === 'farcaster' 
-                  ? 'bg-purple-600 text-white' 
+              onClick={() => setViewMode('collection')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                viewMode === 'collection'
+                  ? 'bg-pokedex-yellow text-black shadow-lg'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <AtSign className="w-4 h-4" />
-              Farcaster
+              <BookOpen className="w-4 h-4" />
+              Collection
+              {clankdexEntries.length > 0 && (
+                <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">
+                  {clankdexEntries.length}
+                </span>
+              )}
             </button>
           </div>
         </div>
 
+        {viewMode === 'scan' && (
+          <>
+            {/* Input Mode Toggle */}
+            <div className="flex justify-center mb-6">
+              <div className="bg-gray-800/50 rounded-full p-1 flex gap-1">
+                <button
+                  onClick={() => setInputMode('wallet')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    inputMode === 'wallet'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <Wallet className="w-4 h-4" />
+                  Wallet
+                </button>
+                <button
+                  onClick={() => setInputMode('farcaster')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    inputMode === 'farcaster'
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <AtSign className="w-4 h-4" />
+                  Farcaster
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Farcaster Input */}
-        {inputMode === 'farcaster' && (
+        {viewMode === 'scan' && inputMode === 'farcaster' && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -419,7 +557,7 @@ export default function Home() {
         )}
 
         {/* Wallet Connect */}
-        {inputMode === 'wallet' && (
+        {viewMode === 'scan' && inputMode === 'wallet' && (
           <div className="flex justify-center mb-8">
             {isConnected ? (
               <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700">
@@ -452,154 +590,169 @@ export default function Home() {
         )}
 
         {/* Main Content */}
-        {(inputMode === 'wallet' && isConnected) || inputMode === 'farcaster' ? (
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Pokedex Device */}
-            <motion.div
-              initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="pokedex aspect-[3/4] max-w-sm mx-auto md:max-w-none"
-            >
-              {/* Top Section with LEDs */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="led led-blue animate-pulse" />
-                <div className="led led-red" />
-                <div className="led led-yellow" />
-                <div className="led led-green" />
-                <span className="text-white/50 text-xs font-pixel ml-auto">
-                  {inputMode === 'wallet' ? 'WALLET' : 'FARCASTER'}
-                </span>
-              </div>
-
-              {/* Screen */}
-              <div className="pokedex-screen aspect-square mb-4 scanlines">
-                <div className="crt-overlay" />
-                
-                {!showCreature ? (
-                  <div className="absolute inset-0 flex items-center justify-center p-6">
-                    {isAnalyzing ? (
-                      <div className="text-center">
-                        <Loader2 className="w-12 h-12 text-pokedex-darkscreen animate-spin mx-auto mb-4" />
-                        <p className="font-pixel text-xs text-pokedex-darkscreen animate-pulse">
-                          {inputMode === 'wallet' ? 'ANALYZING DNA...' : 'SCANNING FARCASTER...'}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        {inputMode === 'farcaster' && farcasterData?.pfpUrl ? (
-                          <img 
-                            src={farcasterData.pfpUrl} 
-                            alt="Profile"
-                            className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pokedex-darkscreen/30"
-                          />
-                        ) : (
-                          <Sparkles className="w-16 h-16 text-pokedex-darkscreen/50 mx-auto mb-4" />
-                        )}
-                        <p className="font-pixel text-xs text-pokedex-darkscreen text-center">
-                          PRESS SCAN TO<br />
-                          {inputMode === 'wallet' ? 'ANALYZE WALLET' : 'ANALYZE @' + (farcasterInput || 'USER')}<br />
-                          & LAUNCH TOKEN
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="absolute inset-0 flex items-center justify-center p-4"
-                  >
-                    {imageBase64 ? (
-                      <img 
-                        src={imageBase64} 
-                        alt={creature?.name}
-                        className="w-full h-full object-contain animate-float"
-                      />
-                    ) : (
-                      <div 
-                        className="w-32 h-32 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: creature?.colorPalette[0] }}
-                      >
-                        <span className="text-6xl">
-                          {ELEMENT_ICONS[creature?.element || 'Fire']}
-                        </span>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </div>
-
-              {/* Bottom Controls */}
-              <div className="flex items-center justify-between">
-                <div className="dpad">
-                  <div className="dpad-up" />
-                  <div className="dpad-left" />
-                  <div className="dpad-center" />
-                  <div className="dpad-right" />
-                  <div className="dpad-down" />
+        {viewMode === 'scan' ? (
+          // SCAN MODE
+          (inputMode === 'wallet' && isConnected) || inputMode === 'farcaster' ? (
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Pokedex Device */}
+              <motion.div
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="pokedex aspect-[3/4] max-w-sm mx-auto md:max-w-none"
+              >
+                {/* Top Section with LEDs */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="led led-blue animate-pulse" />
+                  <div className="led led-red" />
+                  <div className="led led-yellow" />
+                  <div className="led led-green" />
+                  <span className="text-white/50 text-xs font-pixel ml-auto">
+                    {inputMode === 'wallet' ? 'WALLET' : 'FARCASTER'}
+                  </span>
                 </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={analyze}
-                    disabled={isAnalyzing || isMinting || (inputMode === 'farcaster' && !farcasterInput.trim())}
-                    className="pixel-btn text-white disabled:opacity-50"
-                  >
-                    {isAnalyzing ? '...' : 'SCAN'}
-                  </button>
-                  
-                  {showCreature && !deployResult && (
-                    <button
-                      onClick={launchCreature}
-                      disabled={isMinting || isAnalyzing}
-                      className="pixel-btn text-white disabled:opacity-50"
-                      style={{ backgroundColor: '#FFD700', borderColor: '#B8860B', color: '#000' }}
+                {/* Screen */}
+                <div className="pokedex-screen aspect-square mb-4 scanlines">
+                  <div className="crt-overlay" />
+
+                  {!showCreature ? (
+                    <div className="absolute inset-0 flex items-center justify-center p-6">
+                      {isAnalyzing ? (
+                        <div className="text-center">
+                          <Loader2 className="w-12 h-12 text-pokedex-darkscreen animate-spin mx-auto mb-4" />
+                          <p className="font-pixel text-xs text-pokedex-darkscreen animate-pulse">
+                            {inputMode === 'wallet' ? 'ANALYZING DNA...' : 'SCANNING FARCASTER...'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          {inputMode === 'farcaster' && farcasterData?.pfpUrl ? (
+                            <img
+                              src={farcasterData.pfpUrl}
+                              alt="Profile"
+                              className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pokedex-darkscreen/30"
+                            />
+                          ) : (
+                            <Sparkles className="w-16 h-16 text-pokedex-darkscreen/50 mx-auto mb-4" />
+                          )}
+                          <p className="font-pixel text-xs text-pokedex-darkscreen text-center">
+                            PRESS SCAN TO<br />
+                            {inputMode === 'wallet' ? 'ANALYZE WALLET' : 'ANALYZE @' + (farcasterInput || 'USER')}<br />
+                            & LAUNCH TOKEN
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="absolute inset-0 flex items-center justify-center p-4"
                     >
-                      {isMinting ? '...' : '🚀 LAUNCH'}
-                    </button>
+                      {imageBase64 ? (
+                        <img
+                          src={imageBase64}
+                          alt={creature?.name}
+                          className="w-full h-full object-contain animate-float"
+                        />
+                      ) : (
+                        <div
+                          className="w-32 h-32 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: creature?.colorPalette[0] }}
+                        >
+                          <span className="text-6xl">
+                            {ELEMENT_ICONS[creature?.element || 'Fire']}
+                          </span>
+                        </div>
+                      )}
+                    </motion.div>
                   )}
                 </div>
-              </div>
-            </motion.div>
 
-            {/* Stats Panel */}
-            <AnimatePresence mode="wait">
-              {showCreature && creature && (
-                <StatsPanel
-                  creature={creature}
-                  farcasterData={farcasterData}
-                  isMinting={isMinting}
-                  mintStep={mintStep}
-                  deployResult={deployResult}
-                  onShare={(text, embeds) => composeCast(text, embeds)}
-                />
-              )}
-
-              {!showCreature && !isAnalyzing && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-center justify-center h-full min-h-[300px]"
-                >
-                  <div className="text-center">
-                    <Activity className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">
-                      {inputMode === 'wallet' 
-                        ? 'Connect your wallet and scan to discover\nyour unique blockchain creature'
-                        : 'Enter a Farcaster username to analyze\ntheir on-chain personality'
-                      }
-                    </p>
-                    <div className="flex items-center justify-center gap-2 text-sm text-yellow-500">
-                      <Rocket className="w-4 h-4" />
-                      <span>Launches as Clanker token</span>
-                    </div>
+                {/* Bottom Controls */}
+                <div className="flex items-center justify-between">
+                  <div className="dpad">
+                    <div className="dpad-up" />
+                    <div className="dpad-left" />
+                    <div className="dpad-center" />
+                    <div className="dpad-right" />
+                    <div className="dpad-down" />
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={analyze}
+                      disabled={isAnalyzing || isMinting || (inputMode === 'farcaster' && !farcasterInput.trim())}
+                      className="pixel-btn text-white disabled:opacity-50"
+                    >
+                      {isAnalyzing ? '...' : 'SCAN'}
+                    </button>
+
+                    {showCreature && !deployResult && (
+                      <button
+                        onClick={launchCreature}
+                        disabled={isMinting || isAnalyzing}
+                        className="pixel-btn text-white disabled:opacity-50"
+                        style={{ backgroundColor: '#FFD700', borderColor: '#B8860B', color: '#000' }}
+                      >
+                        {isMinting ? '...' : '🚀 LAUNCH'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Stats Panel */}
+              <AnimatePresence mode="wait">
+                {showCreature && creature && (
+                  <StatsPanel
+                    creature={creature}
+                    farcasterData={farcasterData}
+                    isMinting={isMinting}
+                    mintStep={mintStep}
+                    deployResult={deployResult}
+                    onShare={(text, embeds) => composeCast(text, embeds)}
+                  />
+                )}
+
+                {!showCreature && !isAnalyzing && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-center h-full min-h-[300px]"
+                  >
+                    <div className="text-center">
+                      <Activity className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-500 mb-4">
+                        {inputMode === 'wallet'
+                          ? 'Connect your wallet and scan to discover\nyour unique blockchain creature'
+                          : 'Enter a Farcaster username to analyze\ntheir on-chain personality'
+                        }
+                      </p>
+                      <div className="flex items-center justify-center gap-2 text-sm text-yellow-500">
+                        <Rocket className="w-4 h-4" />
+                        <span>Launches as Clanker token</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <NotConnectedState inputMode={inputMode} />
+          )
         ) : (
-          <NotConnectedState inputMode={inputMode} />
+          // COLLECTION MODE - Rolodex
+          <Rolodex
+            entries={filteredEntries}
+            currentIndex={currentEntryIndex}
+            onPrev={() => setCurrentEntryIndex(prev => Math.max(0, prev - 1))}
+            onNext={() => setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1))}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            totalEntries={clankdexEntries.length}
+            onScanNew={() => setViewMode('scan')}
+          />
         )}
 
         {/* Info Cards */}
@@ -607,20 +760,17 @@ export default function Home() {
           <InfoCard
             icon={<Eye className="w-6 h-6" />}
             title="Analyze"
-            description={inputMode === 'wallet' 
-              ? "Scan your wallet history to generate a unique DNA fingerprint"
-              : "Analyze Farcaster activity, followers, and personality"
-            }
+            description="Your wallet history becomes DNA. We scan transaction patterns, token holdings, NFT collections, and on-chain activity to create a unique genetic fingerprint. The AI analyzes this data to determine your creature's element type, stats distribution, and personality traits."
           />
           <InfoCard
             icon={<Sparkles className="w-6 h-6" />}
             title="Generate"
-            description="AI creates a pixel art creature based on your activity"
+            description="Our AI takes your DNA fingerprint and conjures a one-of-a-kind pixel art creature. The name, species, and visual design are all algorithmically determined based on your on-chain identity - no two creatures are alike."
           />
           <InfoCard
             icon={<Rocket className="w-6 h-6" />}
             title="Clanker Launch"
-            description="Launch your creature as a token with trading rewards"
+            description="Deploy your creature as a tradeable ERC-20 token on Base via Clanker. You'll receive creator rewards from trading activity. Your creature joins the Clankdex permanently with a unique entry number."
           />
         </div>
       </div>
@@ -914,7 +1064,7 @@ function NotConnectedState({ inputMode }: { inputMode: InputMode }) {
               <AtSign className="w-16 h-16 text-pokedex-darkscreen/50 mx-auto mb-4" />
             )}
             <p className="font-pixel text-xs text-pokedex-darkscreen">
-              {inputMode === 'wallet' 
+              {inputMode === 'wallet'
                 ? 'CONNECT WALLET\nTO BEGIN'
                 : 'ENTER USERNAME\nTO BEGIN'
               }
@@ -927,6 +1077,267 @@ function NotConnectedState({ inputMode }: { inputMode: InputMode }) {
           <div className="led led-yellow" />
           <div className="led led-green" />
         </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Rolodex Component
+function Rolodex({
+  entries,
+  currentIndex,
+  onPrev,
+  onNext,
+  searchQuery,
+  onSearchChange,
+  totalEntries,
+  onScanNew,
+}: {
+  entries: ClankdexEntry[];
+  currentIndex: number;
+  onPrev: () => void;
+  onNext: () => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  totalEntries: number;
+  onScanNew: () => void;
+}) {
+  const currentEntry = entries[currentIndex];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-2xl mx-auto"
+    >
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search by name, element, or entry #..."
+            className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm"
+          />
+        </div>
+      </div>
+
+      {entries.length === 0 ? (
+        // Empty State
+        <div className="rolodex-container p-8">
+          <div className="text-center py-12">
+            <BookOpen className="w-20 h-20 text-gray-600 mx-auto mb-6" />
+            <h3 className="font-pixel text-xl text-white mb-3">
+              {totalEntries === 0 ? 'NO ENTRIES YET' : 'NO MATCHES FOUND'}
+            </h3>
+            <p className="text-gray-400 mb-6">
+              {totalEntries === 0
+                ? 'Scan your wallet or Farcaster account to create your first creature!'
+                : 'Try a different search term'}
+            </p>
+            {totalEntries === 0 && (
+              <button
+                onClick={onScanNew}
+                className="pixel-btn text-white"
+              >
+                START SCANNING
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Rolodex Card Browser */}
+          <div className="flex items-center gap-4">
+            {/* Prev Button */}
+            <button
+              onClick={onPrev}
+              disabled={currentIndex === 0}
+              className="rolodex-nav flex-shrink-0 disabled:opacity-30"
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+
+            {/* Main Card */}
+            <div className="flex-1">
+              <AnimatePresence mode="wait">
+                <RolodexCard key={currentEntry.entryNumber} entry={currentEntry} />
+              </AnimatePresence>
+            </div>
+
+            {/* Next Button */}
+            <button
+              onClick={onNext}
+              disabled={currentIndex === entries.length - 1}
+              className="rolodex-nav flex-shrink-0 disabled:opacity-30"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+          </div>
+
+          {/* Entry Counter */}
+          <div className="text-center mt-6">
+            <p className="text-gray-400 text-sm">
+              Showing <span className="text-pokedex-yellow font-bold">{formatEntryNumber(currentEntry.entryNumber)}</span>
+              {' '}&bull;{' '}
+              <span className="text-white">{currentIndex + 1}</span> of <span className="text-white">{entries.length}</span>
+              {searchQuery && ` (filtered from ${totalEntries})`}
+            </p>
+            <p className="text-gray-500 text-xs mt-2">
+              Use arrow keys to navigate
+            </p>
+          </div>
+        </>
+      )}
+    </motion.div>
+  );
+}
+
+// Rolodex Card Component
+function RolodexCard({ entry }: { entry: ClankdexEntry }) {
+  const { creature, entryNumber, imageBase64, tokenAddress, tokenSymbol, launchedAt, inputMode, identifier } = entry;
+  const totalStats = creature.hp + creature.attack + creature.defense + creature.speed + creature.special;
+
+  const getRarity = (element: string) => {
+    const rarities: Record<string, string> = {
+      Fire: 'common', Water: 'common', Grass: 'common', Fighting: 'common', Ground: 'common', Bug: 'common',
+      Electric: 'uncommon', Poison: 'uncommon', Flying: 'uncommon',
+      Ice: 'rare', Psychic: 'rare',
+      Dragon: 'legendary'
+    };
+    return rarities[element] || 'common';
+  };
+
+  return (
+    <motion.div
+      initial={{ rotateY: -90, opacity: 0 }}
+      animate={{ rotateY: 0, opacity: 1 }}
+      exit={{ rotateY: 90, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="rolodex-card"
+    >
+      {/* Entry Number Badge */}
+      <div className="entry-number">
+        {formatEntryNumber(entryNumber)}
+      </div>
+
+      {/* Top Section */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h2 className="font-pixel text-2xl text-white">
+            {creature.name}
+          </h2>
+          <p className="text-gray-400 text-sm">{creature.species}</p>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <span className={`element-badge ${ELEMENT_COLORS[creature.element]} text-white`}>
+            {ELEMENT_ICONS[creature.element]}
+            {creature.element}
+          </span>
+          <span className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(creature.element)]}`}>
+            {getRarity(creature.element)}
+          </span>
+        </div>
+      </div>
+
+      {/* Creature Display */}
+      <div className="rolodex-screen mb-4">
+        {imageBase64 ? (
+          <img
+            src={imageBase64}
+            alt={creature.name}
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{ backgroundColor: creature.colorPalette?.[0] || '#333' }}
+          >
+            <span className="text-6xl">
+              {ELEMENT_ICONS[creature.element]}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-5 gap-2 mb-4">
+        <div className="text-center">
+          <p className="text-gray-500 text-xs">HP</p>
+          <p className="font-pixel text-green-400">{creature.hp}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-gray-500 text-xs">ATK</p>
+          <p className="font-pixel text-red-400">{creature.attack}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-gray-500 text-xs">DEF</p>
+          <p className="font-pixel text-blue-400">{creature.defense}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-gray-500 text-xs">SPD</p>
+          <p className="font-pixel text-yellow-400">{creature.speed}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-gray-500 text-xs">SPC</p>
+          <p className="font-pixel text-purple-400">{creature.special}</p>
+        </div>
+      </div>
+
+      {/* Total & Token Info */}
+      <div className="border-t border-gray-700 pt-4 grid grid-cols-2 gap-4">
+        <div>
+          <p className="text-gray-500 text-xs mb-1">TOTAL STATS</p>
+          <p className="font-pixel text-xl text-white">{totalStats}</p>
+        </div>
+        <div>
+          <p className="text-gray-500 text-xs mb-1">TOKEN</p>
+          <p className="font-pixel text-pokedex-yellow">${tokenSymbol}</p>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between text-xs">
+        <span className="text-gray-500">
+          {inputMode === 'wallet' ? (
+            <span className="flex items-center gap-1">
+              <Wallet className="w-3 h-3" />
+              {identifier.slice(0, 6)}...{identifier.slice(-4)}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1">
+              <AtSign className="w-3 h-3" />
+              {identifier}
+            </span>
+          )}
+        </span>
+        <span className="text-gray-500">
+          {new Date(launchedAt).toLocaleDateString()}
+        </span>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <a
+          href={`${CLANKER_URL}/token/${tokenAddress}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm transition-colors"
+        >
+          <Coins className="w-4 h-4" />
+          Clanker
+        </a>
+        <a
+          href={`https://basescan.org/token/${tokenAddress}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition-colors"
+        >
+          <ExternalLink className="w-4 h-4" />
+          BaseScan
+        </a>
       </div>
     </motion.div>
   );
