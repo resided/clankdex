@@ -13,53 +13,54 @@ function getOpenAI() {
 }
 
 // ============================================
-// CREATURE STYLE GUIDE - Original Digital Entities
+// POKEMON-INSPIRED CREATURE STYLE GUIDE
 // ============================================
 const STYLE_GUIDE = {
-  // Visual baseline for DALL-E prompts
+  // Core Pokemon design principles (original creatures)
   visualRules: [
-    "Original creature design, completely unique digital entity",
-    "Glowing eyes that reflect the creature's essence",
-    "Ethereal body with subtle particle effects",
-    "Smooth, clean lines with soft glow effects",
-    "Colors match the elemental affinity",
-    "Pure white background",
-    "No text, no watermarks, no signatures, no borders",
-    "Front-facing or 3/4 view pose",
-    "Digital art style with ethereal qualities",
-    "Soft lighting with ambient glow",
+    "Ken Sugimori Pokemon art style - official game artwork quality",
+    "Creature should have a distinctive, recognizable silhouette",
+    "Large expressive eyes with personality and emotion",
+    "Clean, confident line art with smooth curves",
+    "Bold, saturated colors appropriate to the element type",
+    "Simple white background - no environment",
+    "NO TEXT, NO WATERMARKS, NO SIGNATURES",
+    "Front-facing or 3/4 view showing personality",
+    "Cell-shaded rendering with soft gradients",
+    "Cute but cool aesthetic - appealing to all ages",
+    "Distinctive features that make it memorable",
   ],
   
-  // Art style modifiers
-  artStyle: "original creature design, ethereal digital entity, soft glowing effects, clean vector-like illustration, game asset quality, unique digital being",
+  // Enhanced art style for DALL-E
+  artStyle: "Pokemon official artwork by Ken Sugimori, creature design, clean vector-like illustration, cel-shaded, vibrant colors, game art, character design, appealing proportions, memorable silhouette",
   
-  // Element visual traits for prompts
+  // Detailed element visual traits
   elementTraits: {
-    Fire: "ember particles, warm glowing aura, flame wisps, molten core visible through semi-transparent skin",
-    Water: "flowing liquid form, bubble trails, deep ocean hues, bioluminescent spots, fluid body",
-    Grass: "organic growth patterns, pollen dust, photosynthetic glow, root-like tendrils, living bark",
-    Electric: "energy arcs, ionized air particles, conductivity patterns, plasma trails, sparking aura",
-    Ice: "crystalline formations, frost breath, frozen aura, snowflake patterns, refractive ice body",
-    Fighting: "tense posture, kinetic energy waves, muscular definition, battle-ready stance, force aura",
-    Poison: "toxic aura, bubbling secretions, warning color patterns, spore clouds, venomous glow",
-    Ground: "mineral deposits, tectonic plates, sediment layers, geological formations, earth connection",
-    Flying: "air currents, cloud wisps, gravitational lightness, wind-swept features, sky affinity",
-    Psychic: "third eye glow, telekinetic waves, ethereal mist, consciousness ripples, mental projection",
-    Bug: "hive patterns, compound eye shine, chitin glow, swarm consciousness aura, segmented body",
-    Rock: "mineral veins, crystal inclusions, petrified growths, sedimentary layers, stone core",
-    Ghost: "phasing effect, spirit tether, ectoplasm trails, soul fragments, translucent body",
-    Dragon: "primal markings, ancient runes, power scales, elemental convergence, majestic presence",
-    Dark: "shadow tendrils, void pockets, darkness absorption, eclipse aura, mysterious silhouette",
-    Steel: "forged plating, gear integrations, metallic sheen, industrial fusion, mechanical elegance",
-    Fairy: "glamour dust, enchantment swirls, magical resonance, wonder essence, dream-like appearance",
+    Fire: "warm orange/red/yellow color scheme, flame patterns on body, smoke wisps, heat shimmer effect, passionate expression, ember particles",
+    Water: "cool blue/cyan color scheme, fin-like appendages, bubble details, droplet patterns, fluid graceful pose, wave-like forms",
+    Grass: "natural green/brown color scheme, leaf or petal accents, vine details, organic flowing shapes, gentle nature spirit vibe",
+    Electric: "bright yellow/orange color scheme, lightning bolt patterns, spiky fur or feathers, energetic dynamic pose, spark effects",
+    Ice: "icy blue/white color scheme, crystal formations, snowflake patterns, frosty breath, elegant crystalline features",
+    Fighting: "warm red/brown color scheme, muscular or tough build, bandage or belt details, determined confident stance",
+    Poison: "purple/green color scheme, toxic patterns, gas or bubble effects, mysterious slightly menacing look",
+    Ground: "earthy brown/tan color scheme, rocky or sandy textures, sturdy grounded build, desert or mountain motifs",
+    Flying: "sky blue/white color scheme, wing or feather details, cloud-like fluff, wind-swept features, airy lightweight build",
+    Psychic: "magenta/purple color scheme, mystical gems or orbs, third eye or forehead gem, mysterious wise expression",
+    Bug: "green/yellow color scheme, insectoid features, compound eyes, antennae, chitin shell patterns",
+    Rock: "gray/brown color scheme, rocky armor or skin, crystal formations, sturdy heavy build, mineral patterns",
+    Ghost: "purple/black color scheme, ethereal misty features, floating elements, mysterious translucent effects",
+    Dragon: "deep jewel-tone color scheme, scale patterns, horn or wing features, majestic powerful presence",
+    Dark: "dark purple/black color scheme, shadowy features, red eyes, mysterious sneaky appearance",
+    Steel: "silver/gray color scheme, metallic armor or skin, gear or mechanical details, industrial robotic features",
+    Fairy: "pink/white color scheme, sparkles and stars, wing or ribbon features, cute magical appearance",
   },
   
-  // Size classifications for creature design
-  sizeClasses: {
-    tiny: "tiny ethereal entity, fits in palm, concentrated energy",
-    small: "small digital being, compact form, focused essence",
-    medium: "medium manifestation, balanced ethereal presence",
-    large: "large entity, imposing ethereal presence, significant energy",
+  // Body type based on stats
+  bodyTypes: {
+    tiny: "tiny cute creature, baby-like proportions, oversized head, fits in palm, chibi style",
+    small: "small compact creature, youthful proportions, playful energetic look,便携 size",
+    medium: "medium balanced creature, athletic proportions, adventure-ready appearance",
+    large: "large impressive creature, powerful proportions, commanding presence, evolved form look",
   }
 };
 
@@ -74,44 +75,51 @@ function buildDallePrompt(creature: any): string {
     defense, 
     speed, 
     special,
-    visualTraits,
     description,
     archetype,
     archetypeLore 
   } = creature;
   
-  // Determine size class based on stats
+  // Determine body type based on stats
   const avgStat = (hp + attack + defense + speed + special) / 5;
-  let sizeClass = 'small';
-  if (avgStat < 60) sizeClass = 'tiny';
-  else if (avgStat < 80) sizeClass = 'small';
-  else if (avgStat < 100) sizeClass = 'medium';
-  else sizeClass = 'large';
+  let bodyType = 'small';
+  if (avgStat < 60) bodyType = 'tiny';
+  else if (avgStat < 85) bodyType = 'small';
+  else if (avgStat < 110) bodyType = 'medium';
+  else bodyType = 'large';
   
   // Get element-specific visual traits
   const elementVisuals = STYLE_GUIDE.elementTraits[element as keyof typeof STYLE_GUIDE.elementTraits] || '';
-  const sizeVisuals = STYLE_GUIDE.sizeClasses[sizeClass as keyof typeof STYLE_GUIDE.sizeClasses];
+  const bodyTypeDesc = STYLE_GUIDE.bodyTypes[bodyType as keyof typeof STYLE_GUIDE.bodyTypes];
   
-  // Build the prompt with lore integration
-  const prompt = `An original digital creature called "${name}" - a ${element} ${species}.
+  // Build the enhanced prompt
+  const prompt = `A Pokemon-style creature named "${name}" the ${element}-type ${species}.
 
-Archetype: ${archetype} - ${archetypeLore}
-
-Physical description:
-- ${sizeVisuals}
+CREATURE DESIGN:
+- ${bodyTypeDesc}
 - ${elementVisuals}
-- ${visualTraits || elementVisuals}
-- Glowing eyes reflecting its ${element} essence
+- Distinctive features that make it instantly recognizable
+- Expressive eyes showing ${archetype.toLowerCase()} personality
 
-Creature backstory (visual influence):
+ARCHETYPE INFLUENCE:
+The creature embodies the ${archetype} archetype: ${archetypeLore}
+This influences its pose, expression, and overall vibe.
+
+BACKSTORY VISUALS:
 ${description}
 
-Design rules (MUST FOLLOW):
-- ${STYLE_GUIDE.visualRules.join('\n- ')}
+ART STYLE (CRITICAL - MUST FOLLOW):
+- Ken Sugimori Pokemon official artwork style
+- Clean confident line art
+- Bold saturated colors
+- Cel-shaded with soft gradients
+- Simple white background
+- NO TEXT, NO WATERMARKS
+- Memorable silhouette
+- Cute but cool aesthetic
+- Game-ready character design
 
-Style: ${STYLE_GUIDE.artStyle}
-
-Create a completely original creature design that embodies the ${archetype} archetype with ${element} elemental powers. The creature ${name} should look like a unique digital entity born from blockchain essence, not based on any existing character.`;
+Create an original creature that looks like it could be in a Pokemon game. Make it appealing, memorable, and true to its ${element} type.`;
 
   return prompt;
 }
@@ -124,19 +132,26 @@ function generateFallbackSVG(creature: any): string {
   const secondaryColor = colorPalette[1] || colorPalette[0];
   const accentColor = colorPalette[2] || '#FFFFFF';
   
+  // Create a more interesting Pokemon-style abstract shape
+  const seed = name.split('').reduce((a: number, b: string) => a + b.charCodeAt(0), 0);
+  
   const svg = `
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:${primaryColor};stop-opacity:0.3" />
+      <stop offset="0%" style="stop-color:${primaryColor};stop-opacity:0.2" />
       <stop offset="100%" style="stop-color:${secondaryColor};stop-opacity:0.1" />
     </linearGradient>
     <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:${primaryColor}" />
       <stop offset="100%" style="stop-color:${secondaryColor}" />
     </linearGradient>
+    <radialGradient id="eyeGrad">
+      <stop offset="0%" style="stop-color:#FFF" />
+      <stop offset="100%" style="stop-color:${accentColor}" />
+    </radialGradient>
     <filter id="glow">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -145,61 +160,69 @@ function generateFallbackSVG(creature: any): string {
   </defs>
   
   <!-- Background -->
+  <rect width="512" height="512" fill="white" rx="20"/>
   <rect width="512" height="512" fill="url(#bgGrad)" rx="20"/>
   
-  <!-- Card border -->
-  <rect x="10" y="10" width="492" height="492" fill="none" stroke="${primaryColor}" stroke-width="4" rx="15"/>
-  
-  <!-- Element badge background -->
-  <circle cx="256" cy="200" r="120" fill="url(#bodyGrad)" opacity="0.8"/>
-  <circle cx="256" cy="200" r="100" fill="${accentColor}" opacity="0.3"/>
-  
-  <!-- Creature body (abstract representation based on stats) -->
-  <g transform="translate(256, 200)">
+  <!-- Main creature body - abstract representation -->
+  <g transform="translate(256, 280)">
+    <!-- Aura/Glow -->
+    <ellipse cx="0" cy="0" rx="${140 + special * 0.3}" ry="${120 + special * 0.25}" fill="${primaryColor}" opacity="0.1" filter="url(#glow)"/>
+    
     <!-- Body shape based on defense stat -->
-    <ellipse cx="0" cy="20" rx="${60 + defense * 0.2}" ry="${50 + defense * 0.15}" fill="url(#bodyGrad)" filter="url(#glow)"/>
+    <ellipse cx="0" cy="${20 + defense * 0.1}" rx="${60 + defense * 0.3}" ry="${50 + defense * 0.2}" fill="url(#bodyGrad)" filter="url(#glow)"/>
     
     <!-- Head based on HP -->
-    <circle cx="0" cy="${-30 - hp * 0.1}" r="${40 + hp * 0.15}" fill="${primaryColor}" opacity="0.9"/>
+    <circle cx="0" cy="${-40 - hp * 0.15}" r="${45 + hp * 0.2}" fill="${primaryColor}" opacity="0.95"/>
     
-    <!-- Eyes based on attack -->
-    <ellipse cx="${-20 - attack * 0.05}" cy="${-35 - hp * 0.1}" rx="${8 + attack * 0.03}" ry="${12 + attack * 0.04}" fill="#FFF"/>
-    <ellipse cx="${20 + attack * 0.05}" cy="${-35 - hp * 0.1}" rx="${8 + attack * 0.03}" ry="${12 + attack * 0.04}" fill="#FFF"/>
-    <circle cx="${-20 - attack * 0.05}" cy="${-35 - hp * 0.1}" r="${4 + attack * 0.02}" fill="#000"/>
-    <circle cx="${20 + attack * 0.05}" cy="${-35 - hp * 0.1}" r="${4 + attack * 0.02}" fill="#000"/>
+    <!-- Eyes - large and expressive -->
+    <ellipse cx="${-18}" cy="${-45 - hp * 0.15}" rx="${12}" ry="${16}" fill="url(#eyeGrad)"/>
+    <ellipse cx="${18}" cy="${-45 - hp * 0.15}" rx="${12}" ry="${16}" fill="url(#eyeGrad)"/>
+    <circle cx="${-16}" cy="${-48 - hp * 0.15}" r="${6}" fill="#000"/>
+    <circle cx="${20}" cy="${-48 - hp * 0.15}" r="${6}" fill="#000"/>
+    <circle cx="${-18}" cy="${-52 - hp * 0.15}" r="${3}" fill="#FFF" opacity="0.8"/>
+    <circle cx="${18}" cy="${-52 - hp * 0.15}" r="${3}" fill="#FFF" opacity="0.8"/>
     
-    <!-- Special aura -->
-    <circle cx="0" cy="0" r="${80 + special * 0.3}" fill="none" stroke="${accentColor}" stroke-width="2" opacity="0.5" stroke-dasharray="10,5"/>
+    <!-- Element symbol on forehead -->
+    <circle cx="0" cy="${-65 - hp * 0.15}" r="${8}" fill="${accentColor}" opacity="0.9"/>
     
-    <!-- Speed lines -->
-    ${Array.from({ length: Math.floor(speed / 20) }, (_, i) => {
-      const angle = (i * 360 / Math.floor(speed / 20)) * Math.PI / 180;
-      const x1 = Math.cos(angle) * 90;
-      const y1 = Math.sin(angle) * 90;
-      const x2 = Math.cos(angle) * 110;
-      const y2 = Math.sin(angle) * 110;
-      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accentColor}" stroke-width="3" opacity="0.6"/>`;
+    <!-- Special power aura -->
+    <ellipse cx="0" cy="0" rx="${90 + special * 0.25}" ry="${80 + special * 0.2}" fill="none" stroke="${accentColor}" stroke-width="3" opacity="0.4" stroke-dasharray="8,4"/>
+    
+    <!-- Speed lines/effects -->
+    ${Array.from({ length: Math.min(8, Math.floor(speed / 15)) }, (_, i) => {
+      const angle = (i * 45) * Math.PI / 180;
+      const r1 = 100;
+      const r2 = 120 + speed * 0.2;
+      const x1 = Math.cos(angle) * r1;
+      const y1 = Math.sin(angle) * r1;
+      const x2 = Math.cos(angle) * r2;
+      const y2 = Math.sin(angle) * r2;
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accentColor}" stroke-width="3" opacity="0.5" stroke-linecap="round"/>`;
     }).join('')}
+    
+    <!-- Attack claws/features -->
+    ${attack > 70 ? `
+    <path d="M ${-50 - attack * 0.2} ${30} L ${-70 - attack * 0.3} ${60} L ${-40 - attack * 0.2} ${50} Z" fill="${secondaryColor}" opacity="0.8"/>
+    <path d="M ${50 + attack * 0.2} ${30} L ${70 + attack * 0.3} ${60} L ${40 + attack * 0.2} ${50} Z" fill="${secondaryColor}" opacity="0.8"/>
+    ` : ''}
   </g>
   
-  <!-- Name -->
-  <text x="256" y="380" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#333" text-anchor="middle">${name}</text>
+  <!-- Name and info -->
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#333" text-anchor="middle">${name}</text>
   
   <!-- Element badge -->
-  <rect x="196" y="400" width="120" height="30" rx="15" fill="${primaryColor}"/>
-  <text x="256" y="420" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFF" text-anchor="middle">${element} Type</text>
+  <rect x="186" y="440" width="140" height="32" rx="16" fill="${primaryColor}" stroke="${secondaryColor}" stroke-width="2"/>
+  <text x="256" y="462" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFF" text-anchor="middle">${element} Type</text>
   
-  <!-- Stats bars -->
-  <g transform="translate(80, 450)">
-    <text x="0" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666">HP</text>
-    <rect x="30" y="-10" width="100" height="12" fill="#E0E0E0" rx="6"/>
-    <rect x="30" y="-10" width="${Math.min(hp, 100)}" height="12" fill="#FF5722" rx="6"/>
-    <text x="140" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${hp}</text>
+  <!-- Stats -->
+  <g transform="translate(100, 490)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666" font-weight="bold">HP</text>
+    <rect x="25" y="-12" width="${hp}" height="12" fill="#4CAF50" rx="6"/>
+    <text x="135" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${hp}</text>
     
-    <text x="200" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666">ATK</text>
-    <rect x="230" y="-10" width="100" height="12" fill="#E0E0E0" rx="6"/>
-    <rect x="230" y="-10" width="${Math.min(attack, 100)}" height="12" fill="#F44336" rx="6"/>
-    <text x="340" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${attack}</text>
+    <text x="180" y="0" font-family="Arial, sans-serif" font-size="12" fill="#666" font-weight="bold">ATK</text>
+    <rect x="205" y="-12" width="${attack}" height="12" fill="#F44336" rx="6"/>
+    <text x="315" y="0" font-family="Arial, sans-serif" font-size="12" fill="#333">${attack}</text>
   </g>
 </svg>`;
   
@@ -231,7 +254,7 @@ export async function POST(request: NextRequest) {
       try {
         const prompt = buildDallePrompt(creature);
         
-        console.log('Generating DALL-E image with prompt:', prompt.slice(0, 200) + '...');
+        console.log('Generating DALL-E image for:', creature.name);
         
         const response = await openaiClient.images.generate({
           model: "dall-e-3",
@@ -244,7 +267,7 @@ export async function POST(request: NextRequest) {
         
         dalleImageUrl = response.data?.[0]?.url || null;
         
-        console.log('DALL-E image generated successfully');
+        console.log('DALL-E image generated:', dalleImageUrl ? 'success' : 'failed');
       } catch (dalleError) {
         console.error('DALL-E generation failed:', dalleError);
         // Fall back to SVG

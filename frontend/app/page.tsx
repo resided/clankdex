@@ -460,6 +460,176 @@ const DNAScanningAnimation = ({ mode }: { mode: InputMode }) => {
   );
 };
 
+// Epic Launch Animation
+const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success' }) => {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
+      <AnimatePresence mode="wait">
+        {step === 'generating' && (
+          <motion.div
+            key="generating"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.2 }}
+            className="text-center"
+          >
+            {/* Energy swirling effect */}
+            <div className="relative w-48 h-48">
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute inset-0 rounded-full border-4 border-yellow-400"
+                  animate={{ 
+                    rotate: 360,
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 1, 0.5]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                    ease: "linear"
+                  }}
+                  style={{ borderStyle: 'dashed' }}
+                />
+              ))}
+              <motion.div
+                className="absolute inset-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                <Sparkles className="w-16 h-16 text-white" />
+              </motion.div>
+            </div>
+            <motion.p 
+              className="mt-6 text-yellow-400 font-bold text-lg"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              GENERATING ART...
+            </motion.p>
+          </motion.div>
+        )}
+        
+        {step === 'deploying' && (
+          <motion.div
+            key="deploying"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center"
+          >
+            {/* Rocket launch effect */}
+            <div className="relative w-48 h-64">
+              {/* Exhaust particles */}
+              {[...Array(8)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute left-1/2 bottom-0 w-4 h-4 rounded-full"
+                  style={{ 
+                    backgroundColor: ['#FF5722', '#FF9800', '#FFC107', '#FFEB3B'][i % 4],
+                    marginLeft: -8
+                  }}
+                  animate={{ 
+                    y: [0, 100],
+                    x: [0, (Math.random() - 0.5) * 60],
+                    scale: [1, 0],
+                    opacity: [1, 0]
+                  }}
+                  transition={{ 
+                    duration: 0.8,
+                    repeat: Infinity,
+                    delay: i * 0.1
+                  }}
+                />
+              ))}
+              {/* Rocket */}
+              <motion.div
+                className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 0.3, repeat: Infinity }}
+              >
+                <Rocket className="w-24 h-24 text-white" />
+              </motion.div>
+              {/* Glow */}
+              <motion.div
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, rgba(255,215,0,0.5) 0%, transparent 70%)'
+                }}
+                animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              />
+            </div>
+            <motion.p 
+              className="mt-4 text-white font-bold text-lg"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 0.8, repeat: Infinity }}
+            >
+              LAUNCHING TOKEN...
+            </motion.p>
+          </motion.div>
+        )}
+        
+        {step === 'success' && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            {/* Explosion of confetti */}
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-3 h-3 rounded-full"
+                style={{ 
+                  backgroundColor: ['#DC0A2D', '#FFDE00', '#3B4CCA', '#51AE5E', '#FF5722'][i % 5],
+                  left: '50%',
+                  top: '50%'
+                }}
+                animate={{ 
+                  x: Math.cos(i * 18 * Math.PI / 180) * 150,
+                  y: Math.sin(i * 18 * Math.PI / 180) * 150,
+                  scale: [1, 0],
+                  opacity: [1, 0]
+                }}
+                transition={{ duration: 1, ease: "easeOut" }}
+              />
+            ))}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.5, type: "spring" }}
+              className="relative z-10"
+            >
+              <div className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-16 h-16 text-white" />
+              </div>
+            </motion.div>
+            <motion.p 
+              className="mt-4 text-green-400 font-bold text-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              TOKEN LAUNCHED!
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 // Creature Reveal Animation
 const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; imageBase64: string | null }) => {
   const [phase, setPhase] = useState<'flash' | 'particles' | 'reveal'>('flash');
@@ -1683,25 +1853,16 @@ function StatsPanel({
         </div>
       </div>
 
-      {/* Launch Progress */}
+      {/* Launch Animation Overlay */}
       {isMinting && (
-        <div className="mt-6 p-4 bg-gray-700/50 rounded-lg">
-          <div className="flex items-center gap-3 mb-3">
-            <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
-            <span className="text-sm text-white">
-              {mintStep === 'generating' && 'Generating pixel art...'}
-              {mintStep === 'deploying' && 'Launching on Clanker...'}
-            </span>
-          </div>
-          <div className="w-full bg-gray-600 rounded-full h-2">
-            <div 
-              className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
-              style={{ 
-                width: mintStep === 'generating' ? '40%' : '90%' 
-              }}
-            />
-          </div>
-        </div>
+        <motion.div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <LaunchAnimation step={mintStep as 'generating' | 'deploying' | 'success'} />
+        </motion.div>
       )}
 
       {/* Success Message */}
