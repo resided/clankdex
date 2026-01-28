@@ -1433,10 +1433,21 @@ export default function Home() {
                               <>
                                 <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#306230' }} />
                                 <button
-                                  onClick={() => connect({ connector: connectors[0] })}
-                                  className="px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded"
+                                  onClick={() => {
+                                    // Find first available injected connector (MetaMask, etc)
+                                    const injectedConnector = connectors.find(c => 
+                                      c.id === 'injected' || c.id === 'metaMask' || c.type === 'injected'
+                                    );
+                                    if (injectedConnector) {
+                                      connect({ connector: injectedConnector });
+                                    } else if (connectors.length > 0) {
+                                      connect({ connector: connectors[0] });
+                                    }
+                                  }}
+                                  disabled={isConnecting || connectors.length === 0}
+                                  className="px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded disabled:opacity-50"
                                 >
-                                  CONNECT WALLET
+                                  {isConnecting ? '...' : 'CONNECT WALLET'}
                                 </button>
                               </>
                             )}

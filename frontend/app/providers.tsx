@@ -5,9 +5,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { farcasterFrame } from '@farcaster/miniapp-wagmi-connector';
+import { injected, walletConnect } from 'wagmi/connectors';
 import { FarcasterProvider } from './components/FarcasterProvider';
 
-// Create wagmi config with Farcaster miniapp connector
+// Create wagmi config with multiple connectors
 const config = createConfig({
   chains: [base],
   transports: {
@@ -15,6 +16,19 @@ const config = createConfig({
   },
   connectors: [
     farcasterFrame(),
+    injected({ target: 'metaMask' }),
+    injected(),
+    ...(process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ? [
+      walletConnect({
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+        metadata: {
+          name: 'ClankDex',
+          description: 'Wallet Pokedex powered by Clanker',
+          url: 'https://clankdex.vercel.app',
+          icons: ['https://clankdex.vercel.app/icon.png'],
+        },
+      })
+    ] : []),
   ],
 });
 
