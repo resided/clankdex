@@ -1150,8 +1150,8 @@ export default function Home() {
       // Step 2: Deploy Clanker token
       const endpoint = inputMode === 'wallet' ? '/api/deploy' : '/api/deploy-farcaster';
       const body = inputMode === 'wallet' 
-        ? { creature, creatorAddress: address, simulate: false }
-        : { identifier: farcasterInput };
+        ? { creature, creatorAddress: address, imageUrl }
+        : { identifier: farcasterInput, creature, imageUrl };
       
       const deployResponse = await fetch(endpoint, {
         method: 'POST',
