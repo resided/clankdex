@@ -1141,16 +1141,16 @@ export default function Home() {
 
         {/* View Mode Toggle with sliding indicator */}
         <div className="flex justify-center mb-6">
-          <div className="bg-gray-800/50 rounded-full p-1 flex gap-1 relative">
+          <div className="bg-gray-800/50 rounded-full p-1.5 flex relative">
             <motion.div
-              className="absolute inset-y-1 rounded-full bg-pokedex-red"
+              className="absolute inset-y-1.5 rounded-full bg-pokedex-red"
               initial={false}
               animate={{
                 x: viewMode === 'scan' ? 0 : '100%',
-                width: '50%',
+                width: 'calc(50% - 6px)',
+                left: '6px'
               }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              style={{ left: 4 }}
             />
             <motion.button
               onClick={() => setViewMode('scan')}
