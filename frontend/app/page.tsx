@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import type { EvolutionRecord } from '@/lib/supabase';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -367,7 +368,6 @@ interface ClankdexEntry {
   launchedAt: string;
   inputMode: 'wallet' | 'farcaster';
   identifier: string;
-  nftTokenId?: string; // Optional NFT companion token
 }
 
 // ==========================================
@@ -590,13 +590,13 @@ type SortOption = 'newest' | 'oldest' | 'highestMc' | 'lowestMc' | 'highestPrice
 
 // Evolution tiers based on market cap
 const EVOLUTION_TIERS = [
-  { name: 'Egg', minCap: 0, maxCap: 1000, color: 'text-gray-400', icon: Egg, hpMultiplier: 1 },
-  { name: 'Baby', minCap: 1000, maxCap: 10000, color: 'text-green-400', icon: Baby, hpMultiplier: 1.5 },
-  { name: 'Basic', minCap: 10000, maxCap: 50000, color: 'text-blue-400', icon: Star, hpMultiplier: 2 },
-  { name: 'Stage 1', minCap: 50000, maxCap: 100000, color: 'text-purple-400', icon: Sparkles, hpMultiplier: 3 },
-  { name: 'Stage 2', minCap: 100000, maxCap: 500000, color: 'text-yellow-400', icon: Zap, hpMultiplier: 5 },
-  { name: 'Mega', minCap: 500000, maxCap: 1000000, color: 'text-orange-400', icon: Flame, hpMultiplier: 10 },
-  { name: 'Legendary', minCap: 1000000, maxCap: Infinity, color: 'text-red-400', icon: Crown, hpMultiplier: 20 },
+  { index: 0, name: 'Egg', minCap: 0, maxCap: 1000, color: 'text-gray-400', icon: Egg, hpMultiplier: 1 },
+  { index: 1, name: 'Baby', minCap: 1000, maxCap: 10000, color: 'text-green-400', icon: Baby, hpMultiplier: 1.5 },
+  { index: 2, name: 'Basic', minCap: 10000, maxCap: 50000, color: 'text-blue-400', icon: Star, hpMultiplier: 2 },
+  { index: 3, name: 'Stage 1', minCap: 50000, maxCap: 100000, color: 'text-purple-400', icon: Sparkles, hpMultiplier: 3 },
+  { index: 4, name: 'Stage 2', minCap: 100000, maxCap: 500000, color: 'text-yellow-400', icon: Zap, hpMultiplier: 5 },
+  { index: 5, name: 'Mega', minCap: 500000, maxCap: 1000000, color: 'text-orange-400', icon: Flame, hpMultiplier: 10 },
+  { index: 6, name: 'Legendary', minCap: 1000000, maxCap: Infinity, color: 'text-red-400', icon: Crown, hpMultiplier: 20 },
 ];
 
 const getEvolutionTier = (marketCap: number) => {
@@ -731,7 +731,7 @@ export default function Home() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
-  const [mintStep, setMintStep] = useState<'idle' | 'generating' | 'generating_nft' | 'uploading' | 'deploying' | 'minting_nft'>('idle');
+  const [mintStep, setMintStep] = useState<'idle' | 'generating' | 'deploying'>('idle');
   const [showCreature, setShowCreature] = useState(false);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
   const [farcasterData, setFarcasterData] = useState<FarcasterData | null>(null);
@@ -969,10 +969,8 @@ export default function Home() {
     setIsMinting(true);
     setMintStep('generating');
     
-    let nftTokenId: string | undefined;
-    
     try {
-      // Step 1: Generate and upload base image
+      // Step 1: Generate and upload image
       const generateResponse = await fetch('/api/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -982,29 +980,9 @@ export default function Home() {
       const { imageUrl } = await generateResponse.json();
       creature.imageURI = imageUrl;
       
-      // Step 2: Generate evolution NFT art (all 7 tiers) - background if enabled
-      if (process.env.NEXT_PUBLIC_EVOLUTION_NFT_ENABLED === 'true') {
-        try {
-          setMintStep('generating_nft');
-          
-          const nftArtResponse = await fetch('/api/evolution/generate-art', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ creature, clankerToken: 'pending' }),
-          });
-          
-          if (nftArtResponse.ok) {
-            const nftData = await nftArtResponse.json();
-            console.log('Evolution NFT art generated:', nftData);
-          }
-        } catch (nftError) {
-          console.error('NFT art generation failed (non-critical):', nftError);
-        }
-      }
-      
       setMintStep('deploying');
       
-      // Step 3: Deploy Clanker token
+      // Step 2: Deploy Clanker token
       const endpoint = inputMode === 'wallet' ? '/api/deploy' : '/api/deploy-farcaster';
       const body = inputMode === 'wallet' 
         ? { creature, creatorAddress: address, simulate: false }
@@ -1021,34 +999,10 @@ export default function Home() {
       if (result.success) {
         setDeployResult(result);
 
-        // Step 4: Mint Evolution NFT
-        if (process.env.NEXT_PUBLIC_EVOLUTION_NFT_ENABLED === 'true' && address) {
-          try {
-            setMintStep('minting_nft');
-            
-            const mintResponse = await fetch('/api/evolution/mint', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: address,
-                clankerToken: result.tokenAddress,
-                creatureName: creature.name
-              }),
-            });
-            
-            if (mintResponse.ok) {
-              const mintData = await mintResponse.json();
-              nftTokenId = mintData.tokenId;
-              console.log('Evolution NFT minted:', nftTokenId);
-            }
-          } catch (nftMintError) {
-            console.error('NFT mint failed (non-critical):', nftMintError);
-          }
-        }
-
-        // Step 5: Save to Clankdex
+        // Step 3: Save to Clankdex
+        const entryNumber = getNextEntryNumber(clankdexEntries);
         const newEntry: ClankdexEntry = {
-          entryNumber: getNextEntryNumber(clankdexEntries),
+          entryNumber,
           creature: { ...creature, imageURI: imageUrl },
           imageBase64: imageBase64,
           tokenAddress: result.tokenAddress,
@@ -1056,10 +1010,17 @@ export default function Home() {
           launchedAt: new Date().toISOString(),
           inputMode: inputMode,
           identifier: inputMode === 'wallet' ? (address || '') : farcasterInput,
-          nftTokenId,
         };
         const updatedEntries = saveClankdexEntry(newEntry);
         setClankdexEntries(updatedEntries);
+
+        // Step 4: Create evolution record in Supabase (async, non-blocking)
+        try {
+          const { createEvolution } = await import('@/lib/supabase');
+          await createEvolution(result.tokenAddress, entryNumber);
+        } catch (evoError) {
+          console.error('Evolution record creation failed (non-critical):', evoError);
+        }
 
         confetti({
           particleCount: 200,
@@ -1734,21 +1695,14 @@ function StatsPanel({
             <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
             <span className="text-sm text-white">
               {mintStep === 'generating' && 'Generating pixel art...'}
-              {mintStep === 'generating_nft' && 'Creating evolution art (7 tiers)...'}
-              {mintStep === 'uploading' && 'Uploading to IPFS...'}
               {mintStep === 'deploying' && 'Launching on Clanker...'}
-              {mintStep === 'minting_nft' && 'Minting evolution NFT...'}
             </span>
           </div>
           <div className="w-full bg-gray-600 rounded-full h-2">
             <div 
               className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
               style={{ 
-                width: mintStep === 'generating' ? '20%' : 
-                       mintStep === 'generating_nft' ? '40%' :
-                       mintStep === 'uploading' ? '60%' : 
-                       mintStep === 'deploying' ? '80%' :
-                       mintStep === 'minting_nft' ? '95%' : '90%' 
+                width: mintStep === 'generating' ? '40%' : '90%' 
               }}
             />
           </div>
@@ -2422,7 +2376,41 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
 
   // Fetch live price data
   const { priceData, loading: priceLoading } = usePriceData(tokenAddress);
-  const evolutionTier = priceData ? getEvolutionTier(priceData.marketCap) : EVOLUTION_TIERS[0];
+  
+  // Fetch evolution data from Supabase
+  const [evolutionData, setEvolutionData] = useState<EvolutionRecord | null>(null);
+  
+  useEffect(() => {
+    const fetchEvolution = async () => {
+      const { getEvolutionData, updateEvolution } = await import('@/lib/supabase');
+      
+      // Get existing evolution data
+      let data = await getEvolutionData(tokenAddress);
+      
+      // If we have price data, check for evolution
+      if (data && priceData) {
+        const newTier = getEvolutionTier(priceData.marketCap);
+        if (newTier.index > data.current_tier) {
+          // Evolution happened! Update in database
+          await updateEvolution(tokenAddress, newTier.index, newTier.name, priceData.marketCap);
+          // Re-fetch to get updated data
+          data = await getEvolutionData(tokenAddress);
+        }
+      }
+      
+      setEvolutionData(data);
+    };
+    
+    fetchEvolution();
+    
+    // Re-check every 30 seconds
+    const interval = setInterval(fetchEvolution, 30000);
+    return () => clearInterval(interval);
+  }, [tokenAddress, priceData?.marketCap]);
+  
+  // Use evolution data from DB if available, otherwise fallback to price-based
+  const currentTierIndex = evolutionData?.current_tier ?? (priceData ? getEvolutionTier(priceData.marketCap).index : 0);
+  const evolutionTier = EVOLUTION_TIERS[currentTierIndex] || EVOLUTION_TIERS[0];
 
   // Calculate HP based on market cap (logarithmic scale for better visualization)
   const marketCapHP = priceData
