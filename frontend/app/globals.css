@@ -718,3 +718,361 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #e02a4a;
 }
+
+/* ============================================
+   PREMIUM GAME BOY DEVICE
+   ============================================ */
+
+.gameboy-device {
+  @apply relative mx-auto;
+  width: min(380px, 95vw);
+  background: linear-gradient(165deg, #2a2a3a 0%, #1a1a28 40%, #0f0f18 100%);
+  border-radius: 24px 24px 80px 80px;
+  padding: 20px 20px 40px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 4px #3a3a4a,
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.gameboy-device::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  height: 60%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+  border-radius: 20px 20px 40px 40px;
+  pointer-events: none;
+}
+
+/* Premium screen bezel */
+.gameboy-bezel {
+  @apply relative rounded-lg p-3;
+  background: linear-gradient(145deg, #1a1a25 0%, #0a0a12 100%);
+  box-shadow:
+    inset 0 4px 12px rgba(0, 0, 0, 0.8),
+    0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+/* LCD Screen with authentic look */
+.gameboy-lcd {
+  @apply relative rounded overflow-hidden;
+  background: #8bac0f;
+  aspect-ratio: 10/9;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Pixel grid overlay */
+.gameboy-lcd::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Screen reflection */
+.gameboy-lcd::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* Screen content wrapper */
+.gameboy-lcd-content {
+  @apply relative h-full overflow-y-auto overflow-x-hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.gameboy-lcd-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Power indicator */
+.gameboy-power {
+  @apply flex items-center gap-2 mb-3;
+}
+
+.gameboy-power-led {
+  @apply w-2 h-2 rounded-full;
+  background: #dc0a2d;
+  box-shadow: 0 0 8px #dc0a2d, 0 0 16px rgba(220, 10, 45, 0.5);
+  animation: power-pulse 2s ease-in-out infinite;
+}
+
+@keyframes power-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px #dc0a2d, 0 0 16px rgba(220, 10, 45, 0.5); }
+  50% { opacity: 0.7; box-shadow: 0 0 4px #dc0a2d, 0 0 8px rgba(220, 10, 45, 0.3); }
+}
+
+.gameboy-power-label {
+  @apply text-[10px] uppercase tracking-widest;
+  color: #666;
+  font-family: 'Arial Narrow', sans-serif;
+}
+
+/* Logo area */
+.gameboy-logo {
+  @apply text-center py-2 font-pixel text-xs tracking-wider;
+  color: #DC0A2D;
+  text-shadow: 0 0 10px rgba(220, 10, 45, 0.5);
+}
+
+/* Controls section */
+.gameboy-controls {
+  @apply flex justify-between items-start mt-6 px-2;
+}
+
+/* Enhanced D-Pad */
+.dpad-container {
+  @apply relative;
+  width: 100px;
+  height: 100px;
+}
+
+.dpad-bg {
+  @apply absolute inset-0;
+  background: radial-gradient(circle at center, #252535 0%, #1a1a28 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dpad-cross {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+  width: 80px;
+  height: 80px;
+}
+
+.dpad-btn {
+  @apply absolute cursor-pointer transition-all flex items-center justify-center;
+  background: linear-gradient(145deg, #3a3a4a, #2a2a3a);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.dpad-btn:hover {
+  background: linear-gradient(145deg, #4a4a5a, #3a3a4a);
+}
+
+.dpad-btn:active {
+  background: linear-gradient(145deg, #2a2a3a, #3a3a4a);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dpad-up {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px 4px 0 0;
+}
+
+.dpad-down {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 0 0 4px 4px;
+}
+
+.dpad-left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px 0 0 4px;
+}
+
+.dpad-right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+}
+
+.dpad-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  background: #2a2a3a;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* A/B Button container */
+.ab-buttons {
+  @apply flex gap-3;
+  transform: rotate(-25deg);
+}
+
+.ab-btn {
+  @apply relative w-14 h-14 rounded-full font-bold text-base cursor-pointer transition-all;
+  font-family: 'Arial Black', sans-serif;
+}
+
+.ab-btn-a {
+  background: linear-gradient(145deg, #dc0a2d, #a00820);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 6px 0 #600010,
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ab-btn-a:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #600010,
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ab-btn-b {
+  background: linear-gradient(145deg, #dc0a2d, #a00820);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 6px 0 #600010,
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  margin-top: 20px;
+}
+
+.ab-btn-b:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #600010,
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Start/Select buttons */
+.start-select-btns {
+  @apply flex gap-4 justify-center mt-6;
+  transform: rotate(-25deg);
+}
+
+.meta-btn {
+  @apply px-4 py-1 text-[8px] uppercase tracking-widest cursor-pointer transition-all;
+  background: linear-gradient(145deg, #4a4a5a, #3a3a4a);
+  border-radius: 20px;
+  color: #888;
+  box-shadow:
+    0 2px 0 #1a1a28,
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.meta-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Speaker grille */
+.gameboy-speaker {
+  @apply absolute bottom-6 right-6;
+  width: 60px;
+  height: 60px;
+}
+
+.speaker-line {
+  @apply w-full h-1 rounded-full mb-1;
+  background: linear-gradient(90deg, transparent, #1a1a28, transparent);
+}
+
+/* Boot screen animation */
+@keyframes boot-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes boot-logo {
+  0% { transform: translateY(20px); opacity: 0; }
+  50% { transform: translateY(-5px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.boot-animation {
+  animation: boot-fade-in 0.5s ease-out;
+}
+
+.boot-logo {
+  animation: boot-logo 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+  opacity: 0;
+}
+
+/* Screen transition */
+@keyframes screen-slide-left {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes screen-slide-right {
+  0% { transform: translateX(-100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.screen-enter {
+  animation: screen-slide-left 0.3s ease-out;
+}
+
+.screen-exit {
+  animation: screen-slide-right 0.3s ease-out reverse;
+}
+
+/* Menu item styling */
+.menu-item {
+  @apply flex items-center gap-3 px-3 py-2 rounded transition-all cursor-pointer;
+  color: #306230;
+}
+
+.menu-item:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.menu-item.selected {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.menu-item.selected::before {
+  content: '▶';
+  margin-right: 4px;
+  animation: cursor-blink 0.8s infinite;
+}
+
+/* Screen text styles */
+.screen-title {
+  @apply font-pixel text-sm text-center py-2;
+  color: #0f380f;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.screen-text {
+  @apply font-pixel text-xs;
+  color: #306230;
+  line-height: 1.6;
+}

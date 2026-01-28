@@ -1363,99 +1363,129 @@ export default function Home() {
         )}
 
         <AnimatePresence mode="wait">
-          {/* MENU SCREEN - Main navigation hub */}
+          {/* MENU SCREEN - Premium Game Boy Device */}
           {screenMode === 'menu' && (
             <motion.div
               key="menu-view"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-              className="flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="flex justify-center boot-animation"
             >
-              <div className="pokedex p-8 max-w-md w-full">
-                {/* LEDs */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="led led-blue animate-pulse" />
-                  <div className="led led-red" />
-                  <div className="led led-yellow" />
-                  <div className="led led-green" />
-                  <span className="text-white/50 text-xs font-pixel ml-auto">CLANKDEX v1.0</span>
+              <div className="gameboy-device">
+                {/* Power indicator */}
+                <div className="gameboy-power">
+                  <div className="gameboy-power-led" />
+                  <span className="gameboy-power-label">Power</span>
                 </div>
 
-                {/* Menu Screen */}
-                <div className="pokedex-screen aspect-video mb-6 p-6">
-                  <div className="text-center mb-4">
-                    <p className="font-pixel text-sm text-pokedex-darkscreen">SELECT MODE</p>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { mode: 'scan' as const, icon: ScanLine, label: 'SCAN WALLET', desc: 'Generate creature' },
-                      { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length} creatures` },
-                      { mode: 'how-it-works' as const, icon: Sparkles, label: 'HOW IT WORKS', desc: 'Learn more' },
-                      { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Questions' },
-                    ].map((item, idx) => (
-                      <motion.button
-                        key={item.mode}
-                        onClick={() => setScreenMode(item.mode)}
-                        className={`w-full flex items-center gap-4 p-3 rounded-lg transition-all ${
-                          menuIndex === idx
-                            ? 'bg-pokedex-darkscreen/30 border-2 border-pokedex-darkscreen'
-                            : 'hover:bg-pokedex-darkscreen/10'
-                        }`}
-                        onMouseEnter={() => setMenuIndex(idx)}
-                        whileHover={{ x: 4 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <item.icon className="w-5 h-5 text-pokedex-darkscreen" />
-                        <div className="text-left">
-                          <p className="font-pixel text-xs text-pokedex-darkscreen">{item.label}</p>
-                          <p className="text-[10px] text-pokedex-darkscreen/60">{item.desc}</p>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-pokedex-darkscreen/50 ml-auto" />
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Game Boy Controls */}
-                <div className="flex items-center justify-between mt-4">
-                  {/* D-Pad */}
-                  <div className="dpad">
-                    <button
-                      className="dpad-up"
-                      onClick={() => setMenuIndex(i => Math.max(0, i - 1))}
-                      aria-label="Up"
-                    />
-                    <button className="dpad-left" aria-label="Left" />
-                    <div className="dpad-center" />
-                    <button className="dpad-right" aria-label="Right" />
-                    <button
-                      className="dpad-down"
-                      onClick={() => setMenuIndex(i => Math.min(3, i + 1))}
-                      aria-label="Down"
-                    />
+                {/* Screen bezel */}
+                <div className="gameboy-bezel">
+                  {/* Logo above screen */}
+                  <div className="gameboy-logo boot-logo">
+                    CLANK<span className="text-yellow-400">DEX</span>
                   </div>
 
-                  {/* A/B Buttons */}
-                  <div className="flex gap-4 items-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <button
-                        onClick={() => setScreenMode(menuItems[menuIndex])}
-                        className="gb-btn"
-                      >
-                        A
-                      </button>
-                      <span className="text-[10px] text-gray-500 font-pixel">SELECT</span>
+                  {/* LCD Screen */}
+                  <div className="gameboy-lcd">
+                    <div className="gameboy-lcd-content p-4">
+                      {/* Title */}
+                      <div className="screen-title mb-4">
+                        ─ SELECT MODE ─
+                      </div>
+
+                      {/* Menu items */}
+                      <div className="space-y-2">
+                        {[
+                          { mode: 'scan' as const, icon: ScanLine, label: 'SCAN', desc: 'Analyze wallet' },
+                          { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length} found` },
+                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'How it works' },
+                          { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Questions' },
+                        ].map((item, idx) => (
+                          <button
+                            key={item.mode}
+                            onClick={() => setScreenMode(item.mode)}
+                            onMouseEnter={() => setMenuIndex(idx)}
+                            className={`menu-item w-full ${menuIndex === idx ? 'selected' : ''}`}
+                          >
+                            <item.icon className="w-4 h-4" style={{ color: '#306230' }} />
+                            <div className="flex-1 text-left">
+                              <span className="font-pixel text-xs">{item.label}</span>
+                              <span className="text-[9px] opacity-60 ml-2">{item.desc}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Footer hint */}
+                      <div className="text-center mt-4">
+                        <p className="text-[9px]" style={{ color: '#306230' }}>
+                          ▲▼ Move │ A Select
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Keyboard hints */}
-                <div className="mt-4 text-center">
-                  <p className="text-[10px] text-gray-500">
-                    Use arrow keys + Enter or A key
-                  </p>
+                {/* Controls section */}
+                <div className="gameboy-controls">
+                  {/* D-Pad */}
+                  <div className="dpad-container">
+                    <div className="dpad-bg" />
+                    <div className="dpad-cross">
+                      <button
+                        className="dpad-btn dpad-up"
+                        onClick={() => setMenuIndex(i => Math.max(0, i - 1))}
+                      >
+                        <ChevronRight className="w-3 h-3 -rotate-90 text-gray-400" />
+                      </button>
+                      <button
+                        className="dpad-btn dpad-down"
+                        onClick={() => setMenuIndex(i => Math.min(3, i + 1))}
+                      >
+                        <ChevronRight className="w-3 h-3 rotate-90 text-gray-400" />
+                      </button>
+                      <button className="dpad-btn dpad-left">
+                        <ChevronRight className="w-3 h-3 rotate-180 text-gray-400" />
+                      </button>
+                      <button className="dpad-btn dpad-right">
+                        <ChevronRight className="w-3 h-3 text-gray-400" />
+                      </button>
+                      <div className="dpad-btn dpad-center" />
+                    </div>
+                  </div>
+
+                  {/* A/B Buttons */}
+                  <div className="ab-buttons">
+                    <button
+                      onClick={() => setScreenMode(menuItems[menuIndex])}
+                      className="ab-btn ab-btn-a"
+                    >
+                      A
+                    </button>
+                    <button
+                      className="ab-btn ab-btn-b"
+                      onClick={() => {}}
+                    >
+                      B
+                    </button>
+                  </div>
+                </div>
+
+                {/* Start/Select */}
+                <div className="start-select-btns">
+                  <button className="meta-btn">SELECT</button>
+                  <button className="meta-btn">START</button>
+                </div>
+
+                {/* Speaker grille */}
+                <div className="gameboy-speaker">
+                  <div className="speaker-line" />
+                  <div className="speaker-line" />
+                  <div className="speaker-line" />
+                  <div className="speaker-line" />
+                  <div className="speaker-line" />
                 </div>
               </div>
             </motion.div>
