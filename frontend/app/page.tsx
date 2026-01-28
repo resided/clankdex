@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { EvolutionRecord, CreatureRecord } from '@/lib/supabase';
-import { supabase, getAllCreatures, createCreatureRecord, getNextEntryNumber, createEvolution } from '@/lib/supabase';
+import { getAllCreatures, createEvolution } from '@/lib/supabase';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useFarcaster } from './components/FarcasterProvider';
-import { createPublicClient, http as viemHttp } from 'viem';
-import { base } from 'wagmi/chains';
 import {
   Sparkles,
   Zap,
@@ -816,23 +814,6 @@ const usePriceData = (tokenAddress: string | null) => {
 
 type ScreenMode = 'menu' | 'scan' | 'creature' | 'collection' | 'faq' | 'how-it-works';
 
-// On-chain verification - check if token contract exists
-async function verifyTokenOnChain(tokenAddress: string): Promise<boolean> {
-  try {
-    const publicClient = createPublicClient({
-      chain: base,
-      transport: viemHttp(),
-    });
-    
-    // Check if contract has code (is a deployed contract)
-    const code = await publicClient.getBytecode({ address: tokenAddress as `0x${string}` });
-    return code !== undefined && code !== '0x';
-  } catch (error) {
-    console.error('On-chain verification failed:', error);
-    return false;
-  }
-}
-
 const formatEntryNumber = (num: number): string => {
   return `#${num.toString().padStart(3, '0')}`;
 };
@@ -1183,46 +1164,41 @@ export default function Home() {
       if (result.success) {
         setDeployResult(result);
 
-        // Step 3: Verify token exists on-chain
-        const isVerified = await verifyTokenOnChain(result.tokenAddress);
+        // Step 3: Save to Supabase via secure API (verifies on-chain)
+        const saveResponse = await fetch('/api/save-creature', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token_address: result.tokenAddress,
+            token_symbol: result.config?.symbol || creature.name.slice(0, 6).toUpperCase(),
+            name: creature.name,
+            element: creature.element,
+            level: creature.level,
+            hp: creature.hp,
+            attack: creature.attack,
+            defense: creature.defense,
+            speed: creature.speed,
+            special: creature.special,
+            description: creature.description,
+            creator_address: address,
+            farcaster_username: inputMode === 'farcaster' ? farcasterInput : undefined,
+            image_url: imageUrl,
+          }),
+        });
+
+        const saveData = await saveResponse.json();
         
-        if (!isVerified) {
-          console.warn('Token deployment not confirmed on-chain yet');
-          // Continue anyway - will be marked as unverified in DB
-        }
-
-        // Step 4: Get next entry number from Supabase
-        const entryNumber = await getNextEntryNumber();
-
-        // Step 5: Save to Supabase creatures table
-        const creatureRecord: CreatureRecord = {
-          entry_number: entryNumber,
-          token_address: result.tokenAddress.toLowerCase(),
-          token_symbol: result.config?.symbol || creature.name.slice(0, 6).toUpperCase(),
-          name: creature.name,
-          element: creature.element,
-          level: creature.level,
-          hp: creature.hp,
-          attack: creature.attack,
-          defense: creature.defense,
-          speed: creature.speed,
-          special: creature.special,
-          description: creature.description,
-          creator_address: address?.toLowerCase(),
-          farcaster_username: inputMode === 'farcaster' ? farcasterInput : undefined,
-          image_url: imageUrl,
-          verified: isVerified,
-        };
-
-        const saved = await createCreatureRecord(creatureRecord);
-        if (saved) {
+        if (!saveResponse.ok) {
+          console.error('Failed to save creature:', saveData.error);
+          // Don't throw - deployment succeeded even if save failed
+        } else {
           // Refresh entries from Supabase
           const updatedEntries = await getAllCreatures();
           setClankdexEntries(updatedEntries);
+          
+          // Step 4: Create evolution record
+          await createEvolution(result.tokenAddress, saveData.creature.entry_number);
         }
-
-        // Step 6: Create evolution record
-        await createEvolution(result.tokenAddress, entryNumber);
 
         confetti({
           particleCount: 200,
