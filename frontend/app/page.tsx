@@ -1271,136 +1271,83 @@ export default function Home() {
     return rarities[element] || 'common';
   };
 
+  // Get current action button handler based on screen mode
+  const handleAButton = () => {
+    if (screenMode === 'menu') {
+      setScreenMode(menuItems[menuIndex]);
+    } else if (screenMode === 'scan') {
+      if (!isAnalyzing && !isMinting) {
+        if ((inputMode === 'wallet' && isConnected) || (inputMode === 'farcaster' && farcasterInput.trim())) {
+          analyze();
+        }
+      }
+    }
+  };
+
+  const handleBButton = () => {
+    if (screenMode !== 'menu') {
+      setScreenMode('menu');
+      setShowCreature(false);
+      setCreature(null);
+      setDeployResult(null);
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-pokemon-world py-8 px-4 relative">
+    <main className="min-h-screen bg-pokemon-world flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="gradient-orb gradient-orb-1" />
       <div className="gradient-orb gradient-orb-2" />
       <div className="gradient-orb gradient-orb-3" />
       <div className="particles">
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
-        <div className="particle" />
+        {[...Array(10)].map((_, i) => <div key={i} className="particle" />)}
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header with floating animation */}
-        <header className="text-center mb-8">
-          <motion.div
-            initial={{ scale:0.9, opacity: 0, y: -20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="inline-block"
-          >
-            <FloatingElement>
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <motion.div
-                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <Zap className="w-8 h-8 text-yellow-400" />
-                </motion.div>
-                <h1 className="font-pixel text-4xl md:text-6xl text-white drop-shadow-lg">
-                  <motion.span 
-                    className="text-pokedex-red inline-block"
-                    whileHover={{ scale: 1.1, rotate: -3 }}
-                  >
-                    CLANK
-                  </motion.span>
-                  <motion.span 
-                    className="text-pokedex-yellow inline-block"
-                    whileHover={{ scale: 1.1, rotate: 3 }}
-                  >
-                    DEX
-                  </motion.span>
-                </h1>
-                <motion.div
-                  animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                >
-                  <Zap className="w-8 h-8 text-yellow-400" />
-                </motion.div>
-              </div>
-            </FloatingElement>
-            <motion.p 
-              className="text-gray-300 text-sm md:text-base"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              Wallet Pokedex powered by <span className="text-yellow-400 font-bold">Clanker</span>
-            </motion.p>
-          </motion.div>
-        </header>
-
-        {/* Navigation Bar - shows current mode with back to menu */}
-        {screenMode !== 'menu' && (
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <motion.button
-              onClick={() => setScreenMode('menu')}
-              className="gb-btn gb-btn-b text-xs"
-              whileTap={{ scale: 0.95 }}
-              title="Press B or Escape to go back"
-            >
-              B
-            </motion.button>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/80 rounded-lg text-white border border-gray-700">
-              {screenMode === 'scan' && <><ScanLine className="w-4 h-4 text-blue-400" /> <span className="font-pixel text-xs">SCAN</span></>}
-              {screenMode === 'collection' && <><BookOpen className="w-4 h-4 text-yellow-400" /> <span className="font-pixel text-xs">ROLODEX</span></>}
-              {screenMode === 'faq' && <><Activity className="w-4 h-4 text-green-400" /> <span className="font-pixel text-xs">FAQ</span></>}
-              {screenMode === 'how-it-works' && <><Sparkles className="w-4 h-4 text-purple-400" /> <span className="font-pixel text-xs">HOW IT WORKS</span></>}
-              {screenMode === 'creature' && <><Eye className="w-4 h-4 text-red-400" /> <span className="font-pixel text-xs">CREATURE</span></>}
-            </div>
-            <span className="text-[10px] text-gray-500">Press B to go back</span>
+      {/* UNIFIED GAME BOY DEVICE */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="relative z-10"
+      >
+        <div className="gameboy-device">
+          {/* Power indicator */}
+          <div className="gameboy-power">
+            <div className="gameboy-power-led" />
+            <span className="gameboy-power-label">Power</span>
           </div>
-        )}
 
-        <AnimatePresence mode="wait">
-          {/* MENU SCREEN - Premium Game Boy Device */}
-          {screenMode === 'menu' && (
-            <motion.div
-              key="menu-view"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="flex justify-center boot-animation"
-            >
-              <div className="gameboy-device">
-                {/* Power indicator */}
-                <div className="gameboy-power">
-                  <div className="gameboy-power-led" />
-                  <span className="gameboy-power-label">Power</span>
-                </div>
+          {/* Screen bezel */}
+          <div className="gameboy-bezel">
+            {/* Logo above screen */}
+            <div className="gameboy-logo">
+              CLANK<span className="text-yellow-400">DEX</span>
+              {screenMode !== 'menu' && (
+                <span className="text-[8px] text-gray-500 block">
+                  {screenMode.toUpperCase().replace('-', ' ')}
+                </span>
+              )}
+            </div>
 
-                {/* Screen bezel */}
-                <div className="gameboy-bezel">
-                  {/* Logo above screen */}
-                  <div className="gameboy-logo boot-logo">
-                    CLANK<span className="text-yellow-400">DEX</span>
-                  </div>
-
-                  {/* LCD Screen */}
-                  <div className="gameboy-lcd">
-                    <div className="gameboy-lcd-content p-4">
-                      {/* Title */}
-                      <div className="screen-title mb-4">
-                        ─ SELECT MODE ─
-                      </div>
-
-                      {/* Menu items */}
-                      <div className="space-y-2">
+            {/* LCD Screen */}
+            <div className="gameboy-lcd">
+              <div className="gameboy-lcd-content">
+                <AnimatePresence mode="wait">
+                  {/* MENU SCREEN */}
+                  {screenMode === 'menu' && (
+                    <motion.div
+                      key="menu"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="p-4 h-full"
+                    >
+                      <div className="screen-title mb-3">─ SELECT MODE ─</div>
+                      <div className="space-y-1">
                         {[
                           { mode: 'scan' as const, icon: ScanLine, label: 'SCAN', desc: 'Analyze wallet' },
                           { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length} found` },
-                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'How it works' },
+                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'Learn more' },
                           { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Questions' },
                         ].map((item, idx) => (
                           <button
@@ -1411,429 +1358,317 @@ export default function Home() {
                           >
                             <item.icon className="w-4 h-4" style={{ color: '#306230' }} />
                             <div className="flex-1 text-left">
-                              <span className="font-pixel text-xs">{item.label}</span>
-                              <span className="text-[9px] opacity-60 ml-2">{item.desc}</span>
+                              <span className="font-pixel text-[10px]">{item.label}</span>
+                              <span className="text-[8px] opacity-60 ml-2">{item.desc}</span>
                             </div>
                           </button>
                         ))}
                       </div>
-
-                      {/* Footer hint */}
-                      <div className="text-center mt-4">
-                        <p className="text-[9px]" style={{ color: '#306230' }}>
-                          ▲▼ Move │ A Select
-                        </p>
+                      <div className="text-center mt-3">
+                        <p className="text-[8px]" style={{ color: '#306230' }}>▲▼ Move │ A Select</p>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Controls section */}
-                <div className="gameboy-controls">
-                  {/* D-Pad */}
-                  <div className="dpad-container">
-                    <div className="dpad-bg" />
-                    <div className="dpad-cross">
-                      <button
-                        className="dpad-btn dpad-up"
-                        onClick={() => setMenuIndex(i => Math.max(0, i - 1))}
-                      >
-                        <ChevronRight className="w-3 h-3 -rotate-90 text-gray-400" />
-                      </button>
-                      <button
-                        className="dpad-btn dpad-down"
-                        onClick={() => setMenuIndex(i => Math.min(3, i + 1))}
-                      >
-                        <ChevronRight className="w-3 h-3 rotate-90 text-gray-400" />
-                      </button>
-                      <button className="dpad-btn dpad-left">
-                        <ChevronRight className="w-3 h-3 rotate-180 text-gray-400" />
-                      </button>
-                      <button className="dpad-btn dpad-right">
-                        <ChevronRight className="w-3 h-3 text-gray-400" />
-                      </button>
-                      <div className="dpad-btn dpad-center" />
-                    </div>
-                  </div>
-
-                  {/* A/B Buttons */}
-                  <div className="ab-buttons">
-                    <button
-                      onClick={() => setScreenMode(menuItems[menuIndex])}
-                      className="ab-btn ab-btn-a"
-                    >
-                      A
-                    </button>
-                    <button
-                      className="ab-btn ab-btn-b"
-                      onClick={() => {}}
-                    >
-                      B
-                    </button>
-                  </div>
-                </div>
-
-                {/* Start/Select */}
-                <div className="start-select-btns">
-                  <button className="meta-btn">SELECT</button>
-                  <button className="meta-btn">START</button>
-                </div>
-
-                {/* Speaker grille */}
-                <div className="gameboy-speaker">
-                  <div className="speaker-line" />
-                  <div className="speaker-line" />
-                  <div className="speaker-line" />
-                  <div className="speaker-line" />
-                  <div className="speaker-line" />
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {screenMode === 'scan' && (
-          <motion.div
-            key="scan-view"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Input Mode Toggle */}
-            <div className="flex justify-center gap-2 mb-6">
-              <motion.button
-                onClick={() => setInputMode('wallet')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  inputMode === 'wallet'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                    : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Wallet className="w-4 h-4" />
-                Wallet
-              </motion.button>
-              <motion.button
-                onClick={() => setInputMode('farcaster')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  inputMode === 'farcaster'
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
-                    : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <AtSign className="w-4 h-4" />
-                Farcaster
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-        </AnimatePresence>
-
-        {/* Farcaster Input */}
-        {screenMode === 'scan' && inputMode === 'farcaster' && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-md mx-auto mb-8"
-          >
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={farcasterInput}
-                  onChange={(e) => setFarcasterInput(e.target.value)}
-                  placeholder="username or FID"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-                />
-              </div>
-            </div>
-            <p className="text-gray-500 text-xs mt-2 text-center">
-              Enter Farcaster username (without @) or FID number
-            </p>
-          </motion.div>
-        )}
-
-        {/* Wallet Connect */}
-        {screenMode === 'scan' && inputMode === 'wallet' && (
-          <div className="flex justify-center mb-8">
-            {isConnected ? (
-              <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-white font-mono text-sm">
-                  {address?.slice(0, 6)}...{address?.slice(-4)}
-                </span>
-                <button
-                  onClick={() => disconnect()}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => connect({ connector: connectors[0] })}
-                disabled={isConnecting}
-                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-full transition-colors disabled:opacity-50"
-              >
-                {isConnecting ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Wallet className="w-5 h-5" />
-                )}
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Main Content */}
-        <AnimatePresence mode="wait">
-          {screenMode === 'scan' ? (
-            // SCAN MODE
-            <motion.div
-              key="scan-mode"
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 100 }}
-              transition={{ duration: 0.3 }}
-            >
-            {(inputMode === 'wallet' && isConnected) || inputMode === 'farcaster' ? (
-              <div className="grid md:grid-cols-2 gap-6">
-              {/* Pokedex Device */}
-              <motion.div
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className="pokedex aspect-[3/4] max-w-md mx-auto md:max-w-lg"
-              >
-                {/* Top Section with LEDs */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="led led-blue animate-pulse" />
-                  <div className="led led-red" />
-                  <div className="led led-yellow" />
-                  <div className="led led-green" />
-                  <span className="text-white/50 text-xs font-pixel ml-auto">
-                    {inputMode === 'wallet' ? 'WALLET' : 'FARCASTER'}
-                  </span>
-                </div>
-
-                {/* Screen - wider for bigger creature display */}
-                <div className="pokedex-screen aspect-[4/3] mb-4 scanlines relative overflow-hidden">
-                  <div className="crt-overlay" />
-
-                  {!showCreature ? (
-                    <div className="absolute inset-0 flex items-center justify-center p-6">
-                      {isAnalyzing ? (
-                        <DNAScanningAnimation mode={inputMode} />
-                      ) : (
-                        <div className="text-center">
-                          {inputMode === 'farcaster' && farcasterData?.pfpUrl ? (
-                            <motion.img
-                              src={farcasterData.pfpUrl}
-                              alt="Profile"
-                              className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pokedex-darkscreen/30"
-                              animate={{ scale: [1, 1.05, 1] }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                            />
-                          ) : (
-                            <motion.div
-                              animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
-                              transition={{ duration: 3, repeat: Infinity }}
-                            >
-                              <Sparkles className="w-16 h-16 text-pokedex-darkscreen/50 mx-auto mb-4" />
-                            </motion.div>
-                          )}
-                          <p className="font-pixel text-xs text-pokedex-darkscreen text-center">
-                            PRESS SCAN TO<br />
-                            {inputMode === 'wallet' ? 'ANALYZE WALLET' : 'ANALYZE @' + (farcasterInput || 'USER')}<br />
-                            & LAUNCH TOKEN
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <CreatureReveal 
-                      creature={creature} 
-                      imageBase64={imageBase64}
-                    />
+                    </motion.div>
                   )}
-                </div>
 
-                {/* Bottom Controls */}
-                <div className="flex items-center justify-between">
-                  <div className="dpad">
-                    <div className="dpad-up" />
-                    <div className="dpad-left" />
-                    <div className="dpad-center" />
-                    <div className="dpad-right" />
-                    <div className="dpad-down" />
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={analyze}
-                      disabled={isAnalyzing || isMinting || (inputMode === 'farcaster' && !farcasterInput.trim())}
-                      className="pixel-btn text-white disabled:opacity-50"
+                  {/* SCAN SCREEN */}
+                  {screenMode === 'scan' && (
+                    <motion.div
+                      key="scan"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -20, opacity: 0 }}
+                      className="p-3 h-full flex flex-col"
                     >
-                      {isAnalyzing ? '...' : 'SCAN'}
-                    </button>
+                      <div className="screen-title mb-2">─ SCAN ─</div>
 
-                    {showCreature && !deployResult && (
-                      <button
-                        onClick={launchCreature}
-                        disabled={isMinting || isAnalyzing}
-                        className="pixel-btn text-white disabled:opacity-50"
-                        style={{ backgroundColor: '#FFD700', borderColor: '#B8860B', color: '#000' }}
-                      >
-                        {isMinting ? '...' : '🚀 LAUNCH'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Stats Panel */}
-              <AnimatePresence mode="wait">
-                {showCreature && creature && (
-                  <StatsPanel
-                    creature={creature}
-                    farcasterData={farcasterData}
-                    isMinting={isMinting}
-                    mintStep={mintStep}
-                    deployResult={deployResult}
-                    onShare={(text, embeds) => composeCast(text, embeds)}
-                  />
-                )}
-
-                {!showCreature && !isAnalyzing && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-center h-full min-h-[300px]"
-                  >
-                    <div className="text-center">
-                      <Activity className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <p className="text-gray-500 mb-4">
-                        {inputMode === 'wallet'
-                          ? 'Connect your wallet and scan to discover\nyour unique blockchain creature'
-                          : 'Enter a Farcaster username to analyze\ntheir on-chain personality'
-                        }
-                      </p>
-                      <div className="flex items-center justify-center gap-2 text-sm text-yellow-500">
-                        <Rocket className="w-4 h-4" />
-                        <span>Launches as Clanker token</span>
+                      {/* Mode toggle */}
+                      <div className="flex gap-1 mb-2 justify-center">
+                        <button
+                          onClick={() => setInputMode('wallet')}
+                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'wallet' ? 'bg-[#306230] text-[#8bac0f]' : 'text-[#306230]'}`}
+                        >
+                          WALLET
+                        </button>
+                        <button
+                          onClick={() => setInputMode('farcaster')}
+                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'farcaster' ? 'bg-[#306230] text-[#8bac0f]' : 'text-[#306230]'}`}
+                        >
+                          FARCASTER
+                        </button>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+
+                      {/* Content area */}
+                      <div className="flex-1 flex flex-col items-center justify-center">
+                        {isAnalyzing ? (
+                          <div className="text-center">
+                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#306230' }} />
+                            <p className="font-pixel text-[10px]" style={{ color: '#306230' }}>ANALYZING DNA...</p>
+                          </div>
+                        ) : showCreature && creature ? (
+                          <div className="text-center">
+                            {imageBase64 && (
+                              <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated" />
+                            )}
+                            <p className="font-pixel text-[10px]" style={{ color: '#306230' }}>{creature.name}</p>
+                            <p className="text-[8px]" style={{ color: '#306230' }}>{creature.element} Type</p>
+                            <button
+                              onClick={launchCreature}
+                              disabled={isMinting}
+                              className="mt-2 px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded"
+                            >
+                              {isMinting ? 'LAUNCHING...' : '🚀 LAUNCH TOKEN'}
+                            </button>
+                          </div>
+                        ) : inputMode === 'wallet' ? (
+                          <div className="text-center">
+                            {isConnected ? (
+                              <>
+                                <Wallet className="w-8 h-8 mx-auto mb-2" style={{ color: '#306230' }} />
+                                <p className="font-pixel text-[8px] mb-1" style={{ color: '#306230' }}>
+                                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                                </p>
+                                <p className="text-[8px]" style={{ color: '#306230' }}>Press A to scan</p>
+                              </>
+                            ) : (
+                              <>
+                                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#306230' }} />
+                                <button
+                                  onClick={() => connect({ connector: connectors[0] })}
+                                  className="px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded"
+                                >
+                                  CONNECT WALLET
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-center w-full px-2">
+                            <AtSign className="w-6 h-6 mx-auto mb-2" style={{ color: '#306230' }} />
+                            <input
+                              type="text"
+                              value={farcasterInput}
+                              onChange={(e) => setFarcasterInput(e.target.value)}
+                              placeholder="username"
+                              className="w-full px-2 py-1 bg-[#9bbc0f] border-2 border-[#306230] rounded font-pixel text-[10px] text-[#306230] placeholder-[#306230]/50 text-center"
+                            />
+                            <p className="text-[8px] mt-1" style={{ color: '#306230' }}>Press A to scan</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-center">
+                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back │ A {showCreature ? 'Launch' : 'Scan'}</p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* COLLECTION SCREEN */}
+                  {screenMode === 'collection' && (
+                    <motion.div
+                      key="collection"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -20, opacity: 0 }}
+                      className="p-3 h-full flex flex-col"
+                    >
+                      <div className="screen-title mb-2">─ ROLODEX ─</div>
+
+                      {clankdexEntries.length === 0 ? (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="text-center">
+                            <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#306230' }} />
+                            <p className="font-pixel text-[10px]" style={{ color: '#306230' }}>NO CREATURES YET</p>
+                            <p className="text-[8px]" style={{ color: '#306230' }}>Scan a wallet to begin</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex-1 overflow-y-auto space-y-1">
+                            {filteredEntries.slice(0, 5).map((entry, idx) => (
+                              <div
+                                key={entry.creature.dna}
+                                className={`flex items-center gap-2 p-1 rounded ${currentEntryIndex === idx ? 'bg-[#306230]/20' : ''}`}
+                              >
+                                <span className="font-pixel text-[8px] w-6" style={{ color: '#306230' }}>#{entry.entryNumber}</span>
+                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#306230' }}>{entry.creature.name}</span>
+                                <span className="text-[8px]" style={{ color: '#306230' }}>{entry.creature.element}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="text-center mt-2">
+                            <p className="text-[8px]" style={{ color: '#306230' }}>
+                              {clankdexEntries.length} creatures │ ◄► Navigate
+                            </p>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="text-center mt-1">
+                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back</p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* FAQ SCREEN */}
+                  {screenMode === 'faq' && (
+                    <motion.div
+                      key="faq"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -20, opacity: 0 }}
+                      className="p-3 h-full flex flex-col"
+                    >
+                      <div className="screen-title mb-2">─ FAQ ─</div>
+                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#306230' }}>
+                        <div>
+                          <p className="font-pixel text-[9px]">What is ClankDex?</p>
+                          <p className="opacity-70">A Wallet Pokedex that generates creatures from your on-chain data.</p>
+                        </div>
+                        <div>
+                          <p className="font-pixel text-[9px]">How does it work?</p>
+                          <p className="opacity-70">We analyze your wallet to create a unique creature, then launch it as a token.</p>
+                        </div>
+                        <div>
+                          <p className="font-pixel text-[9px]">What is Clanker?</p>
+                          <p className="opacity-70">Token deployment platform on Base. You earn creator rewards.</p>
+                        </div>
+                        <div>
+                          <p className="font-pixel text-[9px]">How do evolutions work?</p>
+                          <p className="opacity-70">Creatures evolve based on market cap: Egg → Legendary.</p>
+                        </div>
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back</p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* HOW IT WORKS SCREEN */}
+                  {screenMode === 'how-it-works' && (
+                    <motion.div
+                      key="how-it-works"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -20, opacity: 0 }}
+                      className="p-3 h-full flex flex-col"
+                    >
+                      <div className="screen-title mb-2">─ HOW IT WORKS ─</div>
+                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#306230' }}>
+                        <div className="flex items-start gap-2">
+                          <span className="font-pixel">1.</span>
+                          <div>
+                            <p className="font-pixel text-[9px]">CONNECT</p>
+                            <p className="opacity-70">Link wallet or enter Farcaster username</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="font-pixel">2.</span>
+                          <div>
+                            <p className="font-pixel text-[9px]">ANALYZE</p>
+                            <p className="opacity-70">We scan your on-chain DNA</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="font-pixel">3.</span>
+                          <div>
+                            <p className="font-pixel text-[9px]">GENERATE</p>
+                            <p className="opacity-70">AI creates unique creature</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="font-pixel">4.</span>
+                          <div>
+                            <p className="font-pixel text-[9px]">LAUNCH</p>
+                            <p className="opacity-70">Deploy as token on Base</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="font-pixel">5.</span>
+                          <div>
+                            <p className="font-pixel text-[9px]">EVOLVE</p>
+                            <p className="opacity-70">Watch it grow with market cap</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
-          ) : (
-            <NotConnectedState inputMode={inputMode} />
-          )}
-            </motion.div>
-          ) : (
-          // COLLECTION MODE - Rolodex
-          <motion.div
-            key="collection-mode"
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Rolodex
-              entries={filteredEntries}
-              currentIndex={currentEntryIndex}
-              onPrev={() => setCurrentEntryIndex(prev => Math.max(0, prev - 1))}
-              onNext={() => setCurrentEntryIndex(prev => Math.min(filteredEntries.length - 1, prev + 1))}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              totalEntries={clankdexEntries.length}
-              onScanNew={() => setScreenMode('scan')}
-              filterTier={filterTier}
-              onFilterTierChange={setFilterTier}
-              filterElement={filterElement}
-              onFilterElementChange={setFilterElement}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              showFilters={showFilters}
-              onToggleFilters={() => setShowFilters(!showFilters)}
-              priceDataCache={priceDataCache}
-            />
-          </motion.div>
-        )}
+          </div>
 
-        {/* FAQ View */}
-        {screenMode === 'faq' && (
-          <motion.div
-            key="faq-view"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <FAQSection />
-          </motion.div>
-        )}
+          {/* Controls section */}
+          <div className="gameboy-controls">
+            {/* D-Pad */}
+            <div className="dpad-container">
+              <div className="dpad-bg" />
+              <div className="dpad-cross">
+                <button
+                  className="dpad-btn dpad-up"
+                  onClick={() => {
+                    if (screenMode === 'menu') setMenuIndex(i => Math.max(0, i - 1));
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
+                  }}
+                >
+                  <ChevronRight className="w-3 h-3 -rotate-90 text-gray-400" />
+                </button>
+                <button
+                  className="dpad-btn dpad-down"
+                  onClick={() => {
+                    if (screenMode === 'menu') setMenuIndex(i => Math.min(3, i + 1));
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
+                  }}
+                >
+                  <ChevronRight className="w-3 h-3 rotate-90 text-gray-400" />
+                </button>
+                <button
+                  className="dpad-btn dpad-left"
+                  onClick={() => {
+                    if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
+                  }}
+                >
+                  <ChevronRight className="w-3 h-3 rotate-180 text-gray-400" />
+                </button>
+                <button
+                  className="dpad-btn dpad-right"
+                  onClick={() => {
+                    if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
+                  }}
+                >
+                  <ChevronRight className="w-3 h-3 text-gray-400" />
+                </button>
+                <div className="dpad-btn dpad-center" />
+              </div>
+            </div>
 
-        {/* How It Works View */}
-        {screenMode === 'how-it-works' && (
-          <motion.div
-            key="how-it-works-view"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <HowItWorksSection />
-          </motion.div>
-        )}
-        </AnimatePresence>
+            {/* A/B Buttons */}
+            <div className="ab-buttons">
+              <button onClick={handleAButton} className="ab-btn ab-btn-a">A</button>
+              <button onClick={handleBButton} className="ab-btn ab-btn-b">B</button>
+            </div>
+          </div>
 
-        {/* Info Cards - only show on scan/collection */}
-        {(screenMode === 'scan' || screenMode === 'collection') && (
-        <div className="grid md:grid-cols-3 gap-4 mt-12">
-          <InfoCard
-            icon={<Eye className="w-6 h-6" />}
-            title="Analyze"
-            description="Your wallet history becomes DNA. We scan transaction patterns, token holdings, NFT collections, and on-chain activity to create a unique genetic fingerprint. The AI analyzes this data to determine your creature's element type, stats distribution, and personality traits."
-          />
-          <InfoCard
-            icon={<Sparkles className="w-6 h-6" />}
-            title="Generate"
-            description="Our AI takes your DNA fingerprint and conjures a one-of-a-kind pixel art creature. The name, species, and visual design are all algorithmically determined based on your on-chain identity - no two creatures are alike."
-          />
-          <InfoCard
-            icon={<Rocket className="w-6 h-6" />}
-            title="Clanker Launch"
-            description="Deploy your creature as a tradeable ERC-20 token on Base via Clanker. You'll receive creator rewards from trading activity. Your creature joins the Clankdex permanently with a unique entry number."
-          />
+          {/* Start/Select */}
+          <div className="start-select-btns">
+            <button className="meta-btn" onClick={() => setScreenMode('menu')}>SELECT</button>
+            <button className="meta-btn" onClick={() => setScreenMode('scan')}>START</button>
+          </div>
+
+          {/* Speaker grille */}
+          <div className="gameboy-speaker">
+            {[...Array(5)].map((_, i) => <div key={i} className="speaker-line" />)}
+          </div>
         </div>
-        )}
-        <div className="grid md:grid-cols-3 gap-4 mt-12">
-          <InfoCard
-            icon={<Eye className="w-6 h-6" />}
-            title="Analyze"
-            description="Your wallet history becomes DNA. We scan transaction patterns, token holdings, NFT collections, and on-chain activity to create a unique genetic fingerprint. The AI analyzes this data to determine your creature's element type, stats distribution, and personality traits."
-          />
-          <InfoCard
-            icon={<Sparkles className="w-6 h-6" />}
-            title="Generate"
-            description="Our AI takes your DNA fingerprint and conjures a one-of-a-kind pixel art creature. The name, species, and visual design are all algorithmically determined based on your on-chain identity - no two creatures are alike."
-          />
-          <InfoCard
-            icon={<Rocket className="w-6 h-6" />}
-            title="Clanker Launch"
-            description="Deploy your creature as a tradeable ERC-20 token on Base via Clanker. You'll receive creator rewards from trading activity. Your creature joins the Clankdex permanently with a unique entry number."
-          />
-        </div>
-      </div>
+      </motion.div>
     </main>
   );
 }
+
 
 // Stats Panel Component
 function StatsPanel({
