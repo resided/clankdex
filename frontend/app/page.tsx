@@ -822,7 +822,7 @@ const usePriceData = (tokenAddress: string | null) => {
   return { priceData, loading, error };
 };
 
-type ViewMode = 'scan' | 'collection' | 'faq' | 'how-it-works';
+type ScreenMode = 'menu' | 'scan' | 'creature' | 'collection' | 'faq' | 'how-it-works';
 
 const CLANKDEX_STORAGE_KEY = 'clankdex_entries';
 
@@ -906,21 +906,22 @@ export default function Home() {
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
   const [farcasterData, setFarcasterData] = useState<FarcasterData | null>(null);
 
+  // Screen navigation state (emulator style)
+  const [screenMode, setScreenMode] = useState<ScreenMode>('menu');
+  const [menuIndex, setMenuIndex] = useState(0);
+  const menuItems = ['scan', 'collection', 'faq', 'how-it-works'] as const;
+
   // Rolodex state
-  const [viewMode, setViewMode] = useState<ViewMode>('scan');
   const [clankdexEntries, setClankdexEntries] = useState<ClankdexEntry[]>([]);
   const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Advanced filter state
   const [filterTier, setFilterTier] = useState<FilterTier>('all');
   const [filterElement, setFilterElement] = useState<FilterElement>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [priceDataCache, setPriceDataCache] = useState<Record<string, PriceData>>({});
-
-  // Menu state
-  const [menuOpen, setMenuOpen] = useState(false);
 
   // Load entries from localStorage on mount
   useEffect(() => {
@@ -929,7 +930,7 @@ export default function Home() {
 
   // Fetch price data for all entries when in collection mode
   useEffect(() => {
-    if (viewMode !== 'collection' || clankdexEntries.length === 0) return;
+    if (screenMode !== 'collection' || clankdexEntries.length === 0) return;
     
     const fetchAllPrices = async () => {
       const addresses = clankdexEntries.map(e => e.tokenAddress);
@@ -952,7 +953,7 @@ export default function Home() {
     // Refresh every 60 seconds
     const interval = setInterval(fetchAllPrices, 60000);
     return () => clearInterval(interval);
-  }, [viewMode, clankdexEntries]);
+  }, [screenMode, clankdexEntries]);
 
   // Filter and sort entries
   const filteredEntries = useMemo(() => {
@@ -1026,7 +1027,7 @@ export default function Home() {
 
   // Keyboard navigation for rolodex
   useEffect(() => {
-    if (viewMode !== 'collection') return;
+    if (screenMode !== 'collection') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
@@ -1038,7 +1039,7 @@ export default function Home() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [viewMode, filteredEntries.length]);
+  }, [screenMode, filteredEntries.length]);
 
   // Reset index when search changes
   useEffect(() => {
@@ -1268,99 +1269,6 @@ export default function Home() {
       </div>
 
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* Hamburger Menu Button */}
-        <motion.button
-          onClick={() => setMenuOpen(true)}
-          className="fixed top-4 right-4 z-50 p-3 bg-gray-800/80 backdrop-blur rounded-xl border border-gray-700 hover:bg-gray-700 transition-colors"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Menu className="w-6 h-6 text-white" />
-        </motion.button>
-
-        {/* Slide-out Menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setMenuOpen(false)}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-              />
-              {/* Menu Panel */}
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="fixed top-0 right-0 h-full w-80 bg-gray-900/95 backdrop-blur-lg border-l border-gray-700 z-50 p-6 overflow-y-auto"
-              >
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="font-pixel text-xl text-white">MENU</h2>
-                  <motion.button
-                    onClick={() => setMenuOpen(false)}
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                  >
-                    <X className="w-6 h-6 text-gray-400" />
-                  </motion.button>
-                </div>
-
-                <nav className="space-y-2">
-                  <motion.button
-                    onClick={() => { setViewMode('scan'); setMenuOpen(false); }}
-                    whileHover={{ x: 8 }}
-                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'scan' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
-                  >
-                    <ScanLine className="w-5 h-5" />
-                    <span className="font-bold">Scan Wallet</span>
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => { setViewMode('collection'); setMenuOpen(false); }}
-                    whileHover={{ x: 8 }}
-                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'collection' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
-                  >
-                    <BookOpen className="w-5 h-5" />
-                    <span className="font-bold">Rolodex</span>
-                  </motion.button>
-
-                  <div className="h-px bg-gray-700 my-4" />
-
-                  <motion.button
-                    onClick={() => { setViewMode('how-it-works'); setMenuOpen(false); }}
-                    whileHover={{ x: 8 }}
-                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'how-it-works' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
-                  >
-                    <Sparkles className="w-5 h-5" />
-                    <span className="font-bold">How It Works</span>
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => { setViewMode('faq'); setMenuOpen(false); }}
-                    whileHover={{ x: 8 }}
-                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'faq' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
-                  >
-                    <Activity className="w-5 h-5" />
-                    <span className="font-bold">FAQ</span>
-                  </motion.button>
-                </nav>
-
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="text-center text-gray-500 text-xs">
-                    <p>Powered by Clanker</p>
-                    <p className="mt-1">Built on Base</p>
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-
         {/* Header with floating animation */}
         <header className="text-center mb-8">
           <motion.div
@@ -1410,60 +1318,107 @@ export default function Home() {
           </motion.div>
         </header>
 
-        {/* View Mode Toggle - only show for scan/collection */}
-        {(viewMode === 'scan' || viewMode === 'collection') && (
+        {/* Navigation Bar - shows current mode with back to menu */}
+        {screenMode !== 'menu' && (
           <div className="flex justify-center gap-3 mb-6">
             <motion.button
-              onClick={() => setViewMode('scan')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
-                viewMode === 'scan'
-                  ? 'bg-pokedex-red text-white shadow-lg shadow-red-500/25'
-                  : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <ScanLine className="w-4 h-4" />
-              Scan
-            </motion.button>
-            <motion.button
-              onClick={() => setViewMode('collection')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
-                viewMode === 'collection'
-                  ? 'bg-pokedex-red text-white shadow-lg shadow-red-500/25'
-                  : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <BookOpen className="w-4 h-4" />
-              Rolodex
-              {clankdexEntries.length > 0 && (
-                <span className="ml-1 bg-black/30 px-2 py-0.5 rounded-full text-xs">
-                  {clankdexEntries.length}
-                </span>
-              )}
-            </motion.button>
-          </div>
-        )}
-
-        {/* Back button for FAQ and How It Works */}
-        {(viewMode === 'faq' || viewMode === 'how-it-works') && (
-          <div className="flex justify-center mb-6">
-            <motion.button
-              onClick={() => setViewMode('scan')}
+              onClick={() => setScreenMode('menu')}
               className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-full text-gray-300 hover:text-white transition-colors"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <ChevronLeft className="w-4 h-4" />
-              Back to Scan
+              Menu
             </motion.button>
+            <div className="flex items-center gap-2 px-4 py-2 bg-pokedex-red/20 rounded-full text-pokedex-red border border-pokedex-red/30">
+              {screenMode === 'scan' && <><ScanLine className="w-4 h-4" /> Scan</>}
+              {screenMode === 'collection' && <><BookOpen className="w-4 h-4" /> Rolodex</>}
+              {screenMode === 'faq' && <><Activity className="w-4 h-4" /> FAQ</>}
+              {screenMode === 'how-it-works' && <><Sparkles className="w-4 h-4" /> How It Works</>}
+              {screenMode === 'creature' && <><Eye className="w-4 h-4" /> Creature</>}
+            </div>
           </div>
         )}
 
         <AnimatePresence mode="wait">
-          {viewMode === 'scan' && (
+          {/* MENU SCREEN - Main navigation hub */}
+          {screenMode === 'menu' && (
+            <motion.div
+              key="menu-view"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center"
+            >
+              <div className="pokedex p-8 max-w-md w-full">
+                {/* LEDs */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="led led-blue animate-pulse" />
+                  <div className="led led-red" />
+                  <div className="led led-yellow" />
+                  <div className="led led-green" />
+                  <span className="text-white/50 text-xs font-pixel ml-auto">CLANKDEX v1.0</span>
+                </div>
+
+                {/* Menu Screen */}
+                <div className="pokedex-screen aspect-video mb-6 p-6">
+                  <div className="text-center mb-4">
+                    <p className="font-pixel text-sm text-pokedex-darkscreen">SELECT MODE</p>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { mode: 'scan' as const, icon: ScanLine, label: 'SCAN WALLET', desc: 'Generate creature' },
+                      { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length} creatures` },
+                      { mode: 'how-it-works' as const, icon: Sparkles, label: 'HOW IT WORKS', desc: 'Learn more' },
+                      { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Questions' },
+                    ].map((item, idx) => (
+                      <motion.button
+                        key={item.mode}
+                        onClick={() => setScreenMode(item.mode)}
+                        className={`w-full flex items-center gap-4 p-3 rounded-lg transition-all ${
+                          menuIndex === idx
+                            ? 'bg-pokedex-darkscreen/30 border-2 border-pokedex-darkscreen'
+                            : 'hover:bg-pokedex-darkscreen/10'
+                        }`}
+                        onMouseEnter={() => setMenuIndex(idx)}
+                        whileHover={{ x: 4 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <item.icon className="w-5 h-5 text-pokedex-darkscreen" />
+                        <div className="text-left">
+                          <p className="font-pixel text-xs text-pokedex-darkscreen">{item.label}</p>
+                          <p className="text-[10px] text-pokedex-darkscreen/60">{item.desc}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-pokedex-darkscreen/50 ml-auto" />
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* D-pad and buttons */}
+                <div className="flex items-center justify-between">
+                  <div className="dpad">
+                    <button className="dpad-up" onClick={() => setMenuIndex(i => Math.max(0, i - 1))} />
+                    <div className="dpad-left" />
+                    <div className="dpad-center" />
+                    <div className="dpad-right" />
+                    <button className="dpad-down" onClick={() => setMenuIndex(i => Math.min(3, i + 1))} />
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setScreenMode(menuItems[menuIndex])}
+                      className="pixel-btn text-white"
+                    >
+                      SELECT
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {screenMode === 'scan' && (
           <motion.div
             key="scan-view"
             initial={{ opacity: 0, x: -50 }}
@@ -1505,7 +1460,7 @@ export default function Home() {
         </AnimatePresence>
 
         {/* Farcaster Input */}
-        {viewMode === 'scan' && inputMode === 'farcaster' && (
+        {screenMode === 'scan' && inputMode === 'farcaster' && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1530,7 +1485,7 @@ export default function Home() {
         )}
 
         {/* Wallet Connect */}
-        {viewMode === 'scan' && inputMode === 'wallet' && (
+        {screenMode === 'scan' && inputMode === 'wallet' && (
           <div className="flex justify-center mb-8">
             {isConnected ? (
               <div className="flex items-center gap-3 bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700">
@@ -1564,7 +1519,7 @@ export default function Home() {
 
         {/* Main Content */}
         <AnimatePresence mode="wait">
-          {viewMode === 'scan' ? (
+          {screenMode === 'scan' ? (
             // SCAN MODE
             <motion.div
               key="scan-mode"
@@ -1724,7 +1679,7 @@ export default function Home() {
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               totalEntries={clankdexEntries.length}
-              onScanNew={() => setViewMode('scan')}
+              onScanNew={() => setScreenMode('scan')}
               filterTier={filterTier}
               onFilterTierChange={setFilterTier}
               filterElement={filterElement}
@@ -1739,7 +1694,7 @@ export default function Home() {
         )}
 
         {/* FAQ View */}
-        {viewMode === 'faq' && (
+        {screenMode === 'faq' && (
           <motion.div
             key="faq-view"
             initial={{ opacity: 0, y: 20 }}
@@ -1752,7 +1707,7 @@ export default function Home() {
         )}
 
         {/* How It Works View */}
-        {viewMode === 'how-it-works' && (
+        {screenMode === 'how-it-works' && (
           <motion.div
             key="how-it-works-view"
             initial={{ opacity: 0, y: 20 }}
@@ -1766,7 +1721,7 @@ export default function Home() {
         </AnimatePresence>
 
         {/* Info Cards - only show on scan/collection */}
-        {(viewMode === 'scan' || viewMode === 'collection') && (
+        {(screenMode === 'scan' || screenMode === 'collection') && (
         <div className="grid md:grid-cols-3 gap-4 mt-12">
           <InfoCard
             icon={<Eye className="w-6 h-6" />}
