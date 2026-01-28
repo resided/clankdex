@@ -1,11 +1,13 @@
 {
-  "name": "Claudex - Wallet Pokedex",
-  "short_name": "Claudex",
-  "description": "Discover your blockchain creature! A Pokedex for your wallet on Base.",
+  "name": "ClankDex",
+  "short_name": "ClankDex",
+  "description": "Wallet-powered creature generator with evolution tracking",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#DC0A2D",
+  "background_color": "#1a0a2e",
   "theme_color": "#DC0A2D",
+  "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192.png",
