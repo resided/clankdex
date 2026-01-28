@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import type { EvolutionRecord } from '@/lib/supabase';
+import type { EvolutionRecord, CreatureRecord } from '@/lib/supabase';
+import { supabase, getAllCreatures, createCreatureRecord, getNextEntryNumber, createEvolution } from '@/lib/supabase';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useFarcaster } from './components/FarcasterProvider';
+import { createPublicClient, http as viemHttp } from 'viem';
+import { base } from 'wagmi/chains';
 import {
   Sparkles,
   Zap,
@@ -357,17 +360,6 @@ interface FarcasterData {
     dominant: string;
     sentiment: string;
   };
-}
-
-interface ClankdexEntry {
-  entryNumber: number;
-  creature: Creature;
-  imageBase64: string | null;
-  tokenAddress: string;
-  tokenSymbol: string;
-  launchedAt: string;
-  inputMode: 'wallet' | 'farcaster';
-  identifier: string;
 }
 
 // ==========================================
@@ -824,30 +816,22 @@ const usePriceData = (tokenAddress: string | null) => {
 
 type ScreenMode = 'menu' | 'scan' | 'creature' | 'collection' | 'faq' | 'how-it-works';
 
-const CLANKDEX_STORAGE_KEY = 'clankdex_entries';
-
-// Storage utilities
-const loadClankdexEntries = (): ClankdexEntry[] => {
-  if (typeof window === 'undefined') return [];
+// On-chain verification - check if token contract exists
+async function verifyTokenOnChain(tokenAddress: string): Promise<boolean> {
   try {
-    const stored = localStorage.getItem(CLANKDEX_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
+    const publicClient = createPublicClient({
+      chain: base,
+      transport: viemHttp(),
+    });
+    
+    // Check if contract has code (is a deployed contract)
+    const code = await publicClient.getBytecode({ address: tokenAddress as `0x${string}` });
+    return code !== undefined && code !== '0x';
+  } catch (error) {
+    console.error('On-chain verification failed:', error);
+    return false;
   }
-};
-
-const saveClankdexEntry = (entry: ClankdexEntry): ClankdexEntry[] => {
-  const entries = loadClankdexEntries();
-  entries.push(entry);
-  localStorage.setItem(CLANKDEX_STORAGE_KEY, JSON.stringify(entries));
-  return entries;
-};
-
-const getNextEntryNumber = (entries: ClankdexEntry[]): number => {
-  if (entries.length === 0) return 1;
-  return Math.max(...entries.map(e => e.entryNumber)) + 1;
-};
+}
 
 const formatEntryNumber = (num: number): string => {
   return `#${num.toString().padStart(3, '0')}`;
@@ -912,7 +896,7 @@ export default function Home() {
   const menuItems = ['scan', 'collection', 'faq', 'how-it-works'] as const;
 
   // Rolodex state
-  const [clankdexEntries, setClankdexEntries] = useState<ClankdexEntry[]>([]);
+  const [clankdexEntries, setClankdexEntries] = useState<CreatureRecord[]>([]);
   const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -923,9 +907,13 @@ export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [priceDataCache, setPriceDataCache] = useState<Record<string, PriceData>>({});
 
-  // Load entries from localStorage on mount
+  // Load entries from Supabase on mount
   useEffect(() => {
-    setClankdexEntries(loadClankdexEntries());
+    const loadEntries = async () => {
+      const entries = await getAllCreatures();
+      setClankdexEntries(entries);
+    };
+    loadEntries();
   }, []);
 
   // Fetch price data for all entries when in collection mode
@@ -933,7 +921,7 @@ export default function Home() {
     if (screenMode !== 'collection' || clankdexEntries.length === 0) return;
     
     const fetchAllPrices = async () => {
-      const addresses = clankdexEntries.map(e => e.tokenAddress);
+      const addresses = clankdexEntries.map(e => e.token_address);
       try {
         const response = await fetch('/api/price', {
           method: 'POST',
@@ -963,22 +951,22 @@ export default function Home() {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       entries = entries.filter(entry => 
-        entry.creature.name.toLowerCase().includes(query) ||
-        entry.creature.element.toLowerCase().includes(query) ||
-        formatEntryNumber(entry.entryNumber).toLowerCase().includes(query) ||
-        entry.tokenSymbol.toLowerCase().includes(query)
+        entry.name.toLowerCase().includes(query) ||
+        entry.element.toLowerCase().includes(query) ||
+        formatEntryNumber(entry.entry_number).toLowerCase().includes(query) ||
+        entry.token_symbol.toLowerCase().includes(query)
       );
     }
     
     // Element filter
     if (filterElement !== 'all') {
-      entries = entries.filter(entry => entry.creature.element === filterElement);
+      entries = entries.filter(entry => entry.element === filterElement);
     }
     
     // Tier filter (based on cached price data)
     if (filterTier !== 'all') {
       entries = entries.filter(entry => {
-        const priceData = priceDataCache[entry.tokenAddress.toLowerCase()];
+        const priceData = priceDataCache[entry.token_address.toLowerCase()];
         if (!priceData) return filterTier === 'Egg'; // Default to Egg if no price
         const tier = getEvolutionTier(priceData.marketCap);
         return tier.name === filterTier;
@@ -989,32 +977,32 @@ export default function Home() {
     entries.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.launchedAt).getTime() - new Date(a.launchedAt).getTime();
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
         case 'oldest':
-          return new Date(a.launchedAt).getTime() - new Date(b.launchedAt).getTime();
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
         case 'highestMc': {
-          const mcA = priceDataCache[a.tokenAddress.toLowerCase()]?.marketCap || 0;
-          const mcB = priceDataCache[b.tokenAddress.toLowerCase()]?.marketCap || 0;
+          const mcA = priceDataCache[a.token_address.toLowerCase()]?.marketCap || 0;
+          const mcB = priceDataCache[b.token_address.toLowerCase()]?.marketCap || 0;
           return mcB - mcA;
         }
         case 'lowestMc': {
-          const mcA = priceDataCache[a.tokenAddress.toLowerCase()]?.marketCap || 0;
-          const mcB = priceDataCache[b.tokenAddress.toLowerCase()]?.marketCap || 0;
+          const mcA = priceDataCache[a.token_address.toLowerCase()]?.marketCap || 0;
+          const mcB = priceDataCache[b.token_address.toLowerCase()]?.marketCap || 0;
           return mcA - mcB;
         }
         case 'highestPrice': {
-          const pA = priceDataCache[a.tokenAddress.toLowerCase()]?.price || 0;
-          const pB = priceDataCache[b.tokenAddress.toLowerCase()]?.price || 0;
+          const pA = priceDataCache[a.token_address.toLowerCase()]?.price || 0;
+          const pB = priceDataCache[b.token_address.toLowerCase()]?.price || 0;
           return pB - pA;
         }
         case 'lowestPrice': {
-          const pA = priceDataCache[a.tokenAddress.toLowerCase()]?.price || 0;
-          const pB = priceDataCache[b.tokenAddress.toLowerCase()]?.price || 0;
+          const pA = priceDataCache[a.token_address.toLowerCase()]?.price || 0;
+          const pB = priceDataCache[b.token_address.toLowerCase()]?.price || 0;
           return pA - pB;
         }
         case 'totalStats': {
-          const statsA = a.creature.hp + a.creature.attack + a.creature.defense + a.creature.speed + a.creature.special;
-          const statsB = b.creature.hp + b.creature.attack + b.creature.defense + b.creature.speed + b.creature.special;
+          const statsA = a.hp + a.attack + a.defense + a.speed + a.special;
+          const statsB = b.hp + b.attack + b.defense + b.speed + b.special;
           return statsB - statsA;
         }
         default:
@@ -1195,28 +1183,46 @@ export default function Home() {
       if (result.success) {
         setDeployResult(result);
 
-        // Step 3: Save to Clankdex
-        const entryNumber = getNextEntryNumber(clankdexEntries);
-        const newEntry: ClankdexEntry = {
-          entryNumber,
-          creature: { ...creature, imageURI: imageUrl },
-          imageBase64: imageBase64,
-          tokenAddress: result.tokenAddress,
-          tokenSymbol: result.config?.symbol || creature.name.slice(0, 6).toUpperCase(),
-          launchedAt: new Date().toISOString(),
-          inputMode: inputMode,
-          identifier: inputMode === 'wallet' ? (address || '') : farcasterInput,
-        };
-        const updatedEntries = saveClankdexEntry(newEntry);
-        setClankdexEntries(updatedEntries);
-
-        // Step 4: Create evolution record in Supabase (async, non-blocking)
-        try {
-          const { createEvolution } = await import('@/lib/supabase');
-          await createEvolution(result.tokenAddress, entryNumber);
-        } catch (evoError) {
-          console.error('Evolution record creation failed (non-critical):', evoError);
+        // Step 3: Verify token exists on-chain
+        const isVerified = await verifyTokenOnChain(result.tokenAddress);
+        
+        if (!isVerified) {
+          console.warn('Token deployment not confirmed on-chain yet');
+          // Continue anyway - will be marked as unverified in DB
         }
+
+        // Step 4: Get next entry number from Supabase
+        const entryNumber = await getNextEntryNumber();
+
+        // Step 5: Save to Supabase creatures table
+        const creatureRecord: CreatureRecord = {
+          entry_number: entryNumber,
+          token_address: result.tokenAddress.toLowerCase(),
+          token_symbol: result.config?.symbol || creature.name.slice(0, 6).toUpperCase(),
+          name: creature.name,
+          element: creature.element,
+          level: creature.level,
+          hp: creature.hp,
+          attack: creature.attack,
+          defense: creature.defense,
+          speed: creature.speed,
+          special: creature.special,
+          description: creature.description,
+          creator_address: address?.toLowerCase(),
+          farcaster_username: inputMode === 'farcaster' ? farcasterInput : undefined,
+          image_url: imageUrl,
+          verified: isVerified,
+        };
+
+        const saved = await createCreatureRecord(creatureRecord);
+        if (saved) {
+          // Refresh entries from Supabase
+          const updatedEntries = await getAllCreatures();
+          setClankdexEntries(updatedEntries);
+        }
+
+        // Step 6: Create evolution record
+        await createEvolution(result.tokenAddress, entryNumber);
 
         confetti({
           particleCount: 200,
@@ -1497,13 +1503,13 @@ export default function Home() {
                           <div className="flex-1 overflow-y-auto space-y-1">
                             {filteredEntries.slice(0, 5).map((entry, idx) => (
                               <button
-                                key={entry.creature.dna}
-                                onClick={() => window.open(`${CLANKER_URL}/token/${entry.tokenAddress}`, '_blank')}
+                                key={entry.token_address}
+                                onClick={() => window.open(`${CLANKER_URL}/token/${entry.token_address}`, '_blank')}
                                 className={`w-full flex items-center gap-2 p-1 rounded text-left hover:opacity-70 ${currentEntryIndex === idx ? 'bg-[#306230]/20' : ''}`}
                               >
-                                <span className="font-pixel text-[8px] w-6" style={{ color: '#306230' }}>#{entry.entryNumber}</span>
-                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#306230' }}>{entry.creature.name}</span>
-                                <span className="text-[8px]" style={{ color: '#306230' }}>{entry.creature.element}</span>
+                                <span className="font-pixel text-[8px] w-6" style={{ color: '#306230' }}>#{entry.entry_number}</span>
+                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#306230' }}>{entry.name}</span>
+                                <span className="text-[8px]" style={{ color: '#306230' }}>{entry.element}</span>
                               </button>
                             ))}
                           </div>
@@ -2374,7 +2380,7 @@ function Rolodex({
   onToggleFilters,
   priceDataCache,
 }: {
-  entries: ClankdexEntry[];
+  entries: CreatureRecord[];
   currentIndex: number;
   onPrev: () => void;
   onNext: () => void;
@@ -2396,7 +2402,7 @@ function Rolodex({
 
   // Get unique elements from entries
   const availableElements = useMemo(() => {
-    const elements = new Set(entries.map(e => e.creature.element));
+    const elements = new Set(entries.map(e => e.element));
     return Array.from(elements).sort();
   }, [entries]);
 
@@ -2611,11 +2617,11 @@ function Rolodex({
           <p className="text-sm text-gray-400">
             Showing <span className="text-white font-bold">{entries.length}</span> of <span className="text-gray-500">{totalEntries}</span> creatures
           </p>
-          {currentEntry && priceDataCache[currentEntry.tokenAddress.toLowerCase()] && (
+          {currentEntry && priceDataCache[currentEntry.token_address.toLowerCase()] && (
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-green-400" />
               <span className="text-green-400 font-pixel text-sm">
-                {formatPrice(priceDataCache[currentEntry.tokenAddress.toLowerCase()].price)}
+                {formatPrice(priceDataCache[currentEntry.token_address.toLowerCase()].price)}
               </span>
             </div>
           )}
@@ -2700,7 +2706,7 @@ function Rolodex({
             {/* Main Card */}
             <div className="flex-1">
               <AnimatePresence mode="wait">
-                <RolodexCard key={currentEntry.entryNumber} entry={currentEntry} />
+                <RolodexCard key={currentEntry.entry_number} entry={currentEntry} />
               </AnimatePresence>
             </div>
 
@@ -2725,7 +2731,7 @@ function Rolodex({
           >
             <motion.p 
               className="text-gray-400 text-sm"
-              key={currentEntry.entryNumber}
+              key={currentEntry.entry_number}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
             >
@@ -2735,7 +2741,7 @@ function Rolodex({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                {formatEntryNumber(currentEntry.entryNumber)}
+                {formatEntryNumber(currentEntry.entry_number)}
               </motion.span>
               {' '}&bull;{' '}
               <span className="text-white">{currentIndex + 1}</span> of <span className="text-white">{entries.length}</span>
@@ -2757,14 +2763,14 @@ function Rolodex({
 }
 
 // Rolodex Card Component with Rich Animations
-function RolodexCard({ entry }: { entry: ClankdexEntry }) {
-  const { creature, entryNumber, imageBase64, tokenAddress, tokenSymbol, launchedAt, inputMode, identifier } = entry;
-  const totalStats = creature.hp + creature.attack + creature.defense + creature.speed + creature.special;
+function RolodexCard({ entry }: { entry: CreatureRecord }) {
+  const { name, element, entry_number, token_address, token_symbol, hp, attack, defense, speed, special, image_url, created_at, creator_address, farcaster_username } = entry;
+  const totalStats = hp + attack + defense + speed + special;
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showStats, setShowStats] = useState(false);
 
   // Fetch live price data
-  const { priceData, loading: priceLoading } = usePriceData(tokenAddress);
+  const { priceData, loading: priceLoading } = usePriceData(token_address);
   
   // Fetch evolution data from Supabase
   const [evolutionData, setEvolutionData] = useState<EvolutionRecord | null>(null);
@@ -2774,16 +2780,16 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
       const { getEvolutionData, updateEvolution } = await import('@/lib/supabase');
       
       // Get existing evolution data
-      let data = await getEvolutionData(tokenAddress);
+      let data = await getEvolutionData(token_address);
       
       // If we have price data, check for evolution
       if (data && priceData) {
         const newTier = getEvolutionTier(priceData.marketCap);
         if (newTier.index > data.current_tier) {
           // Evolution happened! Update in database
-          await updateEvolution(tokenAddress, newTier.index, newTier.name, priceData.marketCap);
+          await updateEvolution(token_address, newTier.index, newTier.name, priceData.marketCap);
           // Re-fetch to get updated data
-          data = await getEvolutionData(tokenAddress);
+          data = await getEvolutionData(token_address);
         }
       }
       
@@ -2795,7 +2801,7 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
     // Re-check every 30 seconds
     const interval = setInterval(fetchEvolution, 30000);
     return () => clearInterval(interval);
-  }, [tokenAddress, priceData?.marketCap]);
+  }, [token_address, priceData?.marketCap]);
   
   // Use evolution data from DB if available, otherwise fallback to price-based
   const currentTierIndex = evolutionData?.current_tier ?? (priceData ? getEvolutionTier(priceData.marketCap).index : 0);
@@ -2837,7 +2843,7 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
         transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.2 }}
         whileHover={{ scale: 1.1, rotate: 5 }}
       >
-        {formatEntryNumber(entryNumber)}
+        {formatEntryNumber(entry_number)}
       </motion.div>
 
       {/* Evolution Tier Badge with pop animation */}
@@ -2873,16 +2879,8 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {creature.name}
+            {name}
           </motion.h2>
-          <motion.p 
-            className="text-gray-400 text-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            {creature.species}
-          </motion.p>
         </div>
         <motion.div 
           className="flex flex-col items-end gap-2"
@@ -2890,15 +2888,15 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Badge color={creature.element.toLowerCase() === 'fire' ? 'red' : creature.element.toLowerCase() === 'water' ? 'blue' : creature.element.toLowerCase() === 'grass' ? 'green' : 'blue'}>
-            {ELEMENT_ICONS[creature.element]}
-            {creature.element}
+          <Badge color={element.toLowerCase() === 'fire' ? 'red' : element.toLowerCase() === 'water' ? 'blue' : element.toLowerCase() === 'grass' ? 'green' : 'blue'}>
+            {ELEMENT_ICONS[element]}
+            {element}
           </Badge>
           <motion.span 
-            className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(creature.element)]}`}
+            className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(element)]}`}
             whileHover={{ scale: 1.1 }}
           >
-            {getRarity(creature.element)}
+            {getRarity(element)}
           </motion.span>
         </motion.div>
       </motion.div>
@@ -2969,11 +2967,11 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
           <div className="absolute inset-0 animate-rainbow pointer-events-none z-10" />
         )}
         
-        {imageBase64 ? (
+        {image_url ? (
           <motion.div className="relative w-full h-full">
             <motion.img
-              src={imageBase64}
-              alt={creature.name}
+              src={image_url}
+              alt={name}
               className="w-full h-full object-contain"
               initial={{ opacity: 0 }}
               animate={{ opacity: imageLoaded ? 1 : 0 }}
@@ -2994,18 +2992,14 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
         ) : (
           <motion.div
             className="w-full h-full flex items-center justify-center"
-            style={{ backgroundColor: creature.colorPalette?.[0] || '#333' }}
-            animate={{ 
-              backgroundColor: [creature.colorPalette?.[0] || '#333', creature.colorPalette?.[1] || '#444', creature.colorPalette?.[0] || '#333']
-            }}
-            transition={{ duration: 4, repeat: Infinity }}
+            style={{ backgroundColor: ELEMENT_COLORS[element] || '#333' }}
           >
             <motion.span 
               className="text-6xl"
               animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {ELEMENT_ICONS[creature.element]}
+              {ELEMENT_ICONS[element]}
             </motion.span>
           </motion.div>
         )}
@@ -3084,11 +3078,11 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
         }}
       >
         {[
-          { label: 'HP', value: creature.hp, color: 'text-green-400' },
-          { label: 'ATK', value: creature.attack, color: 'text-red-400' },
-          { label: 'DEF', value: creature.defense, color: 'text-blue-400' },
-          { label: 'SPD', value: creature.speed, color: 'text-yellow-400' },
-          { label: 'SPC', value: creature.special, color: 'text-purple-400' },
+          { label: 'HP', value: hp, color: 'text-green-400' },
+          { label: 'ATK', value: attack, color: 'text-red-400' },
+          { label: 'DEF', value: defense, color: 'text-blue-400' },
+          { label: 'SPD', value: speed, color: 'text-yellow-400' },
+          { label: 'SPC', value: special, color: 'text-purple-400' },
         ].map((stat) => (
           <motion.div 
             key={stat.label}
@@ -3143,7 +3137,7 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
           >
-            ${tokenSymbol}
+            ${token_symbol}
           </motion.p>
         </motion.div>
       </motion.div>
@@ -3159,20 +3153,22 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
           className="text-gray-500"
           whileHover={{ color: '#fff' }}
         >
-          {inputMode === 'wallet' ? (
+          {creator_address ? (
             <span className="flex items-center gap-1">
               <Wallet className="w-3 h-3" />
-              {identifier.slice(0, 6)}...{identifier.slice(-4)}
+              {creator_address.slice(0, 6)}...{creator_address.slice(-4)}
             </span>
-          ) : (
+          ) : farcaster_username ? (
             <span className="flex items-center gap-1">
               <AtSign className="w-3 h-3" />
-              {identifier}
+              {farcaster_username}
             </span>
+          ) : (
+            <span>Unknown</span>
           )}
         </motion.span>
         <span className="text-gray-500">
-          {new Date(launchedAt).toLocaleDateString()}
+          {created_at ? new Date(created_at).toLocaleDateString() : 'Unknown'}
         </span>
       </motion.div>
 
@@ -3184,7 +3180,7 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
         transition={{ delay: 0.8 }}
       >
         <motion.a
-          href={`${CLANKER_URL}/token/${tokenAddress}`}
+          href={`${CLANKER_URL}/token/${token_address}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm"
@@ -3195,7 +3191,7 @@ function RolodexCard({ entry }: { entry: ClankdexEntry }) {
           Clanker
         </motion.a>
         <motion.a
-          href={`https://basescan.org/token/${tokenAddress}`}
+          href={`https://basescan.org/token/${token_address}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm"

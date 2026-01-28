@@ -126,6 +126,78 @@ export async function getEvolutionsByEntries(entryNumbers: number[]): Promise<Ev
   return data || [];
 }
 
+// Creature record in Supabase (verified on-chain)
+export interface CreatureRecord {
+  id?: string;
+  entry_number: number;
+  token_address: string;
+  token_symbol: string;
+  name: string;
+  element: string;
+  level: number;
+  hp: number;
+  attack: number;
+  defense: number;
+  speed: number;
+  special: number;
+  description: string;
+  creator_address?: string;
+  farcaster_username?: string;
+  image_url?: string;
+  verified: boolean;
+  created_at?: string;
+}
+
+// Create a new creature record (only after on-chain verification)
+export async function createCreatureRecord(
+  creature: CreatureRecord
+): Promise<CreatureRecord | null> {
+  const { data, error } = await supabase
+    .from('creatures')
+    .insert(creature)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating creature record:', error);
+    return null;
+  }
+
+  return data;
+}
+
+// Get all verified creatures for the Rolodex
+export async function getAllCreatures(): Promise<CreatureRecord[]> {
+  const { data, error } = await supabase
+    .from('creatures')
+    .select('*')
+    .eq('verified', true)
+    .order('entry_number', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching creatures:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+// Get next entry number
+export async function getNextEntryNumber(): Promise<number> {
+  const { data, error } = await supabase
+    .from('creatures')
+    .select('entry_number')
+    .order('entry_number', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error || !data) {
+    return 1; // First entry
+  }
+
+  return data.entry_number + 1;
+}
+
 // Test connection
 export async function testConnection(): Promise<boolean> {
   try {
