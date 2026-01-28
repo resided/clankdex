@@ -937,7 +937,7 @@ export default function Home() {
     setDeployResult(null);
 
     try {
-      const response = await fetch('/api/preview-farcaster', {
+      const response = await fetch('/api/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier }),
