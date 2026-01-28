@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -378,6 +378,11 @@ interface PriceData {
   lastUpdated: string;
 }
 
+// Filter and sort types
+type FilterTier = 'all' | 'Egg' | 'Baby' | 'Basic' | 'Stage 1' | 'Stage 2' | 'Mega' | 'Legendary';
+type FilterElement = 'all' | string;
+type SortOption = 'newest' | 'oldest' | 'highestMc' | 'lowestMc' | 'highestPrice' | 'lowestPrice' | 'totalStats';
+
 // Evolution tiers based on market cap
 const EVOLUTION_TIERS = [
   { name: 'Egg', minCap: 0, maxCap: 1000, color: 'text-gray-400', icon: Egg, hpMultiplier: 1 },
@@ -531,23 +536,115 @@ export default function Home() {
   const [clankdexEntries, setClankdexEntries] = useState<ClankdexEntry[]>([]);
   const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Advanced filter state
+  const [filterTier, setFilterTier] = useState<FilterTier>('all');
+  const [filterElement, setFilterElement] = useState<FilterElement>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceDataCache, setPriceDataCache] = useState<Record<string, PriceData>>({});
 
   // Load entries from localStorage on mount
   useEffect(() => {
     setClankdexEntries(loadClankdexEntries());
   }, []);
 
-  // Filter entries based on search
-  const filteredEntries = clankdexEntries.filter(entry => {
-    if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      entry.creature.name.toLowerCase().includes(query) ||
-      entry.creature.element.toLowerCase().includes(query) ||
-      formatEntryNumber(entry.entryNumber).toLowerCase().includes(query) ||
-      entry.tokenSymbol.toLowerCase().includes(query)
-    );
-  });
+  // Fetch price data for all entries when in collection mode
+  useEffect(() => {
+    if (viewMode !== 'collection' || clankdexEntries.length === 0) return;
+    
+    const fetchAllPrices = async () => {
+      const addresses = clankdexEntries.map(e => e.tokenAddress);
+      try {
+        const response = await fetch('/api/price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ addresses }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPriceDataCache(data.prices);
+        }
+      } catch (error) {
+        console.error('Failed to fetch batch prices:', error);
+      }
+    };
+    
+    fetchAllPrices();
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchAllPrices, 60000);
+    return () => clearInterval(interval);
+  }, [viewMode, clankdexEntries]);
+
+  // Filter and sort entries
+  const filteredEntries = useMemo(() => {
+    let entries = [...clankdexEntries];
+    
+    // Text search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      entries = entries.filter(entry => 
+        entry.creature.name.toLowerCase().includes(query) ||
+        entry.creature.element.toLowerCase().includes(query) ||
+        formatEntryNumber(entry.entryNumber).toLowerCase().includes(query) ||
+        entry.tokenSymbol.toLowerCase().includes(query)
+      );
+    }
+    
+    // Element filter
+    if (filterElement !== 'all') {
+      entries = entries.filter(entry => entry.creature.element === filterElement);
+    }
+    
+    // Tier filter (based on cached price data)
+    if (filterTier !== 'all') {
+      entries = entries.filter(entry => {
+        const priceData = priceDataCache[entry.tokenAddress.toLowerCase()];
+        if (!priceData) return filterTier === 'Egg'; // Default to Egg if no price
+        const tier = getEvolutionTier(priceData.marketCap);
+        return tier.name === filterTier;
+      });
+    }
+    
+    // Sorting
+    entries.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.launchedAt).getTime() - new Date(a.launchedAt).getTime();
+        case 'oldest':
+          return new Date(a.launchedAt).getTime() - new Date(b.launchedAt).getTime();
+        case 'highestMc': {
+          const mcA = priceDataCache[a.tokenAddress.toLowerCase()]?.marketCap || 0;
+          const mcB = priceDataCache[b.tokenAddress.toLowerCase()]?.marketCap || 0;
+          return mcB - mcA;
+        }
+        case 'lowestMc': {
+          const mcA = priceDataCache[a.tokenAddress.toLowerCase()]?.marketCap || 0;
+          const mcB = priceDataCache[b.tokenAddress.toLowerCase()]?.marketCap || 0;
+          return mcA - mcB;
+        }
+        case 'highestPrice': {
+          const pA = priceDataCache[a.tokenAddress.toLowerCase()]?.price || 0;
+          const pB = priceDataCache[b.tokenAddress.toLowerCase()]?.price || 0;
+          return pB - pA;
+        }
+        case 'lowestPrice': {
+          const pA = priceDataCache[a.tokenAddress.toLowerCase()]?.price || 0;
+          const pB = priceDataCache[b.tokenAddress.toLowerCase()]?.price || 0;
+          return pA - pB;
+        }
+        case 'totalStats': {
+          const statsA = a.creature.hp + a.creature.attack + a.creature.defense + a.creature.speed + a.creature.special;
+          const statsB = b.creature.hp + b.creature.attack + b.creature.defense + b.creature.speed + b.creature.special;
+          return statsB - statsA;
+        }
+        default:
+          return 0;
+      }
+    });
+    
+    return entries;
+  }, [clankdexEntries, searchQuery, filterElement, filterTier, sortBy, priceDataCache]);
 
   // Keyboard navigation for rolodex
   useEffect(() => {
@@ -1163,6 +1260,15 @@ export default function Home() {
               onSearchChange={setSearchQuery}
               totalEntries={clankdexEntries.length}
               onScanNew={() => setViewMode('scan')}
+              filterTier={filterTier}
+              onFilterTierChange={setFilterTier}
+              filterElement={filterElement}
+              onFilterElementChange={setFilterElement}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              showFilters={showFilters}
+              onToggleFilters={() => setShowFilters(!showFilters)}
+              priceDataCache={priceDataCache}
             />
           </motion.div>
         )}
@@ -1495,7 +1601,102 @@ function NotConnectedState({ inputMode }: { inputMode: InputMode }) {
   );
 }
 
-// Rolodex Component
+// Filter Chip Component
+const FilterChip = ({ 
+  label, 
+  active, 
+  onClick, 
+  color = 'blue',
+  icon: Icon
+}: { 
+  label: string; 
+  active: boolean; 
+  onClick: () => void;
+  color?: string;
+  icon?: React.ElementType;
+}) => {
+  const colors: Record<string, string> = {
+    blue: active ? 'bg-blue-500 text-white' : 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    green: active ? 'bg-green-500 text-white' : 'bg-green-500/20 text-green-400 border-green-500/30',
+    purple: active ? 'bg-purple-500 text-white' : 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    yellow: active ? 'bg-yellow-500 text-black' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+    red: active ? 'bg-red-500 text-white' : 'bg-red-500/20 text-red-400 border-red-500/30',
+    orange: active ? 'bg-orange-500 text-white' : 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    gray: active ? 'bg-gray-500 text-white' : 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+  };
+
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ scale: 1.05, y: -2 }}
+      whileTap={{ scale: 0.95 }}
+      className={`px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all ${colors[color]} flex items-center gap-1`}
+    >
+      {Icon && <Icon className="w-3 h-3" />}
+      {label}
+    </motion.button>
+  );
+};
+
+// Sort Option Button
+const SortButton = ({ 
+  label, 
+  active, 
+  onClick,
+  icon: Icon
+}: { 
+  label: string; 
+  active: boolean; 
+  onClick: () => void;
+  icon: React.ElementType;
+}) => (
+  <motion.button
+    onClick={onClick}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+      active 
+        ? 'bg-pokedex-yellow text-black' 
+        : 'bg-gray-800 text-gray-400 hover:text-white border border-gray-700'
+    }`}
+  >
+    <Icon className="w-3 h-3" />
+    {label}
+  </motion.button>
+);
+
+// Active Filter Badge
+const ActiveFilter = ({ label, onClear, color = 'blue' }: { label: string; onClear: () => void; color?: string }) => {
+  const colors: Record<string, string> = {
+    blue: 'bg-blue-500/20 text-blue-400 border-blue-500',
+    green: 'bg-green-500/20 text-green-400 border-green-500',
+    purple: 'bg-purple-500/20 text-purple-400 border-purple-500',
+    yellow: 'bg-yellow-500/20 text-yellow-400 border-yellow-500',
+    red: 'bg-red-500/20 text-red-400 border-red-500',
+  };
+
+  return (
+    <motion.span
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0, opacity: 0 }}
+      layout
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold border ${colors[color]}`}
+    >
+      {label}
+      <motion.button
+        onClick={onClear}
+        whileHover={{ scale: 1.2, rotate: 90 }}
+        whileTap={{ scale: 0.9 }}
+        className="ml-1 hover:text-white"
+      >
+        <X className="w-3 h-3" />
+      </motion.button>
+    </motion.span>
+  );
+};
+
+// Rolodex Component with Advanced Filters
 function Rolodex({
   entries,
   currentIndex,
@@ -1505,6 +1706,15 @@ function Rolodex({
   onSearchChange,
   totalEntries,
   onScanNew,
+  filterTier,
+  onFilterTierChange,
+  filterElement,
+  onFilterElementChange,
+  sortBy,
+  onSortChange,
+  showFilters,
+  onToggleFilters,
+  priceDataCache,
 }: {
   entries: ClankdexEntry[];
   currentIndex: number;
@@ -1514,8 +1724,32 @@ function Rolodex({
   onSearchChange: (query: string) => void;
   totalEntries: number;
   onScanNew: () => void;
+  filterTier: FilterTier;
+  onFilterTierChange: (tier: FilterTier) => void;
+  filterElement: FilterElement;
+  onFilterElementChange: (element: FilterElement) => void;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
+  showFilters: boolean;
+  onToggleFilters: () => void;
+  priceDataCache: Record<string, PriceData>;
 }) {
   const currentEntry = entries[currentIndex];
+
+  // Get unique elements from entries
+  const availableElements = useMemo(() => {
+    const elements = new Set(entries.map(e => e.creature.element));
+    return Array.from(elements).sort();
+  }, [entries]);
+
+  // Count active filters
+  const activeFilterCount = (filterTier !== 'all' ? 1 : 0) + (filterElement !== 'all' ? 1 : 0);
+
+  const clearAllFilters = () => {
+    onFilterTierChange('all');
+    onFilterElementChange('all');
+    onSearchChange('');
+  };
 
   return (
     <motion.div
@@ -1523,45 +1757,212 @@ function Rolodex({
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto"
     >
-      {/* Search Bar with animation */}
+      {/* Search & Filter Header */}
       <motion.div 
-        className="mb-6"
+        className="mb-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="relative group">
-          <motion.div
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            animate={{ rotate: searchQuery ? [0, 360] : 0 }}
-            transition={{ duration: 0.5 }}
+        {/* Search Bar with Filter Toggle */}
+        <div className="flex gap-2 mb-4">
+          <div className="relative group flex-1">
+            <motion.div
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              animate={{ rotate: searchQuery ? [0, 360] : 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Search className="w-5 h-5" />
+            </motion.div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search creatures..."
+              className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm transition-all"
+            />
+            <AnimatePresence>
+              {searchQuery && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  whileHover={{ scale: 1.2, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </div>
+          
+          {/* Filter Toggle Button */}
+          <motion.button
+            onClick={onToggleFilters}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 border-4 transition-all ${
+              showFilters || activeFilterCount > 0
+                ? 'bg-pokedex-yellow text-black border-pokedex-yellow'
+                : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
+            }`}
           >
-            <Search className="w-5 h-5" />
-          </motion.div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by name, element, or entry #..."
-            className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm transition-all"
-          />
-          <AnimatePresence>
-            {searchQuery && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0 }}
-                onClick={() => onSearchChange('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                whileHover={{ scale: 1.2, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+            <Filter className="w-5 h-5" />
+            {activeFilterCount > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="bg-black text-white w-5 h-5 rounded-full text-xs flex items-center justify-center"
               >
-                <X className="w-5 h-5" />
-              </motion.button>
+                {activeFilterCount}
+              </motion.span>
             )}
-          </AnimatePresence>
+          </motion.button>
         </div>
+
+        {/* Active Filters Display */}
+        <AnimatePresence>
+          {(activeFilterCount > 0 || searchQuery) && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex flex-wrap gap-2 mb-4"
+            >
+              {searchQuery && (
+                <ActiveFilter 
+                  label={`Search: "${searchQuery}"`} 
+                  onClear={() => onSearchChange('')}
+                  color="purple"
+                />
+              )}
+              {filterTier !== 'all' && (
+                <ActiveFilter 
+                  label={`Tier: ${filterTier}`} 
+                  onClear={() => onFilterTierChange('all')}
+                  color="yellow"
+                />
+              )}
+              {filterElement !== 'all' && (
+                <ActiveFilter 
+                  label={`Element: ${filterElement}`} 
+                  onClear={() => onFilterElementChange('all')}
+                  color={filterElement.toLowerCase() === 'fire' ? 'red' : filterElement.toLowerCase() === 'water' ? 'blue' : filterElement.toLowerCase() === 'grass' ? 'green' : 'blue'}
+                />
+              )}
+              <motion.button
+                onClick={clearAllFilters}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-xs text-gray-500 hover:text-gray-300 underline ml-auto"
+              >
+                Clear all
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Expandable Filter Panel */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-gray-800/50 border-2 border-gray-700 rounded-xl p-4 mb-4 space-y-4">
+                {/* Sort Options */}
+                <div>
+                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                    <ArrowUpDown className="w-3 h-3" />
+                    Sort By
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    <SortButton label="Newest" active={sortBy === 'newest'} onClick={() => onSortChange('newest')} icon={Sparkles} />
+                    <SortButton label="Oldest" active={sortBy === 'oldest'} onClick={() => onSortChange('oldest')} icon={RotateCcw} />
+                    <SortButton label="Highest MC" active={sortBy === 'highestMc'} onClick={() => onSortChange('highestMc')} icon={TrendingUp} />
+                    <SortButton label="Lowest MC" active={sortBy === 'lowestMc'} onClick={() => onSortChange('lowestMc')} icon={TrendingDown} />
+                    <SortButton label="Best Stats" active={sortBy === 'totalStats'} onClick={() => onSortChange('totalStats')} icon={Target} />
+                  </div>
+                </div>
+
+                {/* Evolution Tier Filter */}
+                <div>
+                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                    <Crown className="w-3 h-3" />
+                    Evolution Tier
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    <FilterChip label="All" active={filterTier === 'all'} onClick={() => onFilterTierChange('all')} color="gray" />
+                    <FilterChip label="Egg" active={filterTier === 'Egg'} onClick={() => onFilterTierChange('Egg')} color="gray" icon={Egg} />
+                    <FilterChip label="Baby" active={filterTier === 'Baby'} onClick={() => onFilterTierChange('Baby')} color="green" icon={Baby} />
+                    <FilterChip label="Basic" active={filterTier === 'Basic'} onClick={() => onFilterTierChange('Basic')} color="blue" icon={Star} />
+                    <FilterChip label="Stage 1" active={filterTier === 'Stage 1'} onClick={() => onFilterTierChange('Stage 1')} color="purple" icon={Sparkles} />
+                    <FilterChip label="Stage 2" active={filterTier === 'Stage 2'} onClick={() => onFilterTierChange('Stage 2')} color="yellow" icon={Zap} />
+                    <FilterChip label="Mega" active={filterTier === 'Mega'} onClick={() => onFilterTierChange('Mega')} color="orange" icon={Flame} />
+                    <FilterChip label="Legendary" active={filterTier === 'Legendary'} onClick={() => onFilterTierChange('Legendary')} color="red" icon={Crown} />
+                  </div>
+                </div>
+
+                {/* Element Filter */}
+                {availableElements.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                      <Hexagon className="w-3 h-3" />
+                      Element Type
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      <FilterChip label="All" active={filterElement === 'all'} onClick={() => onFilterElementChange('all')} color="gray" />
+                      {availableElements.map(element => {
+                        const colorMap: Record<string, string> = {
+                          Fire: 'red', Water: 'blue', Grass: 'green', Electric: 'yellow',
+                          Ice: 'blue', Fighting: 'red', Poison: 'purple', Ground: 'orange',
+                          Flying: 'blue', Psychic: 'purple', Bug: 'green', Rock: 'gray',
+                          Ghost: 'purple', Dragon: 'red', Dark: 'gray', Steel: 'gray', Fairy: 'purple'
+                        };
+                        return (
+                          <FilterChip
+                            key={element}
+                            label={element}
+                            active={filterElement === element}
+                            onClick={() => onFilterElementChange(element)}
+                            color={colorMap[element] || 'blue'}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
+
+      {/* Results Summary */}
+      {entries.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center justify-between mb-4 px-2"
+        >
+          <p className="text-sm text-gray-400">
+            Showing <span className="text-white font-bold">{entries.length}</span> of <span className="text-gray-500">{totalEntries}</span> creatures
+          </p>
+          {currentEntry && priceDataCache[currentEntry.tokenAddress.toLowerCase()] && (
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-green-400" />
+              <span className="text-green-400 font-pixel text-sm">
+                {formatPrice(priceDataCache[currentEntry.tokenAddress.toLowerCase()].price)}
+              </span>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {entries.length === 0 ? (
         // Empty State with animation
@@ -1594,9 +1995,9 @@ function Rolodex({
             >
               {totalEntries === 0
                 ? 'Scan your wallet or Farcaster account to create your first creature!'
-                : 'Try a different search term'}
+                : 'Try adjusting your filters or search term'}
             </motion.p>
-            {totalEntries === 0 && (
+            {totalEntries === 0 ? (
               <motion.button
                 onClick={onScanNew}
                 className="pixel-btn text-white"
@@ -1607,6 +2008,18 @@ function Rolodex({
                 transition={{ delay: 0.4 }}
               >
                 START SCANNING
+              </motion.button>
+            ) : (
+              <motion.button
+                onClick={clearAllFilters}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-bold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                Clear Filters
               </motion.button>
             )}
           </div>
