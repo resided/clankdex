@@ -13,7 +13,6 @@ export async function GET() {
           justifyContent: 'center',
           background: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1e3a5f 100%)',
           position: 'relative',
-          fontFamily: '"Press Start 2P", cursive',
         }}
       >
         {/* Background gradient overlay */}
@@ -35,48 +34,57 @@ export async function GET() {
             zIndex: 1,
           }}
         >
-          {/* Logo Text - CLANK in red, DEX in yellow */}
+          {/* Logo Row with Zap Icons */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              fontSize: 80,
-              fontWeight: 'bold',
-              textShadow: '0 0 40px rgba(220, 10, 45, 0.5), 4px 4px 0px rgba(0,0,0,0.5)',
+              justifyContent: 'center',
+              gap: 24,
             }}
           >
-            <span style={{ color: '#DC0A2D' }}>CLANK</span>
-            <span style={{ color: '#FFDE00', marginLeft: 16 }}>DEX</span>
+            {/* Left Zap Icon */}
+            <div style={{ display: 'flex' }}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="#FFDE00">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
+            
+            {/* Logo Text */}
+            <div
+              style={{
+                display: 'flex',
+                fontSize: 96,
+                fontWeight: 900,
+                textShadow: '0 0 40px rgba(220, 10, 45, 0.5), 4px 4px 0px rgba(0,0,0,0.5)',
+                letterSpacing: '-2px',
+              }}
+            >
+              <span style={{ color: '#DC0A2D' }}>CLANK</span>
+              <span style={{ color: '#FFDE00' }}>DEX</span>
+            </div>
+            
+            {/* Right Zap Icon */}
+            <div style={{ display: 'flex' }}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="#FFDE00">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
           </div>
           
           {/* Tagline */}
           <div
             style={{
-              fontSize: 28,
-              color: '#ffffff',
+              display: 'flex',
+              fontSize: 32,
+              color: '#D1D5DB',
               marginTop: 24,
               textAlign: 'center',
               textShadow: '2px 2px 0px rgba(0,0,0,0.5)',
-              opacity: 0.95,
             }}
           >
-            Wallet Pokedex
-          </div>
-          
-          {/* Powered by Clanker */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              fontSize: 20,
-              color: '#FFDE00',
-              marginTop: 16,
-              textShadow: '2px 2px 0px rgba(0,0,0,0.5)',
-            }}
-          >
-            <span>powered by</span>
-            <span style={{ color: '#DC0A2D', fontWeight: 'bold' }}>Clanker</span>
+            <span>Clankdex powered by </span>
+            <span style={{ color: '#FFDE00', fontWeight: 'bold' }}>Clanker</span>
           </div>
           
           {/* Feature badges */}
@@ -94,10 +102,11 @@ export async function GET() {
                 borderRadius: 12,
                 padding: '16px 28px',
                 color: '#fff',
-                fontSize: 18,
+                fontSize: 20,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 10,
+                fontWeight: 'bold',
                 textShadow: '1px 1px 0px rgba(0,0,0,0.5)',
               }}
             >
@@ -111,10 +120,11 @@ export async function GET() {
                 borderRadius: 12,
                 padding: '16px 28px',
                 color: '#fff',
-                fontSize: 18,
+                fontSize: 20,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 10,
+                fontWeight: 'bold',
                 textShadow: '1px 1px 0px rgba(0,0,0,0.5)',
               }}
             >
