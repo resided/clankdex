@@ -13,53 +13,53 @@ function getOpenAI() {
 }
 
 // ============================================
-// POKEMON STYLE GUIDE - Must be followed
+// CREATURE STYLE GUIDE - Original Digital Entities
 // ============================================
 const STYLE_GUIDE = {
   // Visual baseline for DALL-E prompts
   visualRules: [
-    "Cute, chibi-style creature design",
-    "Round, friendly eyes with expressive pupils",
-    "Proportional body parts (large head, small body - classic Pokemon proportions)",
-    "Smooth, clean lines without excessive detail",
-    "Vibrant, saturated colors matching the element type",
+    "Original creature design, completely unique digital entity",
+    "Glowing eyes that reflect the creature's essence",
+    "Ethereal body with subtle particle effects",
+    "Smooth, clean lines with soft glow effects",
+    "Colors match the elemental affinity",
     "Pure white background",
     "No text, no watermarks, no signatures, no borders",
     "Front-facing or 3/4 view pose",
-    "Cell-shaded or soft-shaded rendering style",
-    "Consistent soft lighting from upper left",
+    "Digital art style with ethereal qualities",
+    "Soft lighting with ambient glow",
   ],
   
   // Art style modifiers
-  artStyle: "digital art, Pokemon official artwork style, Ken Sugimori inspired, clean vector-like illustration, game asset, high quality render",
+  artStyle: "original creature design, ethereal digital entity, soft glowing effects, clean vector-like illustration, game asset quality, unique digital being",
   
   // Element visual traits for prompts
   elementTraits: {
-    Fire: "flame accents on body, warm color palette (red/orange/yellow), smoke or ember particles, heat waves",
-    Water: "flowing fins, aquatic features, blue/cyan palette, droplet or bubble effects, smooth skin",
-    Grass: "leaf or flower decorations, plant-like features, green/brown palette, pollen particles, bark texture",
-    Electric: "bolt patterns, spiky fur or scales, yellow/orange palette, spark effects, crackling energy",
-    Ice: "crystalline features, snow accents, blue/white palette, frost breath effect, icicle details",
-    Fighting: "muscular build, bandages or belts, red/brown palette, determined expression, combat stance",
-    Poison: "slime trails, gas clouds, purple/green palette, toxic bubble effects, dripping venom",
-    Ground: "rocky armor, earth tones, brown/tan palette, dust particle effects, dirt textures",
-    Flying: "wing features, cloud accents, sky blue/white palette, wind swirl effects, feather details",
-    Psychic: "mystical aura, gem-like eyes, pink/purple palette, energy wave effects, floating objects",
-    Bug: "exoskeleton features, antennae, green/yellow palette, wing flutter effects, compound eyes",
-    Rock: "stone skin, crystal growths, gray/brown palette, gravel particle effects, mineral veins",
-    Ghost: "translucent body, ethereal wisps, purple/black palette, spirit flame effects, floating",
-    Dragon: "scale patterns, horn features, deep color palette, ancient energy aura, reptilian features",
-    Dark: "shadow accents, red eyes, dark purple/black palette, darkness swirl effects, stealthy pose",
-    Steel: "metallic plating, gear or bolt details, silver/gray palette, shine reflections, mechanical parts",
-    Fairy: "sparkle effects, pastel colors, wing or ribbon features, heart/star motifs, magical aura",
+    Fire: "ember particles, warm glowing aura, flame wisps, molten core visible through semi-transparent skin",
+    Water: "flowing liquid form, bubble trails, deep ocean hues, bioluminescent spots, fluid body",
+    Grass: "organic growth patterns, pollen dust, photosynthetic glow, root-like tendrils, living bark",
+    Electric: "energy arcs, ionized air particles, conductivity patterns, plasma trails, sparking aura",
+    Ice: "crystalline formations, frost breath, frozen aura, snowflake patterns, refractive ice body",
+    Fighting: "tense posture, kinetic energy waves, muscular definition, battle-ready stance, force aura",
+    Poison: "toxic aura, bubbling secretions, warning color patterns, spore clouds, venomous glow",
+    Ground: "mineral deposits, tectonic plates, sediment layers, geological formations, earth connection",
+    Flying: "air currents, cloud wisps, gravitational lightness, wind-swept features, sky affinity",
+    Psychic: "third eye glow, telekinetic waves, ethereal mist, consciousness ripples, mental projection",
+    Bug: "hive patterns, compound eye shine, chitin glow, swarm consciousness aura, segmented body",
+    Rock: "mineral veins, crystal inclusions, petrified growths, sedimentary layers, stone core",
+    Ghost: "phasing effect, spirit tether, ectoplasm trails, soul fragments, translucent body",
+    Dragon: "primal markings, ancient runes, power scales, elemental convergence, majestic presence",
+    Dark: "shadow tendrils, void pockets, darkness absorption, eclipse aura, mysterious silhouette",
+    Steel: "forged plating, gear integrations, metallic sheen, industrial fusion, mechanical elegance",
+    Fairy: "glamour dust, enchantment swirls, magical resonance, wonder essence, dream-like appearance",
   },
   
   // Size classifications for creature design
   sizeClasses: {
-    tiny: "tiny size, fits in palm, baby-like proportions",
-    small: "small size, compact body, cute proportions",
-    medium: "medium size, balanced proportions",
-    large: "large size, imposing presence, powerful build",
+    tiny: "tiny ethereal entity, fits in palm, concentrated energy",
+    small: "small digital being, compact form, focused essence",
+    medium: "medium manifestation, balanced ethereal presence",
+    large: "large entity, imposing ethereal presence, significant energy",
   }
 };
 
@@ -75,7 +75,9 @@ function buildDallePrompt(creature: any): string {
     speed, 
     special,
     visualTraits,
-    description 
+    description,
+    archetype,
+    archetypeLore 
   } = creature;
   
   // Determine size class based on stats
@@ -90,20 +92,26 @@ function buildDallePrompt(creature: any): string {
   const elementVisuals = STYLE_GUIDE.elementTraits[element as keyof typeof STYLE_GUIDE.elementTraits] || '';
   const sizeVisuals = STYLE_GUIDE.sizeClasses[sizeClass as keyof typeof STYLE_GUIDE.sizeClasses];
   
-  // Build the prompt
-  const prompt = `A Pokemon-style creature called "${name}" the ${species}, ${element}-type. 
+  // Build the prompt with lore integration
+  const prompt = `An original digital creature called "${name}" - a ${element} ${species}.
+
+Archetype: ${archetype} - ${archetypeLore}
 
 Physical description:
 - ${sizeVisuals}
 - ${elementVisuals}
 - ${visualTraits || elementVisuals}
+- Glowing eyes reflecting its ${element} essence
+
+Creature backstory (visual influence):
+${description}
 
 Design rules (MUST FOLLOW):
 - ${STYLE_GUIDE.visualRules.join('\n- ')}
 
 Style: ${STYLE_GUIDE.artStyle}
 
-The creature should look like an official Pokemon from the game series, with the playful, appealing aesthetic that Pokemon are known for. Name: ${name}, Element: ${element}.`;
+Create a completely original creature design that embodies the ${archetype} archetype with ${element} elemental powers. The creature ${name} should look like a unique digital entity born from blockchain essence, not based on any existing character.`;
 
   return prompt;
 }

@@ -2,84 +2,158 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 // ============================================
-// POKEMON STYLE GUIDE - All characters must follow
+// CREATURE STYLE GUIDE - Original Design
 // ============================================
-const POKEMON_STYLE_GUIDE = {
-  // Visual baseline for DALL-E prompts
+const CREATURE_STYLE_GUIDE = {
   visualRules: [
-    "Cute, chibi-style creature design",
-    "Round, friendly eyes with expressive pupils",
-    "Proportional body parts (large head, small body)",
-    "Smooth, clean lines without excessive detail",
-    "Vibrant, saturated colors matching the element type",
-    "White or simple gradient background",
+    "Original creature design, not based on any existing IP",
+    "Cute but mysterious digital entity appearance",
+    "Glowing eyes that reflect its essence",
+    "Proportional body parts with ethereal qualities",
+    "Smooth, clean lines with subtle particle effects",
+    "Colors match the creature's elemental affinity",
+    "Pure white background",
     "No text, no watermarks, no signatures",
     "Front-facing or 3/4 view pose",
-    "Cell-shaded or soft-shaded rendering style",
-    "Consistent lighting from upper left",
+    "Digital art style with soft glow effects",
   ],
   
-  // Art style modifiers
-  artStyle: "digital art, Pokemon official artwork style, Ken Sugimori inspired, clean vector-like illustration, game asset",
+  artStyle: "digital art, original creature design, ethereal digital entity, soft glowing effects, clean illustration, game asset quality",
   
-  // Element visual traits
   elementTraits: {
-    Fire: "flame accents on body, warm color palette (red/orange/yellow), smoke or ember particles",
-    Water: "flowing fins, aquatic features, blue/cyan palette, droplet or bubble effects",
-    Grass: "leaf or flower decorations, plant-like features, green/brown palette, pollen particles",
-    Electric: "bolt patterns, spiky fur/scales, yellow/orange palette, spark/arc effects",
-    Ice: "crystalline features, snow accents, blue/white palette, frost breath effect",
-    Fighting: "muscular build, bandages or belts, red/brown palette, determined expression",
-    Poison: "slime trails, gas clouds, purple/green palette, toxic bubble effects",
-    Ground: "rocky armor, earth tones, brown/tan palette, dust particle effects",
-    Flying: "wing features, cloud accents, sky blue/white palette, wind swirl effects",
-    Psychic: "mystical aura, gem-like eyes, pink/purple palette, energy wave effects",
-    Bug: "exoskeleton features, antennae, green/yellow palette, wing flutter effects",
-    Rock: "stone skin, crystal growths, gray/brown palette, gravel particle effects",
-    Ghost: "translucent body, ethereal wisps, purple/black palette, spirit flame effects",
-    Dragon: "scale patterns, horn features, deep color palette, ancient energy aura",
-    Dark: "shadow accents, red eyes, dark purple/black palette, darkness swirl effects",
-    Steel: "metallic plating, gear or bolt details, silver/gray palette, shine reflections",
-    Fairy: "sparkle effects, pastel colors, wing or ribbon features, heart/star motifs",
+    Fire: "ember particles, warm glowing aura, flame wisps, molten core visible through skin",
+    Water: "flowing liquid form, bubble trails, deep ocean hues, bioluminescent spots",
+    Grass: "organic growth patterns, pollen dust, photosynthetic glow, root-like tendrils",
+    Electric: "energy arcs, ionized air particles, conductivity patterns, plasma trails",
+    Ice: "crystalline formations, frost breath, frozen aura, snowflake patterns",
+    Fighting: "tense posture, kinetic energy waves, muscular definition, battle-ready stance",
+    Poison: "toxic aura, bubbling secretions, warning color patterns, spore clouds",
+    Ground: "mineral deposits, tectonic plates, sediment layers, geological formations",
+    Flying: "air currents, cloud wisps, gravitational lightness, wind-swept features",
+    Psychic: "third eye glow, telekinetic waves, ethereal mist, consciousness ripples",
+    Bug: "hive patterns, compound eye shine, chitin glow, swarm consciousness aura",
+    Rock: "mineral veins, crystal inclusions, petrified growths, sedimentary layers",
+    Ghost: "phasing effect, spirit tether, ectoplasm trails, soul fragments",
+    Dragon: "primal markings, ancient runes, power scales, elemental convergence",
+    Dark: "shadow tendrils, void pockets, darkness absorption, eclipse aura",
+    Steel: "forged plating, gear integrations, metallic sheen, industrial fusion",
+    Fairy: "glamour dust, enchantment swirls, magical resonance, wonder essence",
   }
 };
 
 // ============================================
-// ORIGINAL POKEMON-STYLE NAME GENERATION
-// (No actual Pokemon names - all original)
+// WALLET ARCHETYPE SYSTEM
+// Based on Neynar social data + on-chain patterns
 // ============================================
-const NAME_SYLLABLES = {
-  // Prefixes (2-3 syllables, Pokemon-sounding but original)
-  prefixes: [
-    // Blockchain themed
-    'Block', 'Chain', 'Hash', 'Ether', 'Crypto', 'Token', 'Coin', 'Ledger', 'Node', 'Mine',
-    'Stake', 'Yield', 'Swap', 'Mint', 'Vault', 'Asset', 'Trade', 'Pool', 'Gas', 'Nonce',
-    'Byte', 'Data', 'Net', 'Web', 'Cyber', 'Digi', 'Neo', 'Flux', 'Nex', 'Verse',
-    // Element themed
-    'Pyro', 'Hydro', 'Terra', 'Volt', 'Cryo', 'Aero', 'Lumo', 'Umbro', 'Fero', 'Glacio',
-    'Ignis', 'Aqua', 'Flora', 'Fulgo', 'Gelo', 'Ventus', 'Tene', 'Lux', 'Metallo', 'Spirit',
-    // Cute/creature themed (original)
-    'Fluff', 'Spark', 'Bubb', 'Zap', 'Bolt', 'Wing', 'Fin', 'Claw', 'Fang', 'Tail',
-    'Puff', 'Buzz', 'Zip', 'Flash', 'Volt', 'Core', 'Wave', 'Drift', 'Mist', 'Dust',
-    'Nova', 'Star', 'Comet', 'Nebula', 'Quasar', 'Cosmo', 'Astro', 'Luna', 'Solar', 'Void',
-    'Quark', 'Photon', 'Ion', 'Neutro', 'Proton', 'Electron', 'Quantum', 'Vector', 'Matrix', 'Cipher',
-  ],
+
+// Archetype type definition
+type Archetype = {
+  name: string;
+  description: string;
+  prefixes: string[];
+  suffixes: string[];
+  elements: string[];
+  statBias: {
+    hp?: number;
+    attack?: number;
+    defense?: number;
+    speed?: number;
+    special?: number;
+  };
+};
+
+// Archetype definitions with lore
+const ARCHETYPES: Record<string, Archetype> = {
+  // Social archetypes based on Farcaster activity
+  ORACLE: {
+    name: 'Oracle',
+    description: 'Sees patterns before others. High engagement, thought leadership.',
+    prefixes: ['Seer', 'Viz', 'Prophet', 'Augur', 'Sage', 'Myst', 'Seer', 'Farsee', 'Omen', 'Divi'],
+    suffixes: ['sight', 'tell', 'gaze', 'mind', 'eye', 'sense', 'know', 'ward', 'loom', 'cast'],
+    elements: ['Psychic', 'Fairy', 'Dark'],
+    statBias: { special: 30, speed: 10 },
+  },
   
-  // Suffixes (Pokemon-sounding structure but original)
-  suffixes: [
-    // Classic creature endings
-    'mon', 'ling', 'oid', 'ite', 'eon', 'py', 'by', 'ny', 'rex', 'gon',
-    'nix', 'pix', 'lux', 'vex', 'max', 'jax', 'lox', 'rox', 'tex', 'vex',
-    // Element/type themed
-    'saur', 'mander', 'rtle', 'chu', 'puff', 'duck', 'der', 'bra', 'bok', 'shrew',
-    'dude', 'drill', 'pan', 'ape', 'pix', 'tales', 'bone', 'lash', 'trike', 'pod',
-    // Cute endings
-    'let', 'pet', 'kin', 'bit', 'bot', 'dot', 'lot', 'pot', 'tot', 'cot',
-    'wing', 'tail', 'fin', 'claw', 'fang', 'horn', 'shell', 'scale', 'pelt', 'mane',
-    // Power endings
-    'tor', 'zor', 'xor', 'kor', 'mor', 'nor', 'por', 'ror', 'sor', 'vor',
-    'tron', 'ron', 'don', 'con', 'von', 'xon', 'yon', 'zon', 'jon', 'hon',
-  ]
+  INFLUENCER: {
+    name: 'Influencer',
+    description: 'Commands attention. High follower count, viral presence.',
+    prefixes: ['Star', 'Nova', 'Lum', 'Radi', 'Beacon', 'Flare', 'Glow', 'Bright', 'Shine', 'Spark'],
+    suffixes: ['light', 'beam', 'glow', 'burst', 'flash', 'spark', 'drift', 'fall', 'rise', 'call'],
+    elements: ['Fire', 'Electric', 'Flying'],
+    statBias: { attack: 20, speed: 20 },
+  },
+  
+  CONNECTOR: {
+    name: 'Connector',
+    description: 'Bridges communities. Balanced following/followers, high interaction.',
+    prefixes: ['Link', 'Nex', 'Bridg', 'Weav', 'Tie', 'Bond', 'Join', 'Merge', 'Sync', 'Hub'],
+    suffixes: ['web', 'net', 'thread', 'cord', 'knot', 'loop', 'ring', 'chain', 'link', 'tie'],
+    elements: ['Grass', 'Bug', 'Steel'],
+    statBias: { hp: 20, defense: 20 },
+  },
+  
+  LURKER: {
+    name: 'Lurker',
+    description: 'Observes from shadows. Low posts, high consumption.',
+    prefixes: ['Shade', 'Umbr', 'Gloom', 'Murk', 'Veil', 'Haze', 'Dusk', 'Night', 'Dim', 'Faint'],
+    suffixes: ['shade', 'veil', 'cloak', 'mist', 'fog', 'hush', 'quiet', 'still', 'calm', 'rest'],
+    elements: ['Dark', 'Ghost', 'Ice'],
+    statBias: { defense: 30, special: 10 },
+  },
+  
+  BUILDER: {
+    name: 'Builder',
+    description: 'Creates without rest. Developer, high technical engagement.',
+    prefixes: ['Forge', 'Smith', 'Craft', 'Build', 'Make', 'Shape', 'Form', 'Mold', 'Cast', 'Weld'],
+    suffixes: ['work', 'make', 'form', 'cast', 'mold', 'shape', 'build', 'craft', 'forge', 'smith'],
+    elements: ['Steel', 'Rock', 'Ground'],
+    statBias: { defense: 25, attack: 15 },
+  },
+  
+  DEGEN: {
+    name: 'Degen',
+    description: 'High risk, high reward. Gambler spirit, volatile activity patterns.',
+    prefixes: ['Chaos', 'Rage', 'Fury', 'Wild', 'Mad', 'Frenzy', 'Storm', 'Blitz', 'Flash', 'Burst'],
+    suffixes: ['rage', 'fury', 'storm', 'chaos', 'wild', 'mad', 'frenzy', 'rush', 'dash', 'blaze'],
+    elements: ['Fire', 'Electric', 'Fighting'],
+    statBias: { attack: 40, defense: -10, speed: 20 },
+  },
+  
+  WHALE: {
+    name: 'Whale',
+    description: 'Massive presence. High value, moves markets.',
+    prefixes: ['Levi', 'Titan', 'Giga', 'Mega', 'Ultra', 'Super', 'Hyper', 'Maxi', 'Grand', 'Vast'],
+    suffixes: ['thane', 'titan', 'giant', 'mass', 'bulk', 'heft', 'weight', 'depth', 'void', 'abyss'],
+    elements: ['Water', 'Dragon', 'Ice'],
+    statBias: { hp: 40, attack: 20, speed: -20 },
+  },
+  
+  SAGE: {
+    name: 'Sage',
+    description: 'Ancient wisdom. Long-time holder, steady presence.',
+    prefixes: ['Elder', 'Ancient', 'Old', 'Prime', 'First', 'Origin', 'Root', 'Core', 'Base', 'Fund'],
+    suffixes: ['wise', 'sage', 'mind', 'thought', 'soul', 'spirit', 'heart', 'truth', 'law', 'way'],
+    elements: ['Psychic', 'Dragon', 'Fairy'],
+    statBias: { special: 25, hp: 15, defense: 10 },
+  },
+  
+  NOMAD: {
+    name: 'Nomad',
+    description: 'Wanders chains. Multi-chain, explorer, never settles.',
+    prefixes: ['Drift', 'Roam', 'Wand', 'Migra', 'Travel', 'Journey', 'Quest', 'Seek', 'Find', 'Path'],
+    suffixes: ['walk', 'path', 'road', 'way', 'trail', 'trek', 'roam', 'drift', 'flow', 'wind'],
+    elements: ['Flying', 'Ground', 'Bug'],
+    statBias: { speed: 40, defense: -10 },
+  },
+  
+  GUARDIAN: {
+    name: 'Guardian',
+    description: 'Protects others. Security focused, helpful community member.',
+    prefixes: ['Shield', 'Guard', 'Ward', 'Protect', 'Keep', 'Save', 'Safe', 'Secure', 'Lock', 'Aegis'],
+    suffixes: ['shield', 'guard', 'wall', 'ward', 'keep', 'hold', 'safe', 'secure', 'lock', 'bond'],
+    elements: ['Steel', 'Rock', 'Ground'],
+    statBias: { defense: 40, hp: 20 },
+  },
 };
 
 const ELEMENTS = [
@@ -98,43 +172,15 @@ function getHashValue(hash: string, position: number, max: number): number {
   return parseInt(segment, 16) % max;
 }
 
-// Generate Pokemon-style name
-function generatePokemonName(address: string): string {
-  const hash = hashString(address);
-  
-  // 70% chance of classic Pokemon name structure
-  const useClassic = getHashValue(hash, 0, 100) < 70;
-  
-  if (useClassic) {
-    // Prefix + Suffix structure
-    const prefix = NAME_SYLLABLES.prefixes[getHashValue(hash, 1, NAME_SYLLABLES.prefixes.length)];
-    const suffix = NAME_SYLLABLES.suffixes[getHashValue(hash, 2, NAME_SYLLABLES.suffixes.length)];
-    
-    // Sometimes add a middle syllable for longer names
-    if (getHashValue(hash, 3, 100) < 30) {
-      const middle = NAME_SYLLABLES.prefixes[getHashValue(hash, 4, NAME_SYLLABLES.prefixes.length)].slice(0, 3);
-      return `${prefix}${middle}${suffix}`;
-    }
-    
-    return `${prefix}${suffix}`;
-  } else {
-    // Creative compound name
-    const part1 = NAME_SYLLABLES.prefixes[getHashValue(hash, 1, NAME_SYLLABLES.prefixes.length)];
-    const part2 = NAME_SYLLABLES.prefixes[getHashValue(hash, 5, NAME_SYLLABLES.prefixes.length)];
-    return `${part1}${part2.toLowerCase()}`;
-  }
-}
-
 // Fetch wallet data from Neynar
 async function fetchWalletData(address: string) {
   try {
     const apiKey = process.env.NEYNAR_API_KEY;
     if (!apiKey) {
-      console.log('Neynar API key not configured, using hash-based generation');
+      console.log('Neynar API key not configured');
       return null;
     }
     
-    // Fetch user data by custody address
     const response = await fetch(`https://api.neynar.com/v2/farcaster/user/custody-address?custody_address=${address}`, {
       headers: {
         'accept': 'application/json',
@@ -155,54 +201,108 @@ async function fetchWalletData(address: string) {
   }
 }
 
-// Generate creature from wallet with Neynar data
+// Determine archetype from Neynar data
+function determineArchetype(neynarData: any, hash: string): keyof typeof ARCHETYPES {
+  if (!neynarData) {
+    // Default to hash-based if no Neynar data
+    const archetypeKeys = Object.keys(ARCHETYPES) as (keyof typeof ARCHETYPES)[];
+    return archetypeKeys[getHashValue(hash, 0, archetypeKeys.length)];
+  }
+  
+  const followers = neynarData.follower_count || 0;
+  const following = neynarData.following_count || 0;
+  const engagement = followers + following;
+  
+  // Calculate follower ratio for archetype detection
+  const ratio = following > 0 ? followers / following : followers;
+  
+  // Determine archetype based on patterns
+  if (followers > 10000) return 'INFLUENCER';
+  if (followers > 5000 && ratio > 2) return 'ORACLE';
+  if (ratio > 0.8 && ratio < 1.5 && engagement > 1000) return 'CONNECTOR';
+  if (followers < 100 && following > 500) return 'LURKER';
+  if (neynarData.username?.includes('dev') || neynarData.bio?.includes('build')) return 'BUILDER';
+  if (neynarData.username?.includes('degen') || neynarData.bio?.includes('ape')) return 'DEGEN';
+  if (followers > 5000 && following < 100) return 'WHALE';
+  if (neynarData.active_on_fc_since && Date.now() - new Date(neynarData.active_on_fc_since).getTime() > 2 * 365 * 24 * 60 * 60 * 1000) return 'SAGE';
+  if (following > followers * 2) return 'NOMAD';
+  if (neynarData.username?.includes('guard') || neynarData.bio?.includes('security')) return 'GUARDIAN';
+  
+  // Hash-based fallback
+  const archetypeKeys = Object.keys(ARCHETYPES) as (keyof typeof ARCHETYPES)[];
+  return archetypeKeys[getHashValue(hash, 0, archetypeKeys.length)];
+}
+
+// Generate lore-based name from archetype
+function generateLoreName(hash: string, archetype: keyof typeof ARCHETYPES): string {
+  const archetypeData = ARCHETYPES[archetype];
+  
+  const prefix = archetypeData.prefixes[getHashValue(hash, 1, archetypeData.prefixes.length)];
+  const suffix = archetypeData.suffixes[getHashValue(hash, 2, archetypeData.suffixes.length)];
+  
+  // Sometimes add a middle syllable for longer names
+  if (getHashValue(hash, 3, 100) < 30) {
+    const middle = archetypeData.prefixes[getHashValue(hash, 4, archetypeData.prefixes.length)].slice(0, 3);
+    return `${prefix}${middle.toLowerCase()}${suffix}`;
+  }
+  
+  return `${prefix}${suffix}`;
+}
+
+// Generate creature from wallet with full lore
 async function generateCreatureFromWallet(address: string, neynarData: any | null) {
   const hash = hashString(address);
   
-  // Generate Pokemon-style name
-  const name = generatePokemonName(address);
+  // Determine archetype
+  const archetypeKey = determineArchetype(neynarData, hash);
+  const archetype = ARCHETYPES[archetypeKey];
   
-  // Generate element
-  const element = ELEMENTS[getHashValue(hash, 10, ELEMENTS.length)];
+  // Generate lore-based name
+  const name = generateLoreName(hash, archetypeKey);
   
-  // Generate species based on element
+  // Determine element based on archetype preference + hash
+  const preferredElements = archetype.elements;
+  const elementIndex = getHashValue(hash, 5, 100) < 70 
+    ? getHashValue(hash, 6, preferredElements.length) // 70% chance of preferred element
+    : getHashValue(hash, 7, ELEMENTS.length); // 30% chance of random
+  const element = preferredElements[elementIndex] || ELEMENTS[getHashValue(hash, 7, ELEMENTS.length)];
+  
+  // Generate species type
   const speciesTypes: Record<string, string[]> = {
-    Fire: ['Flame Pokemon', 'Ember Pokemon', 'Blaze Pokemon'],
-    Water: ['Aqua Pokemon', 'Torrent Pokemon', 'Bubble Pokemon'],
-    Grass: ['Seed Pokemon', 'Leaf Pokemon', 'Bloom Pokemon'],
-    Electric: ['Thunder Pokemon', 'Spark Pokemon', 'Volt Pokemon'],
-    Ice: ['Frost Pokemon', 'Snow Pokemon', 'Glacier Pokemon'],
-    Fighting: ['Fighting Pokemon', 'Combat Pokemon', 'Brawler Pokemon'],
-    Poison: ['Toxic Pokemon', 'Venom Pokemon', 'Poison Pokemon'],
-    Ground: ['Earth Pokemon', 'Terrain Pokemon', 'Burrow Pokemon'],
-    Flying: ['Wing Pokemon', 'Sky Pokemon', 'Gale Pokemon'],
-    Psychic: ['Psi Pokemon', 'Mind Pokemon', 'Mystic Pokemon'],
-    Bug: ['Insect Pokemon', 'Cocoon Pokemon', 'Swarm Pokemon'],
-    Rock: ['Stone Pokemon', 'Boulder Pokemon', 'Crag Pokemon'],
-    Ghost: ['Specter Pokemon', 'Spirit Pokemon', 'Shadow Pokemon'],
-    Dragon: ['Dragon Pokemon', 'Wyrm Pokemon', 'Drake Pokemon'],
-    Dark: ['Darkness Pokemon', 'Night Pokemon', 'Shadow Pokemon'],
-    Steel: ['Iron Pokemon', 'Metal Pokemon', 'Chrome Pokemon'],
-    Fairy: ['Fairy Pokemon', 'Pixie Pokemon', 'Enchant Pokemon'],
+    Fire: ['Ember Entity', 'Flame Manifest', 'Heat Spirit', 'Pyro Form'],
+    Water: ['Aqua Being', 'Tide Essence', 'Current Form', 'Deep Entity'],
+    Grass: ['Flora Spirit', 'Growth Manifest', 'Nature Entity', 'Bloom Form'],
+    Electric: ['Volt Entity', 'Current Being', 'Spark Manifest', 'Charge Form'],
+    Ice: ['Frost Entity', 'Cold Manifest', 'Crystal Being', 'Glacial Form'],
+    Fighting: ['Combat Entity', 'Force Manifest', 'Battle Form', 'Strive Being'],
+    Poison: ['Toxin Entity', 'Venom Form', 'Toxic Manifest', 'Plague Being'],
+    Ground: ['Earth Entity', 'Terrain Form', 'Soil Manifest', 'Land Being'],
+    Flying: ['Sky Entity', 'Air Manifest', 'Cloud Form', 'Wind Being'],
+    Psychic: ['Mind Entity', 'Thought Form', 'Psyche Manifest', 'Mental Being'],
+    Bug: ['Swarm Entity', 'Hive Form', 'Insect Manifest', 'Colony Being'],
+    Rock: ['Stone Entity', 'Mineral Form', 'Earth Manifest', 'Crag Being'],
+    Ghost: ['Spirit Entity', 'Phantom Form', 'Specter Manifest', 'Soul Being'],
+    Dragon: ['Wyrm Entity', 'Drake Form', 'Ancient Manifest', 'Primal Being'],
+    Dark: ['Shadow Entity', 'Void Form', 'Darkness Manifest', 'Umbral Being'],
+    Steel: ['Metal Entity', 'Iron Form', 'Alloy Manifest', 'Forge Being'],
+    Fairy: ['Fae Entity', 'Enchant Form', 'Magic Manifest', 'Wonder Being'],
   };
   
-  const species = speciesTypes[element][getHashValue(hash, 11, 3)];
+  const species = speciesTypes[element][getHashValue(hash, 8, 4)];
   
-  // Generate stats influenced by Neynar data if available
-  let statModifier = 0;
-  if (neynarData) {
-    // Boost stats based on social activity
-    const followerCount = neynarData.follower_count || 0;
-    const followingCount = neynarData.following_count || 0;
-    statModifier = Math.min(30, Math.floor((followerCount + followingCount) / 100));
-  }
+  // Generate stats with archetype bias
+  const baseHp = 50 + getHashValue(hash, 9, 100);
+  const baseAttack = 50 + getHashValue(hash, 10, 100);
+  const baseDefense = 50 + getHashValue(hash, 11, 100);
+  const baseSpeed = 50 + getHashValue(hash, 12, 100);
+  const baseSpecial = 50 + getHashValue(hash, 13, 100);
   
-  // Generate stats (50-150 range based on hash + Neynar modifier)
-  const hp = 50 + getHashValue(hash, 12, 100) + statModifier;
-  const attack = 50 + getHashValue(hash, 13, 100) + statModifier;
-  const defense = 50 + getHashValue(hash, 14, 100) + statModifier;
-  const speed = 50 + getHashValue(hash, 15, 100) + statModifier;
-  const special = 50 + getHashValue(hash, 16, 100) + statModifier;
+  // Apply archetype stat bias
+  const hp = Math.min(150, Math.max(20, baseHp + (archetype.statBias.hp || 0)));
+  const attack = Math.min(150, Math.max(20, baseAttack + (archetype.statBias.attack || 0)));
+  const defense = Math.min(150, Math.max(20, baseDefense + (archetype.statBias.defense || 0)));
+  const speed = Math.min(150, Math.max(20, baseSpeed + (archetype.statBias.speed || 0)));
+  const special = Math.min(150, Math.max(20, baseSpecial + (archetype.statBias.special || 0)));
   
   // Generate color palette based on element
   const colorPalettes: Record<string, string[]> = {
@@ -227,21 +327,68 @@ async function generateCreatureFromWallet(address: string, neynarData: any | nul
   
   const colorPalette = colorPalettes[element] || colorPalettes.Fire;
   
-  // Generate description
-  const descriptions = [
-    `The ${element} ${species.toLowerCase()}. It stores energy in its body from blockchain transactions.`,
-    `A ${element.toLowerCase()}-type creature discovered in the digital realm. Its power grows with wallet activity.`,
-    `This ${species.toLowerCase()} draws strength from on-chain entropy. Trainers value its ${element.toLowerCase()} abilities.`,
-    `Found deep within the blockchain. This ${element.toLowerCase()}-type ${name.toLowerCase()} evolves through transactions.`,
-    `A mysterious ${species.toLowerCase()} with ${element.toLowerCase()} powers. Its stats reflect the wallet's journey.`,
-  ];
-  const description = descriptions[getHashValue(hash, 17, descriptions.length)];
+  // Generate lore description based on archetype
+  const loreDescriptions: Record<string, string[]> = {
+    ORACLE: [
+      `Born from the foresight of ${neynarData?.username || 'an oracle'}. This ${element.toLowerCase()} being sees patterns before they form.`,
+      `A ${element.toLowerCase()} manifestation of prescience. It channels the predictive powers of its origin wallet.`,
+      `Forged in the fires of foresight. This entity ${name} guards the wisdom of ${neynarData?.username || 'its creator'}.`,
+    ],
+    INFLUENCER: [
+      `Radiates the charisma of ${neynarData?.username || 'a star'}. This ${element.toLowerCase()} entity commands attention effortlessly.`,
+      `A ${element.toLowerCase()} being that shines bright like its origin. ${name} amplifies presence wherever it goes.`,
+      `Born from viral energy. This ${element.toLowerCase()} form reflects the magnetic pull of ${neynarData?.username || 'its creator'}.`,
+    ],
+    CONNECTOR: [
+      `Weaves connections like ${neynarData?.username || 'a weaver'}. This ${element.toLowerCase()} entity bridges worlds.`,
+      `A ${element.toLowerCase()} manifestation of unity. ${name} binds disparate forces together.`,
+      `Forged in the fires of community. This being carries the linking essence of ${neynarData?.username || 'its origin'}.`,
+    ],
+    LURKER: [
+      `Watches from shadows like ${neynarData?.username || 'a phantom'}. This ${element.toLowerCase()} entity sees without being seen.`,
+      `A ${element.toLowerCase()} being of quiet power. ${name} observes the world from hidden vantage points.`,
+      `Born from silent observation. This ${element.toLowerCase()} form reflects the patient gaze of ${neynarData?.username || 'its creator'}.`,
+    ],
+    BUILDER: [
+      `Shaped by the relentless craft of ${neynarData?.username || 'a builder'}. This ${element.toLowerCase()} entity creates without rest.`,
+      `A ${element.toLowerCase()} manifestation of creation. ${name} forges reality with determined will.`,
+      `Forged in the fires of making. This being embodies the constructive spirit of ${neynarData?.username || 'its origin'}.`,
+    ],
+    DEGEN: [
+      `Wild and unpredictable like ${neynarData?.username || 'a storm'}. This ${element.toLowerCase()} entity thrives on chaos.`,
+      `A ${element.toLowerCase()} being of pure volatility. ${name} risks everything for glory.`,
+      `Born from calculated madness. This ${element.toLowerCase()} form channels the reckless energy of ${neynarData?.username || 'its creator'}.`,
+    ],
+    WHALE: [
+      `Massive and deep like ${neynarData?.username || 'the ocean'}. This ${element.toLowerCase()} entity moves markets with a thought.`,
+      `A ${element.toLowerCase()} manifestation of magnitude. ${name} carries the weight of great power.`,
+      `Forged in the depths of abundance. This being represents the vast holdings of ${neynarData?.username || 'its origin'}.`,
+    ],
+    SAGE: [
+      `Ancient and wise like ${neynarData?.username || 'an elder'}. This ${element.toLowerCase()} entity holds timeless knowledge.`,
+      `A ${element.toLowerCase()} being of accumulated wisdom. ${name} speaks only truth.`,
+      `Born from patient persistence. This ${element.toLowerCase()} form reflects the steady presence of ${neynarData?.username || 'its creator'}.`,
+    ],
+    NOMAD: [
+      `Restless and wandering like ${neynarData?.username || 'the wind'}. This ${element.toLowerCase()} entity never settles.`,
+      `A ${element.toLowerCase()} manifestation of journey. ${name} explores all paths.`,
+      `Forged in the fires of exploration. This being carries the wandering spirit of ${neynarData?.username || 'its origin'}.`,
+    ],
+    GUARDIAN: [
+      `Steadfast and protective like ${neynarData?.username || 'a shield'}. This ${element.toLowerCase()} entity defends without question.`,
+      `A ${element.toLowerCase()} being of absolute protection. ${name} stands as an unbreakable wall.`,
+      `Born from the duty of care. This ${element.toLowerCase()} form embodies the protective will of ${neynarData?.username || 'its creator'}.`,
+    ],
+  };
+  
+  const descriptions = loreDescriptions[archetypeKey] || loreDescriptions.ORACLE;
+  const description = descriptions[getHashValue(hash, 14, descriptions.length)];
   
   // Generate DNA from address
   const dna = BigInt('0x' + hash.slice(0, 16)).toString();
   
-  // Build visual traits for DALL-E
-  const visualTraits = POKEMON_STYLE_GUIDE.elementTraits[element as keyof typeof POKEMON_STYLE_GUIDE.elementTraits];
+  // Build visual traits
+  const visualTraits = CREATURE_STYLE_GUIDE.elementTraits[element as keyof typeof CREATURE_STYLE_GUIDE.elementTraits];
   
   return {
     name,
@@ -257,6 +404,8 @@ async function generateCreatureFromWallet(address: string, neynarData: any | nul
     description,
     colorPalette,
     visualTraits,
+    archetype: archetypeKey,
+    archetypeLore: archetype.description,
     neynarData: neynarData ? {
       username: neynarData.username,
       displayName: neynarData.display_name,
@@ -287,10 +436,10 @@ export async function POST(request: NextRequest) {
       neynarData = await fetchWalletData(address);
     }
     
-    // Generate creature from wallet/Farcaster identifier
+    // Generate creature with full lore
     const creature = await generateCreatureFromWallet(seed, neynarData);
     
-    // Generate image URL using our image generation API
+    // Generate image
     const imageResponse = await fetch(new URL('/api/generate-image', request.url).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -309,7 +458,9 @@ export async function POST(request: NextRequest) {
       creature,
       imageUrl,
       imageBase64,
-      styleGuide: POKEMON_STYLE_GUIDE,
+      archetype: creature.archetype,
+      archetypeLore: creature.archetypeLore,
+      styleGuide: CREATURE_STYLE_GUIDE,
       farcasterData: creature.neynarData || (identifier ? { username: identifier } : null),
     });
   } catch (error) {
