@@ -1410,48 +1410,40 @@ export default function Home() {
           </motion.div>
         </header>
 
-        {/* View Mode Toggle with sliding indicator - only show for scan/collection */}
+        {/* View Mode Toggle - only show for scan/collection */}
         {(viewMode === 'scan' || viewMode === 'collection') && (
-          <div className="flex justify-center mb-6">
-            <div className="bg-gray-800/50 rounded-full p-1.5 flex relative w-64">
-              <motion.div
-                className="absolute top-1.5 bottom-1.5 rounded-full bg-pokedex-red"
-                initial={false}
-                animate={{
-                  left: viewMode === 'scan' ? '6px' : '50%',
-                  right: viewMode === 'scan' ? '50%' : '6px',
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                style={{ left: viewMode === 'scan' ? '6px' : undefined, right: viewMode === 'collection' ? '6px' : undefined }}
-              />
-              <motion.button
-                onClick={() => setViewMode('scan')}
-                className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
-                  viewMode === 'scan' ? 'text-white' : 'text-gray-400 hover:text-white'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <ScanLine className="w-4 h-4" />
-                Scan
-              </motion.button>
-              <motion.button
-                onClick={() => setViewMode('collection')}
-                className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
-                  viewMode === 'collection' ? 'text-white' : 'text-gray-400 hover:text-white'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <BookOpen className="w-4 h-4" />
-                Collection
-                {clankdexEntries.length > 0 && (
-                  <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">
-                    {clankdexEntries.length}
-                  </span>
-                )}
-              </motion.button>
-            </div>
+          <div className="flex justify-center gap-3 mb-6">
+            <motion.button
+              onClick={() => setViewMode('scan')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                viewMode === 'scan'
+                  ? 'bg-pokedex-red text-white shadow-lg shadow-red-500/25'
+                  : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <ScanLine className="w-4 h-4" />
+              Scan
+            </motion.button>
+            <motion.button
+              onClick={() => setViewMode('collection')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                viewMode === 'collection'
+                  ? 'bg-pokedex-red text-white shadow-lg shadow-red-500/25'
+                  : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <BookOpen className="w-4 h-4" />
+              Rolodex
+              {clankdexEntries.length > 0 && (
+                <span className="ml-1 bg-black/30 px-2 py-0.5 rounded-full text-xs">
+                  {clankdexEntries.length}
+                </span>
+              )}
+            </motion.button>
           </div>
         )}
 
@@ -1480,41 +1472,33 @@ export default function Home() {
             transition={{ duration: 0.3 }}
           >
             {/* Input Mode Toggle */}
-            <div className="flex justify-center mb-6">
-              <div className="bg-gray-800/50 rounded-full p-1 flex relative w-56">
-                <motion.div
-                  className="absolute top-1 bottom-1 rounded-full bg-blue-600"
-                  initial={false}
-                  animate={{
-                    left: inputMode === 'wallet' ? '4px' : '50%',
-                    right: inputMode === 'wallet' ? '50%' : '4px',
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  style={{ left: inputMode === 'wallet' ? '4px' : undefined, right: inputMode === 'farcaster' ? '4px' : undefined }}
-                />
-                <motion.button
-                  onClick={() => setInputMode('wallet')}
-                  className={`relative flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
-                    inputMode === 'wallet' ? 'text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Wallet className="w-4 h-4" />
-                  Wallet
-                </motion.button>
-                <motion.button
-                  onClick={() => setInputMode('farcaster')}
-                  className={`relative flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
-                    inputMode === 'farcaster' ? 'text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <AtSign className="w-4 h-4" />
-                  Farcaster
-                </motion.button>
-              </div>
+            <div className="flex justify-center gap-2 mb-6">
+              <motion.button
+                onClick={() => setInputMode('wallet')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  inputMode === 'wallet'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                    : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Wallet className="w-4 h-4" />
+                Wallet
+              </motion.button>
+              <motion.button
+                onClick={() => setInputMode('farcaster')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  inputMode === 'farcaster'
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                    : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <AtSign className="w-4 h-4" />
+                Farcaster
+              </motion.button>
             </div>
           </motion.div>
         )}
@@ -2256,19 +2240,6 @@ function FAQSection() {
         ))}
       </div>
 
-      <motion.div
-        className="mt-8 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <p className="text-gray-500 text-sm">
-          Still have questions? Reach out on{' '}
-          <a href="https://warpcast.com/clankdex" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">
-            Farcaster
-          </a>
-        </p>
-      </motion.div>
     </div>
   );
 }
