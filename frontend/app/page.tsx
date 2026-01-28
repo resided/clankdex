@@ -1141,47 +1141,42 @@ export default function Home() {
 
         {/* View Mode Toggle with sliding indicator */}
         <div className="flex justify-center mb-6">
-          <div className="bg-gray-800/50 rounded-full p-1.5 flex relative">
+          <div className="bg-gray-800/50 rounded-full p-1.5 flex relative w-64">
             <motion.div
-              className="absolute inset-y-1.5 rounded-full bg-pokedex-red"
+              className="absolute top-1.5 bottom-1.5 rounded-full bg-pokedex-red"
               initial={false}
               animate={{
-                x: viewMode === 'scan' ? 0 : '100%',
-                width: 'calc(50% - 6px)',
-                left: '6px'
+                left: viewMode === 'scan' ? '6px' : '50%',
+                right: viewMode === 'scan' ? '50%' : '6px',
               }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              style={{ left: viewMode === 'scan' ? '6px' : undefined, right: viewMode === 'collection' ? '6px' : undefined }}
             />
             <motion.button
               onClick={() => setViewMode('scan')}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
+              className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
                 viewMode === 'scan' ? 'text-white' : 'text-gray-400 hover:text-white'
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <ScanLine className="w-4 h-4" />
               Scan
             </motion.button>
             <motion.button
               onClick={() => setViewMode('collection')}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
-                viewMode === 'collection' ? 'text-black' : 'text-gray-400 hover:text-white'
+              className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
+                viewMode === 'collection' ? 'text-white' : 'text-gray-400 hover:text-white'
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <BookOpen className="w-4 h-4" />
               Collection
               {clankdexEntries.length > 0 && (
-                <motion.span 
-                  className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500 }}
-                >
+                <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">
                   {clankdexEntries.length}
-                </motion.span>
+                </span>
               )}
             </motion.button>
           </div>
@@ -1198,35 +1193,35 @@ export default function Home() {
           >
             {/* Input Mode Toggle */}
             <div className="flex justify-center mb-6">
-              <div className="bg-gray-800/50 rounded-full p-1 flex gap-1 relative">
+              <div className="bg-gray-800/50 rounded-full p-1 flex relative w-56">
                 <motion.div
-                  className="absolute inset-y-1 rounded-full bg-blue-600"
+                  className="absolute top-1 bottom-1 rounded-full bg-blue-600"
                   initial={false}
                   animate={{
-                    x: inputMode === 'wallet' ? 0 : '100%',
-                    width: '50%',
+                    left: inputMode === 'wallet' ? '4px' : '50%',
+                    right: inputMode === 'wallet' ? '50%' : '4px',
                   }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  style={{ left: 4 }}
+                  style={{ left: inputMode === 'wallet' ? '4px' : undefined, right: inputMode === 'farcaster' ? '4px' : undefined }}
                 />
                 <motion.button
                   onClick={() => setInputMode('wallet')}
-                  className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
+                  className={`relative flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
                     inputMode === 'wallet' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <Wallet className="w-4 h-4" />
                   Wallet
                 </motion.button>
                 <motion.button
                   onClick={() => setInputMode('farcaster')}
-                  className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
+                  className={`relative flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm font-medium z-10 transition-colors ${
                     inputMode === 'farcaster' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <AtSign className="w-4 h-4" />
                   Farcaster
