@@ -2738,6 +2738,91 @@ function Rolodex({
   );
 }
 
+// Claim Rewards Button Component
+function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: string; creatorAddress?: string }) {
+  const [availableRewards, setAvailableRewards] = useState<string>('0');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const { address } = useAccount();
+
+  // Fetch available rewards
+  useEffect(() => {
+    const fetchRewards = async () => {
+      if (!tokenAddress || !creatorAddress) return;
+      
+      try {
+        const response = await fetch(`/api/claim-rewards?token=${tokenAddress}&recipient=${creatorAddress}`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableRewards(data.availableRewardsEth || '0');
+        }
+      } catch (error) {
+        console.error('Failed to fetch rewards:', error);
+      }
+    };
+
+    fetchRewards();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchRewards, 30000);
+    return () => clearInterval(interval);
+  }, [tokenAddress, creatorAddress]);
+
+  const handleClaim = async () => {
+    if (!tokenAddress || !address) return;
+    
+    setIsClaiming(true);
+    try {
+      const response = await fetch('/api/claim-rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tokenAddress,
+          rewardRecipient: creatorAddress || address,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Rewards claimed! TX: ${data.txHash.slice(0, 10)}...`);
+        setAvailableRewards('0');
+      } else {
+        const error = await response.json();
+        alert('Failed to claim: ' + error.details);
+      }
+    } catch (error) {
+      alert('Claim failed: ' + (error as Error).message);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
+
+  const hasRewards = parseFloat(availableRewards) > 0.001;
+
+  return (
+    <motion.button
+      onClick={handleClaim}
+      disabled={isClaiming || !hasRewards}
+      className={`flex flex-col items-center justify-center gap-0 px-2 py-2 rounded-lg text-xs font-bold transition-colors ${
+        hasRewards 
+          ? 'bg-green-600 hover:bg-green-500 text-white cursor-pointer' 
+          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+      }`}
+      whileHover={hasRewards ? { scale: 1.05, y: -2 } : {}}
+      whileTap={hasRewards ? { scale: 0.95, y: 0 } : {}}
+    >
+      <span className="flex items-center gap-1">
+        <TrendingUp className="w-3 h-3" />
+        {isClaiming ? '...' : 'Claim'}
+      </span>
+      {hasRewards && (
+        <span className="text-[10px] opacity-80">
+          {parseFloat(availableRewards).toFixed(4)} ETH
+        </span>
+      )}
+    </motion.button>
+  );
+}
+
 // Rolodex Card Component with Rich Animations
 function RolodexCard({ entry }: { entry: CreatureRecord }) {
   const { name, element, entry_number, token_address, token_symbol, hp, attack, defense, speed, special, image_url, created_at, creator_address, farcaster_username } = entry;
@@ -3150,7 +3235,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
 
       {/* Action Buttons with press effect */}
       <motion.div 
-        className="mt-4 grid grid-cols-2 gap-2"
+        className="mt-4 grid grid-cols-3 gap-2"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
@@ -3159,18 +3244,22 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
           href={`${CLANKER_URL}/token/${token_address}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-sm"
+          className="flex items-center justify-center gap-1 px-2 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg text-xs"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95, y: 0 }}
         >
-          <Coins className="w-4 h-4" />
+          <Coins className="w-3 h-3" />
           Clanker
         </motion.a>
+        <ClaimRewardsButton 
+          tokenAddress={token_address} 
+          creatorAddress={creator_address}
+        />
         <motion.a
           href={`https://basescan.org/token/${token_address}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm"
+          className="flex items-center justify-center gap-1 px-2 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-xs"
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95, y: 0 }}
         >
