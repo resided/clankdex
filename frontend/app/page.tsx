@@ -367,7 +367,212 @@ interface ClankdexEntry {
   launchedAt: string;
   inputMode: 'wallet' | 'farcaster';
   identifier: string;
+  nftTokenId?: string; // Optional NFT companion token
 }
+
+// ==========================================
+// ENHANCED ANIMATION COMPONENTS
+// ==========================================
+
+// DNA Helix Scanning Animation
+const DNAScanningAnimation = ({ mode }: { mode: InputMode }) => {
+  const steps = mode === 'wallet' 
+    ? ['SCANNING TRANSACTIONS...', 'ANALYZING HOLDINGS...', 'EXTRACTING DNA...', 'GENERATING CREATURE...']
+    : ['SCANNING CASTS...', 'ANALYZING ENGAGEMENT...', 'MAPPING SOCIAL GRAPH...', 'GENERATING CREATURE...'];
+  
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          setCurrentStep(s => (s + 1) % steps.length);
+          return 0;
+        }
+        return prev + 2;
+      });
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="text-center w-full max-w-xs">
+      {/* DNA Helix Animation */}
+      <div className="relative w-24 h-24 mx-auto mb-4">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-3 h-3 rounded-full"
+            style={{
+              background: `linear-gradient(135deg, ${['#DC0A2D', '#FFDE00', '#3B4CCA'][i % 3]} 0%, ${['#FF5722', '#FFD700', '#5C6BC0'][i % 3]} 100%)`,
+            }}
+            animate={{
+              x: [0, 40, 0, -40, 0],
+              y: [i * 12, i * 12 + 5, i * 12, i * 12 - 5, i * 12],
+              scale: [1, 1.2, 1, 1.2, 1],
+              opacity: [0.5, 1, 0.5, 1, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              delay: i * 0.1,
+              ease: "easeInOut",
+            }}
+            initial={{ left: '50%', top: 0, x: '-50%' }}
+          />
+        ))}
+        {/* Connecting lines */}
+        <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.3 }}>
+          <motion.path
+            d="M 48 10 Q 70 30 48 50 Q 26 70 48 90"
+            stroke="#DC0A2D"
+            strokeWidth="2"
+            fill="none"
+            animate={{ pathLength: [0, 1, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        </svg>
+      </div>
+      
+      {/* Progress Bar */}
+      <div className="h-2 bg-gray-700 rounded-full overflow-hidden mb-3">
+        <motion.div
+          className="h-full bg-gradient-to-r from-pokedex-red via-pokedex-yellow to-pokedex-blue"
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.1 }}
+        />
+      </div>
+      
+      {/* Step Text */}
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={currentStep}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="font-pixel text-xs text-pokedex-darkscreen"
+        >
+          {steps[currentStep]}
+        </motion.p>
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Creature Reveal Animation
+const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; imageBase64: string | null }) => {
+  const [phase, setPhase] = useState<'flash' | 'particles' | 'reveal'>('flash');
+  
+  useEffect(() => {
+    const timer1 = setTimeout(() => setPhase('particles'), 300);
+    const timer2 = setTimeout(() => setPhase('reveal'), 800);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center p-4">
+      {/* Flash Effect */}
+      <AnimatePresence>
+        {phase === 'flash' && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-white z-20"
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </AnimatePresence>
+      
+      {/* Particle Burst */}
+      <AnimatePresence>
+        {phase === 'particles' && (
+          <>
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ scale: 0, x: 0, y: 0 }}
+                animate={{ 
+                  scale: [0, 1.5, 0],
+                  x: Math.cos(i * 30 * Math.PI / 180) * 80,
+                  y: Math.sin(i * 30 * Math.PI / 180) * 80,
+                  opacity: [1, 0]
+                }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="absolute w-4 h-4 rounded-full"
+                style={{
+                  background: ['#DC0A2D', '#FFDE00', '#3B4CCA', '#51AE5E'][i % 4],
+                }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+      
+      {/* Creature Image */}
+      <motion.div
+        initial={{ scale: 0, rotate: -10 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ 
+          type: "spring",
+          stiffness: 200,
+          damping: 15,
+          delay: 0.5 
+        }}
+        className="relative"
+      >
+        {imageBase64 ? (
+          <motion.img
+            src={imageBase64}
+            alt={creature?.name}
+            className="w-full h-full object-contain max-h-48"
+            animate={{ 
+              y: [0, -8, 0],
+              rotate: [0, 2, -2, 0]
+            }}
+            transition={{ 
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        ) : (
+          <motion.div
+            className="w-32 h-32 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: creature?.colorPalette[0] }}
+            animate={{
+              boxShadow: [
+                '0 0 20px rgba(220, 10, 45, 0.3)',
+                '0 0 40px rgba(220, 10, 45, 0.5)',
+                '0 0 20px rgba(220, 10, 45, 0.3)'
+              ]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <motion.span 
+              className="text-6xl"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              {ELEMENT_ICONS[creature?.element || 'Fire']}
+            </motion.span>
+          </motion.div>
+        )}
+        
+        {/* Shine effect */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
+          initial={{ x: '-200%' }}
+          animate={{ x: '200%' }}
+          transition={{ duration: 1.5, delay: 1 }}
+        />
+      </motion.div>
+    </div>
+  );
+};
 
 interface PriceData {
   price: number;
@@ -1112,28 +1317,30 @@ export default function Home() {
                 </div>
 
                 {/* Screen */}
-                <div className="pokedex-screen aspect-square mb-4 scanlines">
+                <div className="pokedex-screen aspect-square mb-4 scanlines relative overflow-hidden">
                   <div className="crt-overlay" />
 
                   {!showCreature ? (
                     <div className="absolute inset-0 flex items-center justify-center p-6">
                       {isAnalyzing ? (
-                        <div className="text-center">
-                          <Loader2 className="w-12 h-12 text-pokedex-darkscreen animate-spin mx-auto mb-4" />
-                          <p className="font-pixel text-xs text-pokedex-darkscreen animate-pulse">
-                            {inputMode === 'wallet' ? 'ANALYZING DNA...' : 'SCANNING FARCASTER...'}
-                          </p>
-                        </div>
+                        <DNAScanningAnimation mode={inputMode} />
                       ) : (
                         <div className="text-center">
                           {inputMode === 'farcaster' && farcasterData?.pfpUrl ? (
-                            <img
+                            <motion.img
                               src={farcasterData.pfpUrl}
                               alt="Profile"
                               className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pokedex-darkscreen/30"
+                              animate={{ scale: [1, 1.05, 1] }}
+                              transition={{ duration: 2, repeat: Infinity }}
                             />
                           ) : (
-                            <Sparkles className="w-16 h-16 text-pokedex-darkscreen/50 mx-auto mb-4" />
+                            <motion.div
+                              animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
+                              transition={{ duration: 3, repeat: Infinity }}
+                            >
+                              <Sparkles className="w-16 h-16 text-pokedex-darkscreen/50 mx-auto mb-4" />
+                            </motion.div>
                           )}
                           <p className="font-pixel text-xs text-pokedex-darkscreen text-center">
                             PRESS SCAN TO<br />
@@ -1144,28 +1351,10 @@ export default function Home() {
                       )}
                     </div>
                   ) : (
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="absolute inset-0 flex items-center justify-center p-4"
-                    >
-                      {imageBase64 ? (
-                        <img
-                          src={imageBase64}
-                          alt={creature?.name}
-                          className="w-full h-full object-contain animate-float"
-                        />
-                      ) : (
-                        <div
-                          className="w-32 h-32 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: creature?.colorPalette[0] }}
-                        >
-                          <span className="text-6xl">
-                            {ELEMENT_ICONS[creature?.element || 'Fire']}
-                          </span>
-                        </div>
-                      )}
-                    </motion.div>
+                    <CreatureReveal 
+                      creature={creature} 
+                      imageBase64={imageBase64}
+                    />
                   )}
                 </div>
 
@@ -1332,12 +1521,17 @@ function StatsPanel({
     >
       {/* Farcaster Profile */}
       {farcasterData && (
-        <div className="flex items-center gap-4 mb-6 p-4 bg-purple-900/20 rounded-lg border border-purple-500/30">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4 mb-6 p-4 bg-purple-900/20 rounded-lg border border-purple-500/30"
+        >
           {farcasterData.pfpUrl && (
-            <img 
+            <motion.img 
               src={farcasterData.pfpUrl} 
               alt={farcasterData.username}
               className="w-16 h-16 rounded-full border-2 border-purple-500"
+              whileHover={{ scale: 1.1, rotate: 5 }}
             />
           )}
           <div>
@@ -1348,41 +1542,109 @@ function StatsPanel({
               <span className="text-gray-500">{farcasterData.castCount} casts</span>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Creature Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h2 className="font-pixel text-2xl text-white mb-1">
+          <motion.h2 
+            className="font-pixel text-2xl text-white mb-1"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
             {creature.name}
-          </h2>
-          <p className="text-gray-400 text-sm">
+          </motion.h2>
+          <motion.p 
+            className="text-gray-400 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
             {creature.species}
-          </p>
+          </motion.p>
           {farcasterData && (
-            <p className="text-purple-400 text-xs mt-1">
+            <motion.p 
+              className="text-purple-400 text-xs mt-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               {farcasterData.archetype} • {farcasterData.personality?.dominant}
-            </p>
+            </motion.p>
           )}
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className={`element-badge ${ELEMENT_COLORS[creature.element]} text-white`}>
+        <motion.div 
+          className="flex flex-col items-end gap-2"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Badge color={creature.element.toLowerCase() === 'fire' ? 'red' : creature.element.toLowerCase() === 'water' ? 'blue' : creature.element.toLowerCase() === 'grass' ? 'green' : 'blue'}>
             {ELEMENT_ICONS[creature.element]}
             {creature.element}
-          </span>
+          </Badge>
           <span className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(creature.element)]}`}>
             {getRarity(creature.element)}
           </span>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Description */}
-      <div className="bg-pokedex-screen/20 rounded-lg p-4 mb-6 border border-pokedex-screen/30">
+      {/* Description with typewriter effect */}
+      <motion.div 
+        className="bg-pokedex-screen/20 rounded-lg p-4 mb-6 border border-pokedex-screen/30"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <p className="text-gray-300 text-sm leading-relaxed">
           {creature.description}
         </p>
-      </div>
+      </motion.div>
+
+      {/* Evolution Preview */}
+      {!deployResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-6 p-4 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-lg border border-purple-500/30"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <h4 className="text-sm font-bold text-purple-400">EVOLUTION PATH</h4>
+          </div>
+          
+          {/* Evolution Stages Preview */}
+          <div className="flex items-center justify-between">
+            {EVOLUTION_TIERS.map((tier, idx) => (
+              <motion.div
+                key={tier.name}
+                className="flex flex-col items-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + idx * 0.1 }}
+                whileHover={{ scale: 1.1, y: -2 }}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
+                  idx === 0 ? 'bg-gray-600' : 'bg-gray-800 border border-gray-600'
+                }`}>
+                  {(() => {
+                    const IconComponent = tier.icon;
+                    return <IconComponent className={`w-4 h-4 ${tier.color}`} />;
+                  })()}
+                </div>
+                <span className="text-[10px] text-gray-500 mt-1 hidden sm:block">{tier.name}</span>
+              </motion.div>
+            ))}
+          </div>
+          
+          <p className="text-xs text-gray-500 mt-3 text-center">
+            Your creature will evolve as market cap grows!
+          </p>
+        </motion.div>
+      )}
 
       {/* Stats */}
       <div className="space-y-3">
