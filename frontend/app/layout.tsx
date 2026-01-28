@@ -48,6 +48,8 @@ export const metadata: Metadata = {
     images: [OG_IMAGE_URL],
   },
   other: {
+    // Base app ID for verification
+    'base:app_id': '697a8a5228b944af8eb15519',
     // Farcaster Mini App embed (new format)
     'fc:miniapp': JSON.stringify(miniappEmbed),
     // Backward compatibility

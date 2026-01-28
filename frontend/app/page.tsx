@@ -822,7 +822,7 @@ const usePriceData = (tokenAddress: string | null) => {
   return { priceData, loading, error };
 };
 
-type ViewMode = 'scan' | 'collection';
+type ViewMode = 'scan' | 'collection' | 'faq' | 'how-it-works';
 
 const CLANKDEX_STORAGE_KEY = 'clankdex_entries';
 
@@ -918,6 +918,9 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [priceDataCache, setPriceDataCache] = useState<Record<string, PriceData>>({});
+
+  // Menu state
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Load entries from localStorage on mount
   useEffect(() => {
@@ -1198,6 +1201,11 @@ export default function Home() {
           origin: { y: 0.6 },
           colors: ['#DC0A2D', '#FFDE00', '#3B4CCA', '#51AE5E', '#FF5722'],
         });
+
+        // Redirect to Clanker after a short delay
+        setTimeout(() => {
+          window.open(`${CLANKER_URL}/token/${result.tokenAddress}`, '_blank');
+        }, 2000);
       } else {
         throw new Error(result.error || 'Deployment failed');
       }
@@ -1260,6 +1268,99 @@ export default function Home() {
       </div>
 
       <div className="max-w-4xl mx-auto relative z-10">
+        {/* Hamburger Menu Button */}
+        <motion.button
+          onClick={() => setMenuOpen(true)}
+          className="fixed top-4 right-4 z-50 p-3 bg-gray-800/80 backdrop-blur rounded-xl border border-gray-700 hover:bg-gray-700 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Menu className="w-6 h-6 text-white" />
+        </motion.button>
+
+        {/* Slide-out Menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMenuOpen(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              />
+              {/* Menu Panel */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="fixed top-0 right-0 h-full w-80 bg-gray-900/95 backdrop-blur-lg border-l border-gray-700 z-50 p-6 overflow-y-auto"
+              >
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="font-pixel text-xl text-white">MENU</h2>
+                  <motion.button
+                    onClick={() => setMenuOpen(false)}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <X className="w-6 h-6 text-gray-400" />
+                  </motion.button>
+                </div>
+
+                <nav className="space-y-2">
+                  <motion.button
+                    onClick={() => { setViewMode('scan'); setMenuOpen(false); }}
+                    whileHover={{ x: 8 }}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'scan' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
+                  >
+                    <ScanLine className="w-5 h-5" />
+                    <span className="font-bold">Scan Wallet</span>
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => { setViewMode('collection'); setMenuOpen(false); }}
+                    whileHover={{ x: 8 }}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'collection' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    <span className="font-bold">Rolodex</span>
+                  </motion.button>
+
+                  <div className="h-px bg-gray-700 my-4" />
+
+                  <motion.button
+                    onClick={() => { setViewMode('how-it-works'); setMenuOpen(false); }}
+                    whileHover={{ x: 8 }}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'how-it-works' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    <span className="font-bold">How It Works</span>
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => { setViewMode('faq'); setMenuOpen(false); }}
+                    whileHover={{ x: 8 }}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl transition-colors ${viewMode === 'faq' ? 'bg-pokedex-red text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800'}`}
+                  >
+                    <Activity className="w-5 h-5" />
+                    <span className="font-bold">FAQ</span>
+                  </motion.button>
+                </nav>
+
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="text-center text-gray-500 text-xs">
+                    <p>Powered by Clanker</p>
+                    <p className="mt-1">Built on Base</p>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
         {/* Header with floating animation */}
         <header className="text-center mb-8">
           <motion.div
@@ -1309,48 +1410,65 @@ export default function Home() {
           </motion.div>
         </header>
 
-        {/* View Mode Toggle with sliding indicator */}
-        <div className="flex justify-center mb-6">
-          <div className="bg-gray-800/50 rounded-full p-1.5 flex relative w-64">
-            <motion.div
-              className="absolute top-1.5 bottom-1.5 rounded-full bg-pokedex-red"
-              initial={false}
-              animate={{
-                left: viewMode === 'scan' ? '6px' : '50%',
-                right: viewMode === 'scan' ? '50%' : '6px',
-              }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              style={{ left: viewMode === 'scan' ? '6px' : undefined, right: viewMode === 'collection' ? '6px' : undefined }}
-            />
+        {/* View Mode Toggle with sliding indicator - only show for scan/collection */}
+        {(viewMode === 'scan' || viewMode === 'collection') && (
+          <div className="flex justify-center mb-6">
+            <div className="bg-gray-800/50 rounded-full p-1.5 flex relative w-64">
+              <motion.div
+                className="absolute top-1.5 bottom-1.5 rounded-full bg-pokedex-red"
+                initial={false}
+                animate={{
+                  left: viewMode === 'scan' ? '6px' : '50%',
+                  right: viewMode === 'scan' ? '50%' : '6px',
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                style={{ left: viewMode === 'scan' ? '6px' : undefined, right: viewMode === 'collection' ? '6px' : undefined }}
+              />
+              <motion.button
+                onClick={() => setViewMode('scan')}
+                className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
+                  viewMode === 'scan' ? 'text-white' : 'text-gray-400 hover:text-white'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <ScanLine className="w-4 h-4" />
+                Scan
+              </motion.button>
+              <motion.button
+                onClick={() => setViewMode('collection')}
+                className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
+                  viewMode === 'collection' ? 'text-white' : 'text-gray-400 hover:text-white'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <BookOpen className="w-4 h-4" />
+                Collection
+                {clankdexEntries.length > 0 && (
+                  <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">
+                    {clankdexEntries.length}
+                  </span>
+                )}
+              </motion.button>
+            </div>
+          </div>
+        )}
+
+        {/* Back button for FAQ and How It Works */}
+        {(viewMode === 'faq' || viewMode === 'how-it-works') && (
+          <div className="flex justify-center mb-6">
             <motion.button
               onClick={() => setViewMode('scan')}
-              className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
-                viewMode === 'scan' ? 'text-white' : 'text-gray-400 hover:text-white'
-              }`}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-full text-gray-300 hover:text-white transition-colors"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <ScanLine className="w-4 h-4" />
-              Scan
-            </motion.button>
-            <motion.button
-              onClick={() => setViewMode('collection')}
-              className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide z-10 transition-colors ${
-                viewMode === 'collection' ? 'text-white' : 'text-gray-400 hover:text-white'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <BookOpen className="w-4 h-4" />
-              Collection
-              {clankdexEntries.length > 0 && (
-                <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">
-                  {clankdexEntries.length}
-                </span>
-              )}
+              <ChevronLeft className="w-4 h-4" />
+              Back to Scan
             </motion.button>
           </div>
-        </div>
+        )}
 
         <AnimatePresence mode="wait">
           {viewMode === 'scan' && (
@@ -1635,9 +1753,54 @@ export default function Home() {
             />
           </motion.div>
         )}
+
+        {/* FAQ View */}
+        {viewMode === 'faq' && (
+          <motion.div
+            key="faq-view"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <FAQSection />
+          </motion.div>
+        )}
+
+        {/* How It Works View */}
+        {viewMode === 'how-it-works' && (
+          <motion.div
+            key="how-it-works-view"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <HowItWorksSection />
+          </motion.div>
+        )}
         </AnimatePresence>
 
-        {/* Info Cards */}
+        {/* Info Cards - only show on scan/collection */}
+        {(viewMode === 'scan' || viewMode === 'collection') && (
+        <div className="grid md:grid-cols-3 gap-4 mt-12">
+          <InfoCard
+            icon={<Eye className="w-6 h-6" />}
+            title="Analyze"
+            description="Your wallet history becomes DNA. We scan transaction patterns, token holdings, NFT collections, and on-chain activity to create a unique genetic fingerprint. The AI analyzes this data to determine your creature's element type, stats distribution, and personality traits."
+          />
+          <InfoCard
+            icon={<Sparkles className="w-6 h-6" />}
+            title="Generate"
+            description="Our AI takes your DNA fingerprint and conjures a one-of-a-kind pixel art creature. The name, species, and visual design are all algorithmically determined based on your on-chain identity - no two creatures are alike."
+          />
+          <InfoCard
+            icon={<Rocket className="w-6 h-6" />}
+            title="Clanker Launch"
+            description="Deploy your creature as a tradeable ERC-20 token on Base via Clanker. You'll receive creator rewards from trading activity. Your creature joins the Clankdex permanently with a unique entry number."
+          />
+        </div>
+        )}
         <div className="grid md:grid-cols-3 gap-4 mt-12">
           <InfoCard
             icon={<Eye className="w-6 h-6" />}
@@ -1989,6 +2152,229 @@ function InfoCard({ icon, title, description }: { icon: React.ReactNode; title: 
       <h3 className="text-white font-bold mb-2">{title}</h3>
       <p className="text-gray-400 text-sm">{description}</p>
     </motion.div>
+  );
+}
+
+// FAQ Data
+const FAQ_DATA = [
+  {
+    question: "What is ClankDex?",
+    answer: "ClankDex is a Wallet Pokedex powered by Clanker. We analyze your wallet or Farcaster profile to generate a unique Pokemon-style creature based on your on-chain activity, then launch it as a tradeable token on Base."
+  },
+  {
+    question: "How are creatures generated?",
+    answer: "We scan your transaction history, token holdings, NFT collections, and social graph to create a unique 'DNA fingerprint'. This determines your creature's element type, stats, appearance, and personality. No two creatures are alike!"
+  },
+  {
+    question: "What is Clanker?",
+    answer: "Clanker is a token deployment platform on Base. When you launch your creature, it becomes a real ERC-20 token that can be traded. You receive creator rewards from trading activity on your token."
+  },
+  {
+    question: "How do evolutions work?",
+    answer: "Your creature evolves based on its token's market cap. There are 7 evolution tiers: Egg (0), Hatchling ($1K), Rookie ($10K), Champion ($100K), Ultra ($500K), Master ($1M), and Legendary ($10M+)."
+  },
+  {
+    question: "Do I need a wallet to use ClankDex?",
+    answer: "For wallet-based scanning, yes. But you can also scan any Farcaster username to generate a creature based on their on-chain personality. The token launch requires a connected wallet."
+  },
+  {
+    question: "What determines my creature's stats?",
+    answer: "Your on-chain archetype (Oracle, Influencer, Connector, Builder, Degen, Whale, etc.) influences your creature's stat distribution. Active traders get higher Speed, diamond hands get higher Defense, and so on."
+  },
+  {
+    question: "Can I scan the same wallet twice?",
+    answer: "Each wallet generates a deterministic creature based on its unique DNA fingerprint. Scanning the same wallet will always produce the same creature - it's uniquely yours!"
+  },
+  {
+    question: "What blockchain is this on?",
+    answer: "ClankDex runs on Base, Coinbase's L2 network. Tokens are deployed as ERC-20s on Base with liquidity provided through Clanker."
+  }
+];
+
+// FAQ Accordion Item
+function FAQItem({ question, answer, isOpen, onToggle }: {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <motion.div
+      className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden"
+      initial={false}
+    >
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-700/30 transition-colors"
+      >
+        <span className="font-bold text-white pr-4">{question}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronRight className="w-5 h-5 text-gray-400 rotate-90" />
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="px-4 pb-4 text-gray-400 text-sm leading-relaxed border-t border-gray-700/50 pt-3">
+              {answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// FAQ Section Component
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="text-center mb-8">
+        <h2 className="font-pixel text-3xl text-white mb-2">FAQ</h2>
+        <p className="text-gray-400">Everything you need to know about ClankDex</p>
+      </div>
+
+      <div className="space-y-3">
+        {FAQ_DATA.map((item, index) => (
+          <FAQItem
+            key={index}
+            question={item.question}
+            answer={item.answer}
+            isOpen={openIndex === index}
+            onToggle={() => setOpenIndex(openIndex === index ? null : index)}
+          />
+        ))}
+      </div>
+
+      <motion.div
+        className="mt-8 text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <p className="text-gray-500 text-sm">
+          Still have questions? Reach out on{' '}
+          <a href="https://warpcast.com/clankdex" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">
+            Farcaster
+          </a>
+        </p>
+      </motion.div>
+    </div>
+  );
+}
+
+// How It Works Steps Data
+const HOW_IT_WORKS_STEPS = [
+  {
+    step: 1,
+    title: "Connect & Scan",
+    description: "Connect your wallet or enter a Farcaster username. We analyze transaction patterns, token holdings, NFT collections, and social connections to build your unique on-chain DNA.",
+    icon: ScanLine,
+    color: "from-blue-500 to-cyan-500"
+  },
+  {
+    step: 2,
+    title: "DNA Analysis",
+    description: "Our algorithm determines your archetype (Oracle, Influencer, Builder, Degen, etc.) based on your on-chain behavior. This influences your creature's element type and stat distribution.",
+    icon: Activity,
+    color: "from-purple-500 to-pink-500"
+  },
+  {
+    step: 3,
+    title: "Creature Generation",
+    description: "AI generates a unique Pokemon-style creature with a custom name, species, and pixel art design. Every detail is algorithmically determined by your wallet's fingerprint.",
+    icon: Sparkles,
+    color: "from-yellow-500 to-orange-500"
+  },
+  {
+    step: 4,
+    title: "Token Launch",
+    description: "Deploy your creature as an ERC-20 token on Base via Clanker. You become the creator and earn rewards from trading activity. Your creature joins the ClankDex permanently!",
+    icon: Rocket,
+    color: "from-red-500 to-pink-500"
+  },
+  {
+    step: 5,
+    title: "Evolution",
+    description: "Watch your creature evolve as its token gains market cap. From Egg to Legendary, there are 7 evolution tiers to unlock. The strongest creatures become legends!",
+    icon: TrendingUp,
+    color: "from-green-500 to-emerald-500"
+  }
+];
+
+// How It Works Section Component
+function HowItWorksSection() {
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="text-center mb-12">
+        <h2 className="font-pixel text-3xl text-white mb-2">HOW IT WORKS</h2>
+        <p className="text-gray-400">From wallet to creature in 5 simple steps</p>
+      </div>
+
+      <div className="relative">
+        {/* Connecting Line */}
+        <div className="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-green-500 hidden md:block" />
+
+        <div className="space-y-6">
+          {HOW_IT_WORKS_STEPS.map((item, index) => (
+            <motion.div
+              key={item.step}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="relative"
+            >
+              <div className="flex gap-6 items-start">
+                {/* Step Number */}
+                <motion.div
+                  className={`relative z-10 flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg`}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  <item.icon className="w-8 h-8 text-white" />
+                </motion.div>
+
+                {/* Content */}
+                <div className="flex-1 bg-gray-800/50 rounded-xl p-5 border border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-gray-500 uppercase">Step {item.step}</span>
+                  </div>
+                  <h3 className="font-bold text-white text-lg mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{item.description}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <motion.div
+        className="mt-12 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <p className="text-gray-400 mb-4">Ready to discover your creature?</p>
+        <motion.button
+          className="px-8 py-3 bg-pokedex-red hover:bg-red-600 text-white font-bold rounded-xl transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          Start Scanning
+        </motion.button>
+      </motion.div>
+    </div>
   );
 }
 
