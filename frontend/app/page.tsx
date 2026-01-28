@@ -1496,35 +1496,15 @@ export default function Home() {
                         <>
                           <div className="flex-1 overflow-y-auto space-y-1">
                             {filteredEntries.slice(0, 5).map((entry, idx) => (
-                              <div
+                              <button
                                 key={entry.creature.dna}
-                                className={`flex items-center gap-2 p-1 rounded ${currentEntryIndex === idx ? 'bg-[#306230]/20' : ''}`}
+                                onClick={() => window.open(`${CLANKER_URL}/token/${entry.tokenAddress}`, '_blank')}
+                                className={`w-full flex items-center gap-2 p-1 rounded text-left hover:opacity-70 ${currentEntryIndex === idx ? 'bg-[#306230]/20' : ''}`}
                               >
-                                <button
-                                  onClick={() => window.open(`${CLANKER_URL}/token/${entry.tokenAddress}`, '_blank')}
-                                  className="flex items-center gap-2 flex-1 text-left hover:opacity-70"
-                                >
-                                  <span className="font-pixel text-[8px] w-6" style={{ color: '#306230' }}>#{entry.entryNumber}</span>
-                                  <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#306230' }}>{entry.creature.name}</span>
-                                  <span className="text-[8px]" style={{ color: '#306230' }}>{entry.creature.element}</span>
-                                </button>
-                                {/* Remove button for first entry ever created */}
-                                {entry.entryNumber === 1 && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      const entries = loadClankdexEntries();
-                                      const updated = entries.filter(e => e.creature.dna !== entry.creature.dna);
-                                      localStorage.setItem(CLANKDEX_STORAGE_KEY, JSON.stringify(updated));
-                                      setClankdexEntries(updated);
-                                    }}
-                                    className="text-[#306230] hover:opacity-70 px-1"
-                                    title="Remove test entry"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                )}
-                              </div>
+                                <span className="font-pixel text-[8px] w-6" style={{ color: '#306230' }}>#{entry.entryNumber}</span>
+                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#306230' }}>{entry.creature.name}</span>
+                                <span className="text-[8px]" style={{ color: '#306230' }}>{entry.creature.element}</span>
+                              </button>
                             ))}
                           </div>
                           <div className="text-center mt-2">
