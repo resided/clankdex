@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply antialiased;
+    font-family: 'Courier New', monospace;
+  }
+}
+
+@layer components {
+  /* Pokedex Container */
+  .pokedex {
+    @apply relative mx-auto rounded-3xl p-4;
+    background: linear-gradient(145deg, #e02a4a 0%, #DC0A2D 50%, #8B0000 100%);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      inset 0 2px 4px rgba(255, 255, 255, 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Pokedex Screen */
+  .pokedex-screen {
+    @apply relative rounded-lg overflow-hidden;
+    background: #51AE5E;
+    box-shadow: 
+      inset 0 0 40px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(255, 255, 255, 0.1);
+  }
+  
+  .pokedex-screen::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+  
+  /* Scanline effect */
+  .scanlines::after {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+  
+  /* Pixel button */
+  .pixel-btn {
+    @apply relative px-6 py-3 font-pixel text-xs uppercase tracking-wider transition-all;
+    background: #DC0A2D;
+    border: 4px solid #8B0000;
+    box-shadow: 
+      4px 4px 0 #500000,
+      inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  .pixel-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 
+      2px 2px 0 #500000,
+      inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  .pixel-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+  
+  /* D-Pad */
+  .dpad {
+    @apply relative w-24 h-24;
+  }
+  
+  .dpad-center {
+    @apply absolute top-1/2 left-1/2 w-8 h-8 -translate-x-1/2 -translate-y-1/2 z-10;
+    background: #333;
+  }
+  
+  .dpad-up, .dpad-down, .dpad-left, .dpad-right {
+    @apply absolute cursor-pointer transition-all;
+    background: #333;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .dpad-up:hover, .dpad-down:hover, .dpad-left:hover, .dpad-right:hover {
+    background: #444;
+  }
+  
+  .dpad-up { @apply top-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-t; }
+  .dpad-down { @apply bottom-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-b; }
+  .dpad-left { @apply left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-l; }
+  .dpad-right { @apply right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-r; }
+  
+  /* Stat Bar */
+  .stat-bar {
+    @apply h-3 rounded-full overflow-hidden;
+    background: #306938;
+    border: 2px solid #1a4a25;
+  }
+  
+  .stat-bar-fill {
+    @apply h-full transition-all duration-1000 ease-out;
+    background: linear-gradient(90deg, #7EE787 0%, #51AE5E 100%);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Element Badge */
+  .element-badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Typewriter text */
+  .typewriter {
+    @apply font-pixel text-xs leading-relaxed;
+    color: #0F380F;
+  }
+  
+  /* Pokemon card */
+  .creature-card {
+    @apply relative p-4 rounded-xl;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* CRT effect overlay */
+  .crt-overlay {
+    @apply absolute inset-0 pointer-events-none;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.1) 80%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  }
+  
+  /* LED indicator */
+  .led {
+    @apply w-4 h-4 rounded-full;
+    box-shadow: 
+      0 0 10px currentColor,
+      inset -2px -2px 4px rgba(0, 0, 0, 0.3),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.3);
+  }
+  
+  .led-blue { @apply bg-blue-500 text-blue-500; }
+  .led-red { @apply bg-red-500 text-red-500; }
+  .led-green { @apply bg-green-500 text-green-500; }
+  .led-yellow { @apply bg-yellow-400 text-yellow-400; }
+}
+
+/* Animations */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DC0A2D;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e02a4a;
+}
