@@ -270,6 +270,120 @@ function generateFallbackSVG(creature: any): string {
   return svg;
 }
 
+// Fetch image and convert to base64
+async function fetchImageAsBase64(url: string): Promise<{ data: string; mimeType: string } | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+    return { data: base64, mimeType: contentType };
+  } catch (error) {
+    console.error('Failed to fetch image:', error);
+    return null;
+  }
+}
+
+// Generate Pokemon from PFP using Gemini Vision
+async function generateFromPFP(pfpUrl: string, creature: any): Promise<string | null> {
+  try {
+    // Fetch the PFP image
+    const pfpImage = await fetchImageAsBase64(pfpUrl);
+    if (!pfpImage) {
+      console.log('Could not fetch PFP, falling back to text-only generation');
+      return null;
+    }
+
+    const { name, element, archetype } = creature;
+    const elementData = ELEMENT_VISUALS[element] || ELEMENT_VISUALS.Fire;
+
+    const prompt = `You are a Pokemon character designer. Transform this profile picture into an original Pokemon-style creature.
+
+CREATURE SPECS:
+- Name: "${name}"
+- Type: ${element}
+- Archetype: ${archetype}
+
+TRANSFORMATION RULES:
+1. Extract the dominant colors from this image and use them as the creature's color palette
+2. Capture the mood/vibe/energy of this image in the creature's expression
+3. If there are any distinctive visual elements (patterns, shapes, accessories), subtly incorporate them into the creature design
+4. The creature should feel like this image's "spirit Pokemon"
+
+ELEMENT INFLUENCE:
+- Colors to blend with: ${elementData.colors}
+- Features to include: ${elementData.features}
+- Personality: ${elementData.vibe}
+
+ART STYLE (CRITICAL):
+- Official Pokemon Ken Sugimori illustration style
+- Clean vector linework with varying weights
+- Soft cel-shading with subtle gradients
+- Large expressive anime eyes with catchlights
+- Full body, 3/4 front view
+- Solid pure white background (#FFFFFF)
+- Single creature, centered, filling 80% of frame
+
+DO NOT:
+- Copy the image directly - transform it into a creature
+- Include any text, watermarks, or signatures
+- Make it realistic - must be stylized 2D Pokemon art
+- Include humans or human clothing
+
+Create a single high-quality Pokemon that embodies this profile picture's essence.`;
+
+    // Use Gemini with vision capabilities
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              {
+                inlineData: {
+                  mimeType: pfpImage.mimeType,
+                  data: pfpImage.data
+                }
+              },
+              { text: prompt }
+            ]
+          }],
+          generationConfig: {
+            responseModalities: ['image', 'text'],
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini Vision API error:', response.status, errorText);
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Extract image from response
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith('image/')) {
+        console.log('PFP transformation successful');
+        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('PFP transformation error:', error);
+    return null;
+  }
+}
+
 // Generate image using Google Imagen API
 async function generateWithImagen(prompt: string): Promise<string | null> {
   try {
@@ -363,7 +477,7 @@ async function generateWithGemini(prompt: string): Promise<string | null> {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { creature, useAI = true } = body;
+    const { creature, useAI = true, pfpUrl } = body;
 
     if (!creature) {
       return NextResponse.json(
@@ -377,16 +491,30 @@ export async function POST(request: NextRequest) {
     const base64 = Buffer.from(svg).toString('base64');
     const fallbackImageBase64 = `data:image/svg+xml;base64,${base64}`;
 
-    // Try Google Imagen/Gemini if enabled
+    // Try AI image generation
     let aiImageUrl = null;
+    let usedPFP = false;
 
     if (useAI && GOOGLE_API_KEY) {
       try {
-        const prompt = buildImagePrompt(creature);
-
         console.log('Generating image for:', creature.name);
 
-        aiImageUrl = await generateWithImagen(prompt);
+        // Priority 1: Try PFP transformation if available
+        if (pfpUrl) {
+          console.log('Attempting PFP transformation from:', pfpUrl);
+          aiImageUrl = await generateFromPFP(pfpUrl, creature);
+          if (aiImageUrl) {
+            usedPFP = true;
+            console.log('PFP transformation successful');
+          }
+        }
+
+        // Priority 2: Fall back to text-only Imagen/Gemini
+        if (!aiImageUrl) {
+          const prompt = buildImagePrompt(creature);
+          console.log('Falling back to text-only generation');
+          aiImageUrl = await generateWithImagen(prompt);
+        }
 
         console.log('AI image generated:', aiImageUrl ? 'success' : 'failed');
       } catch (aiError) {
@@ -400,6 +528,7 @@ export async function POST(request: NextRequest) {
       imageBase64: fallbackImageBase64,
       prompt: useAI ? buildImagePrompt(creature) : null,
       usedAI: !!aiImageUrl,
+      usedPFP: usedPFP,
       metadata: {
         name: creature.name,
         description: creature.description,

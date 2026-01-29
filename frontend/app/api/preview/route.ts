@@ -513,20 +513,25 @@ export async function POST(request: NextRequest) {
     
     // Generate creature with full lore
     const creature = await generateCreatureFromWallet(seed, neynarData);
-    
-    // Generate image
+
+    // Extract PFP URL from Neynar data for image transformation
+    const pfpUrl = neynarData?.pfp_url || null;
+
+    // Generate image (with PFP transformation if available)
     const imageResponse = await fetch(new URL('/api/generate-image', request.url).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ creature, useAI: true }),
+      body: JSON.stringify({ creature, useAI: true, pfpUrl }),
     });
-    
+
     let imageUrl = null;
     let imageBase64 = null;
+    let usedPFP = false;
     if (imageResponse.ok) {
       const imageData = await imageResponse.json();
       imageUrl = imageData.imageUrl;
       imageBase64 = imageData.imageBase64;
+      usedPFP = imageData.usedPFP || false;
     }
     
     return NextResponse.json({
@@ -537,6 +542,8 @@ export async function POST(request: NextRequest) {
       archetypeLore: creature.archetypeLore,
       styleGuide: CREATURE_STYLE_GUIDE,
       farcasterData: creature.neynarData || (identifier ? { username: identifier } : null),
+      pfpUrl,
+      usedPFP,
     });
   } catch (error) {
     console.error('Preview API error:', error);
