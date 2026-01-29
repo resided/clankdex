@@ -1338,7 +1338,7 @@ export default function Home() {
                             onMouseEnter={() => setMenuIndex(idx)}
                             className={`menu-item w-full ${menuIndex === idx ? 'selected' : ''}`}
                           >
-                            <item.icon className="w-4 h-4" style={{ color: '#306230' }} />
+                            <item.icon className="w-4 h-4" style={{ color: '#000000' }} />
                             <div className="flex-1 text-left">
                               <span className="font-pixel text-[10px]">{item.label}</span>
                               <span className="text-[8px] opacity-60 ml-2">{item.desc}</span>
@@ -1347,7 +1347,7 @@ export default function Home() {
                         ))}
                       </div>
                       <div className="text-center mt-3">
-                        <p className="text-[8px]" style={{ color: '#306230' }}>▲▼ Move │ A Select</p>
+                        <p className="text-[8px]" style={{ color: '#000000' }}>▲▼ Move │ A Select</p>
                       </div>
                     </motion.div>
                   )}
@@ -1367,13 +1367,13 @@ export default function Home() {
                       <div className="flex gap-1 mb-2 justify-center">
                         <button
                           onClick={() => setInputMode('wallet')}
-                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'wallet' ? 'bg-[#306230] text-[#8bac0f]' : 'text-[#306230]'}`}
+                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'wallet' ? 'bg-[#306230] text-[#8bac0f]' : 'text-black'}`}
                         >
                           WALLET
                         </button>
                         <button
                           onClick={() => setInputMode('farcaster')}
-                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'farcaster' ? 'bg-[#306230] text-[#8bac0f]' : 'text-[#306230]'}`}
+                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'farcaster' ? 'bg-[#306230] text-[#8bac0f]' : 'text-black'}`}
                         >
                           FARCASTER
                         </button>
@@ -1383,16 +1383,16 @@ export default function Home() {
                       <div className="flex-1 flex flex-col items-center justify-center">
                         {isAnalyzing ? (
                           <div className="text-center">
-                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#306230' }} />
-                            <p className="font-pixel text-[10px]" style={{ color: '#306230' }}>ANALYZING DNA...</p>
+                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#000000' }} />
+                            <p className="font-pixel text-[10px]" style={{ color: '#000000' }}>ANALYZING DNA...</p>
                           </div>
                         ) : showCreature && creature ? (
                           <div className="text-center">
                             {imageBase64 && (
                               <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated" />
                             )}
-                            <p className="font-pixel text-[10px]" style={{ color: '#306230' }}>{creature.name}</p>
-                            <p className="text-[8px]" style={{ color: '#306230' }}>{creature.element} Type</p>
+                            <p className="font-pixel text-[10px]" style={{ color: '#000000' }}>{creature.name}</p>
+                            <p className="text-[8px]" style={{ color: '#000000' }}>{creature.element} Type</p>
                             <button
                               onClick={launchCreature}
                               disabled={isMinting}
@@ -1405,15 +1405,15 @@ export default function Home() {
                           <div className="text-center">
                             {isConnected ? (
                               <>
-                                <Wallet className="w-8 h-8 mx-auto mb-2" style={{ color: '#306230' }} />
-                                <p className="font-pixel text-[8px] mb-1" style={{ color: '#306230' }}>
+                                <Wallet className="w-8 h-8 mx-auto mb-2" style={{ color: '#000000' }} />
+                                <p className="font-pixel text-[8px] mb-1" style={{ color: '#000000' }}>
                                   {address?.slice(0, 6)}...{address?.slice(-4)}
                                 </p>
-                                <p className="text-[8px]" style={{ color: '#306230' }}>Press A to scan</p>
+                                <p className="text-[8px]" style={{ color: '#000000' }}>Press A to scan</p>
                               </>
                             ) : (
                               <>
-                                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#306230' }} />
+                                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#000000' }} />
                                 <button
                                   onClick={async () => {
                                     // Find injected connector
@@ -1446,21 +1446,21 @@ export default function Home() {
                           </div>
                         ) : (
                           <div className="text-center w-full px-2">
-                            <AtSign className="w-6 h-6 mx-auto mb-2" style={{ color: '#306230' }} />
+                            <AtSign className="w-6 h-6 mx-auto mb-2" style={{ color: '#000000' }} />
                             <input
                               type="text"
                               value={farcasterInput}
                               onChange={(e) => setFarcasterInput(e.target.value)}
                               placeholder="username"
-                              className="w-full px-2 py-1 bg-[#9bbc0f] border-2 border-[#306230] rounded font-pixel text-[10px] text-[#306230] placeholder-[#306230]/50 text-center"
+                              className="w-full px-2 py-1 bg-[#9bbc0f] border-2 border-[#306230] rounded font-pixel text-[10px] text-black placeholder-black/60 text-center"
                             />
-                            <p className="text-[8px] mt-1" style={{ color: '#306230' }}>Press A to scan</p>
+                            <p className="text-[8px] mt-1" style={{ color: '#000000' }}>Press A to scan</p>
                           </div>
                         )}
                       </div>
 
                       <div className="text-center">
-                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back │ A {showCreature ? 'Launch' : 'Scan'}</p>
+                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back │ A {showCreature ? 'Launch' : 'Scan'}</p>
                       </div>
                     </motion.div>
                   )}
@@ -1479,9 +1479,9 @@ export default function Home() {
                       {clankdexEntries.length === 0 ? (
                         <div className="flex-1 flex items-center justify-center">
                           <div className="text-center">
-                            <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#306230' }} />
-                            <p className="font-pixel text-[10px]" style={{ color: '#306230' }}>NO CREATURES YET</p>
-                            <p className="text-[8px]" style={{ color: '#306230' }}>Scan a wallet to begin</p>
+                            <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#000000' }} />
+                            <p className="font-pixel text-[10px]" style={{ color: '#000000' }}>NO CREATURES YET</p>
+                            <p className="text-[8px]" style={{ color: '#000000' }}>Scan a wallet to begin</p>
                           </div>
                         </div>
                       ) : (
@@ -1493,14 +1493,14 @@ export default function Home() {
                                 onClick={() => window.open(`${CLANKER_URL}/token/${entry.token_address}`, '_blank')}
                                 className={`w-full flex items-center gap-2 p-1 rounded text-left hover:opacity-70 ${currentEntryIndex === idx ? 'bg-[#306230]/20' : ''}`}
                               >
-                                <span className="font-pixel text-[8px] w-6" style={{ color: '#306230' }}>#{entry.entry_number}</span>
-                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#306230' }}>{entry.name}</span>
-                                <span className="text-[8px]" style={{ color: '#306230' }}>{entry.element}</span>
+                                <span className="font-pixel text-[8px] w-6" style={{ color: '#000000' }}>#{entry.entry_number}</span>
+                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#000000' }}>{entry.name}</span>
+                                <span className="text-[8px]" style={{ color: '#000000' }}>{entry.element}</span>
                               </button>
                             ))}
                           </div>
                           <div className="text-center mt-2">
-                            <p className="text-[8px]" style={{ color: '#306230' }}>
+                            <p className="text-[8px]" style={{ color: '#000000' }}>
                               {clankdexEntries.length} creatures │ ◄► Navigate │ Click to view
                             </p>
                           </div>
@@ -1508,7 +1508,7 @@ export default function Home() {
                       )}
 
                       <div className="text-center mt-1">
-                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back</p>
+                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1523,7 +1523,7 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="screen-title mb-2">─ FAQ ─</div>
-                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#306230' }}>
+                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#000000' }}>
                         <div>
                           <p className="font-pixel text-[9px]">What is ClankDex?</p>
                           <p className="opacity-70">A Wallet Pokedex that generates creatures from your on-chain data.</p>
@@ -1542,7 +1542,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back</p>
+                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1557,7 +1557,7 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="screen-title mb-2">─ HOW IT WORKS ─</div>
-                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#306230' }}>
+                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#000000' }}>
                         <div className="flex items-start gap-2">
                           <span className="font-pixel">1.</span>
                           <div>
@@ -1595,7 +1595,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[8px]" style={{ color: '#306230' }}>B Back</p>
+                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
