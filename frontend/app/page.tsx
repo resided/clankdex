@@ -1277,10 +1277,15 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-pokemon-world flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="gradient-orb gradient-orb-1" />
-      <div className="gradient-orb gradient-orb-2" />
-      <div className="gradient-orb gradient-orb-3" />
+      {/* Pokemon World Background */}
+      <div className="pokemon-world-bg">
+        <div className="pokemon-sun" />
+        <div className="pokemon-trees" />
+        <div className="pokemon-houses" />
+        <div className="pokemon-grass" />
+      </div>
+
+      {/* Floating particles */}
       <div className="particles">
         {[...Array(10)].map((_, i) => <div key={i} className="particle" />)}
       </div>
@@ -1293,6 +1298,9 @@ export default function Home() {
         className="relative z-10"
       >
         <div className="gameboy-device">
+          {/* Visible internals through transparent shell */}
+          <div className="gameboy-internals" />
+
           {/* Power indicator */}
           <div className="gameboy-power">
             <div className="gameboy-power-led" />
@@ -1301,14 +1309,14 @@ export default function Home() {
 
           {/* Screen bezel */}
           <div className="gameboy-bezel">
-            {/* Logo above screen */}
+            {/* ClankDex Logo above screen */}
             <div className="gameboy-logo">
-              CLANK<span className="text-yellow-400">DEX</span>
-              {screenMode !== 'menu' && (
-                <span className="text-[8px] text-gray-500 block">
-                  {screenMode.toUpperCase().replace('-', ' ')}
-                </span>
-              )}
+              <span className="gameboy-logo-text">
+                CLANK<span style={{ color: '#FFD700' }}>DEX</span>
+              </span>
+              <span className="gameboy-logo-sub">
+                {screenMode === 'menu' ? 'Wallet Pokedex' : screenMode.toUpperCase().replace('-', ' ')}
+              </span>
             </div>
 
             {/* LCD Screen */}
