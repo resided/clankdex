@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Google AI Studio API key
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || 'REMOVED_API_KEY';
+// Google AI Studio API key - MUST be set in environment variables
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 // ============================================
 // ENHANCED POKEMON-STYLE CREATURE GUIDE
