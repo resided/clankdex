@@ -1673,8 +1673,11 @@ export default function Home() {
 
           {/* Speaker grille */}
           <div className="gameboy-speaker">
-            {[...Array(5)].map((_, i) => <div key={i} className="speaker-line" />)}
+            {[...Array(6)].map((_, i) => <div key={i} className="speaker-hole" />)}
           </div>
+
+          {/* Clanker emblem */}
+          <div className="clanker-emblem" title="Powered by Clanker" />
         </div>
       </motion.div>
     </main>
