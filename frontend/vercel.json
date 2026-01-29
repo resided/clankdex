@@ -1,5 +1,12 @@
 {
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "redirects": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "https://api.farcaster.xyz/miniapps/hosted-manifest/019c070f-14c4-9012-0241-9aa73c922b53",
+      "statusCode": 307
+    }
+  ]
 }
