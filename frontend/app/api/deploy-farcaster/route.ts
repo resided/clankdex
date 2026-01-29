@@ -77,8 +77,10 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // Deploy!
-    const result = await clanker.deploy(tokenConfig);
+    // Deploy with Base builder code
+    const result = await clanker.deploy(tokenConfig, {
+      dataSuffix: '0x62e349', // Base builder code
+    });
     
     if (result.error) {
       throw new Error(result.error.message);
