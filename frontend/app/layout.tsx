@@ -5,34 +5,18 @@ import { Providers } from './providers';
 const APP_URL = 'https://frontend-weld-mu-91.vercel.app';
 const OG_IMAGE_URL = `${APP_URL}/og`;  // Dynamic OG image
 
-// Miniapp embed configuration
+// Miniapp embed configuration (fc:miniapp meta tag)
 const miniappEmbed = {
   version: "1",
   imageUrl: OG_IMAGE_URL,
   button: {
-    title: "🎮 Launch ClankDex",
-    action: {
-      type: "launch_miniapp",
-      url: APP_URL,
-      name: "ClankDex",
-      splashImageUrl: `${APP_URL}/splash.png`,
-      splashBackgroundColor: "#1a0a2e"
-    }
-  }
-};
-
-// Backward compatible frame config
-const frameEmbed = {
-  version: "1",
-  imageUrl: OG_IMAGE_URL,
-  button: {
-    title: "🎮 Launch ClankDex",
+    title: "CLANKDEX",
     action: {
       type: "launch_frame",
-      url: APP_URL,
       name: "ClankDex",
-      splashImageUrl: `${APP_URL}/splash.png`,
-      splashBackgroundColor: "#1a0a2e"
+      url: APP_URL,
+      splashImageUrl: OG_IMAGE_URL,
+      splashBackgroundColor: "#000000"
     }
   }
 };
@@ -50,10 +34,8 @@ export const metadata: Metadata = {
   other: {
     // Base app ID for verification
     'base:app_id': '697a8a5228b944af8eb15519',
-    // Farcaster Mini App embed (new format)
+    // Farcaster Mini App embed
     'fc:miniapp': JSON.stringify(miniappEmbed),
-    // Backward compatibility
-    'fc:frame': JSON.stringify(frameEmbed),
   },
 };
 
