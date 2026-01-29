@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Clanker } from 'clanker-sdk/v4';
 import { createPublicClient, createWalletClient, http, PublicClient } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { base } from 'viem/chains';
+import { base } from 'wagmi/chains';
+import { Attribution } from 'ox/erc8021';
+
+// Base Builder Code attribution suffix
+const DATA_SUFFIX = Attribution.toDataSuffix({
+  codes: ['bc_pung2696'],
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,9 +83,9 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // Deploy with Base builder code (bc_pung2696)
+    // Deploy with Base builder attribution
     const result = await clanker.deploy(tokenConfig, {
-      dataSuffix: '0x62635f70756e6732363936', // Base builder code: bc_pung2696
+      dataSuffix: DATA_SUFFIX,
     });
     
     if (result.error) {
