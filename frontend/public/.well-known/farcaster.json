@@ -1,16 +1,22 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjM0MjQzMywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDAzNDdlQkZiNEE3MmMyMjE3ZTQwMjU5YTc1YjU2OTkyZEM1NjU1REMifQ",
+    "header": "eyJmaWQiOjM0MjQzMywidHlwZSI6ImF1dGgiLCJrZXkiOiIweDlGYUEzZWMxNjZDMjlCOTU0MjZENWJiQjc5RDNCNDVBZDUxQ0QxYzIifQ",
     "payload": "eyJkb21haW4iOiJmcm9udGVuZC13ZWxkLW11LTkxLnZlcmNlbC5hcHAifQ",
-    "signature": "DFmoHFETTtwE3w9LFH8G74tw3OHuI5h87MwpmGHdNB93ZhRKGPVwODLwmlSiEa8XKSweZtyi6OQgIJ6Wu+ZGDxs="
+    "signature": "wtDmbAd7YIohFyuANu30XkiSKB1QCjckRf8Jwf9nQE9hm3cqh3UMCDW1HWEmBTFclQvxfSBntQLR7fQhsHO8YRw="
   },
   "frame": {
     "version": "1",
     "name": "ClankDex",
     "iconUrl": "https://frontend-weld-mu-91.vercel.app/og",
     "homeUrl": "https://frontend-weld-mu-91.vercel.app",
-    "splashImageUrl": "https://frontend-weld-mu-91.vercel.app/splash.png",
-    "splashBackgroundColor": "#1a0a2e",
-    "webhookUrl": "https://frontend-weld-mu-91.vercel.app/api/webhook"
+    "imageUrl": "https://frontend-weld-mu-91.vercel.app/og",
+    "buttonTitle": "CLANKDEX",
+    "splashImageUrl": "https://frontend-weld-mu-91.vercel.app/og",
+    "splashBackgroundColor": "#000000",
+    "webhookUrl": "https://frontend-weld-mu-91.vercel.app/api/webhook",
+    "subtitle": "CLANKDEX",
+    "description": "Scan your wallet, summon a creature, launch a token",
+    "primaryCategory": "social",
+    "tags": ["social", "ai", "finance"]
   }
 }

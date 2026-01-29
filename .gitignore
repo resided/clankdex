@@ -41,3 +41,4 @@ coverage/
 *.seed
 *.pid.lock
 Thumbs.db
+.grepai/
