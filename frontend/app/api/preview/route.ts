@@ -518,7 +518,7 @@ export async function POST(request: NextRequest) {
     const imageResponse = await fetch(new URL('/api/generate-image', request.url).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ creature, useDalle: true }),
+      body: JSON.stringify({ creature, useAI: true }),
     });
     
     let imageUrl = null;

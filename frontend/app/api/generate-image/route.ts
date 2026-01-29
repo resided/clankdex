@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 
-// Lazy initialization of OpenAI client
-let openai: OpenAI | null = null;
-function getOpenAI() {
-  if (!openai && process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
-  return openai;
-}
+// Google AI Studio API key
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || 'REMOVED_API_KEY';
 
 // ============================================
 // ENHANCED POKEMON-STYLE CREATURE GUIDE
@@ -135,8 +126,8 @@ const BODY_TYPES: Record<string, string> = {
   large: 'Large creature (120cm+), 4-5 heads tall, powerful imposing build, majestic presence, fully evolved look'
 };
 
-// Build comprehensive DALL-E prompt
-function buildDallePrompt(creature: any): string {
+// Build comprehensive image generation prompt (works with Imagen/DALL-E)
+function buildImagePrompt(creature: any): string {
   const { name, element, hp, attack, defense, speed, special, archetype } = creature;
   
   // Determine body type
@@ -321,65 +312,145 @@ function generateFallbackSVG(creature: any): string {
   return svg;
 }
 
+// Generate image using Google Imagen API
+async function generateWithImagen(prompt: string): Promise<string | null> {
+  try {
+    // Use Imagen 3 via Gemini API
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${GOOGLE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          instances: [{ prompt }],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: '1:1',
+            safetyFilterLevel: 'block_few',
+            personGeneration: 'dont_allow',
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Imagen API error:', response.status, errorText);
+
+      // Try alternative Gemini image generation
+      return await generateWithGemini(prompt);
+    }
+
+    const data = await response.json();
+
+    if (data.predictions?.[0]?.bytesBase64Encoded) {
+      return `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Imagen generation error:', error);
+    return await generateWithGemini(prompt);
+  }
+}
+
+// Fallback to Gemini 2.0 Flash image generation
+async function generateWithGemini(prompt: string): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Generate an image: ${prompt}`
+            }]
+          }],
+          generationConfig: {
+            responseModalities: ['image', 'text'],
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API error:', response.status, errorText);
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Check for inline image data in response
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith('image/')) {
+        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Gemini generation error:', error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { creature, useDalle = true } = body;
-    
+    const { creature, useAI = true } = body;
+
     if (!creature) {
       return NextResponse.json(
         { error: 'Missing creature data' },
         { status: 400 }
       );
     }
-    
+
     // Always generate fallback SVG first
     const svg = generateFallbackSVG(creature);
     const base64 = Buffer.from(svg).toString('base64');
     const fallbackImageBase64 = `data:image/svg+xml;base64,${base64}`;
-    
-    // Try DALL-E if enabled and API key is available
-    let dalleImageUrl = null;
-    
-    const openaiClient = getOpenAI();
-    if (useDalle && openaiClient) {
+
+    // Try Google Imagen/Gemini if enabled
+    let aiImageUrl = null;
+
+    if (useAI && GOOGLE_API_KEY) {
       try {
-        const prompt = buildDallePrompt(creature);
-        
-        console.log('Generating DALL-E image for:', creature.name);
-        
-        const response = await openaiClient.images.generate({
-          model: "dall-e-3",
-          prompt: prompt,
-          n: 1,
-          size: "1024x1024",
-          quality: "standard",
-          style: "vivid",
-        });
-        
-        dalleImageUrl = response.data?.[0]?.url || null;
-        
-        console.log('DALL-E image generated:', dalleImageUrl ? 'success' : 'failed');
-      } catch (dalleError) {
-        console.error('DALL-E generation failed:', dalleError);
+        const prompt = buildImagePrompt(creature);
+
+        console.log('Generating image for:', creature.name);
+
+        aiImageUrl = await generateWithImagen(prompt);
+
+        console.log('AI image generated:', aiImageUrl ? 'success' : 'failed');
+      } catch (aiError) {
+        console.error('AI generation failed:', aiError);
         // Fall back to SVG
       }
     }
-    
+
     return NextResponse.json({
-      imageUrl: dalleImageUrl || fallbackImageBase64,
+      imageUrl: aiImageUrl || fallbackImageBase64,
       imageBase64: fallbackImageBase64,
-      dallePrompt: useDalle ? buildDallePrompt(creature) : null,
-      usedDalle: !!dalleImageUrl,
+      prompt: useAI ? buildImagePrompt(creature) : null,
+      usedAI: !!aiImageUrl,
       metadata: {
         name: creature.name,
         description: creature.description,
-        image: dalleImageUrl || fallbackImageBase64,
+        image: aiImageUrl || fallbackImageBase64,
       },
     });
   } catch (error) {
     console.error('Generate image API error:', error);
-    
+
     return NextResponse.json(
       { error: 'Failed to generate image', details: (error as Error).message },
       { status: 500 }
