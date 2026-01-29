@@ -1313,26 +1313,26 @@ export default function Home() {
                         <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>CLANKDEX</p>
                         <p className="text-[8px]" style={{ color: '#0f380f', opacity: 0.7 }}>v1.0</p>
                       </div>
-                      <div className="flex-1 space-y-1">
+                      <div className="flex-1 space-y-2">
                         {[
-                          { mode: 'scan' as const, icon: ScanLine, label: 'SCAN', desc: 'Analyze' },
-                          { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length}` },
-                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'Learn' },
+                          { mode: 'scan' as const, icon: ScanLine, label: 'NEW', desc: 'Create' },
+                          { mode: 'collection' as const, icon: BookOpen, label: 'DEX', desc: `${clankdexEntries.length}` },
+                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'How' },
                           { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Help' },
                         ].map((item, idx) => (
                           <button
                             key={item.mode}
                             onClick={() => setScreenMode(item.mode)}
                             onMouseEnter={() => setMenuIndex(idx)}
-                            className={`w-full flex items-center gap-2 p-2 rounded border-2 transition-all ${
+                            className={`w-full flex items-center gap-2 p-2.5 rounded border-2 transition-all ${
                               menuIndex === idx 
                                 ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' 
                                 : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
                             }`}
                           >
                             <item.icon className="w-3 h-3" />
-                            <span className="font-pixel text-[9px]">{item.label}</span>
-                            <span className="text-[7px] opacity-60 ml-auto">{item.desc}</span>
+                            <span className="font-pixel text-[10px]">{item.label}</span>
+                            <span className="text-[8px] opacity-60 ml-auto">{item.desc}</span>
                           </button>
                         ))}
                       </div>
@@ -1351,24 +1351,8 @@ export default function Home() {
                       exit={{ x: -20, opacity: 0 }}
                       className="p-3 h-full flex flex-col"
                     >
-                      <div className="text-center mb-2">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>SCAN</p>
-                      </div>
-
-                      {/* Mode toggle */}
-                      <div className="flex gap-1 mb-2 justify-center">
-                        <button
-                          onClick={() => setInputMode('wallet')}
-                          className={`px-2 py-1 text-[7px] font-pixel rounded border-2 ${inputMode === 'wallet' ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
-                        >
-                          WALLET
-                        </button>
-                        <button
-                          onClick={() => setInputMode('farcaster')}
-                          className={`px-2 py-1 text-[7px] font-pixel rounded border-2 ${inputMode === 'farcaster' ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
-                        >
-                          FARCASTER
-                        </button>
+                      <div className="text-center mb-3">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>NEW CREATURE</p>
                       </div>
 
                       {/* Content area */}
@@ -1376,83 +1360,67 @@ export default function Home() {
                         {isAnalyzing ? (
                           <div className="text-center">
                             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>ANALYZING DNA...</p>
+                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>ANALYZING...</p>
                           </div>
                         ) : showCreature && creature ? (
                           <div className="text-center">
                             {imageBase64 && (
-                              <img src={imageBase64} alt={creature.name} className="w-20 h-20 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
+                              <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
                             )}
-                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>{creature.name}</p>
-                            <p className="text-[7px]" style={{ color: '#0f380f' }}>{creature.element} Type</p>
+                            <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>{creature.name}</p>
+                            <p className="text-[8px] mb-2" style={{ color: '#0f380f' }}>{creature.element}</p>
                             <button
                               onClick={launchCreature}
                               disabled={isMinting}
-                              className="mt-2 px-3 py-1 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded border-2 border-[#0f380f] disabled:opacity-50"
+                              className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f] disabled:opacity-50"
                             >
-                              {isMinting ? 'LAUNCHING...' : 'LAUNCH TOKEN'}
+                              {isMinting ? '...' : 'DEPLOY'}
                             </button>
                           </div>
-                        ) : inputMode === 'wallet' ? (
-                          <div className="text-center">
+                        ) : (
+                          <div className="text-center w-full px-4">
+                            <Wallet className="w-10 h-10 mx-auto mb-3" style={{ color: '#0f380f' }} />
                             {isConnected ? (
                               <>
-                                <Wallet className="w-8 h-8 mx-auto mb-2" style={{ color: '#0f380f' }} />
-                                <p className="font-pixel text-[8px] mb-1" style={{ color: '#0f380f' }}>
+                                <p className="font-pixel text-[9px] mb-2" style={{ color: '#0f380f' }}>
                                   {address?.slice(0, 6)}...{address?.slice(-4)}
                                 </p>
-                                <p className="text-[7px]" style={{ color: '#0f380f' }}>Press A to scan</p>
-                              </>
-                            ) : (
-                              <>
-                                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
                                 <button
-                                  onClick={async () => {
-                                    // Find injected connector
-                                    const injectedConnector = connectors.find(c => c.id === 'injected');
-                                    if (injectedConnector) {
-                                      try {
-                                        await connect({ connector: injectedConnector });
-                                      } catch (e) {
-                                        console.error('Connection failed:', e);
-                                        // Fallback: try to trigger wallet detection
-                                        if (typeof window !== 'undefined' && window.ethereum) {
-                                          try {
-                                            await window.ethereum.request({ method: 'eth_requestAccounts' });
-                                          } catch (err) {
-                                            console.error('Direct ethereum request failed:', err);
-                                          }
-                                        }
-                                      }
-                                    } else if (connectors.length > 0) {
-                                      connect({ connector: connectors[0] });
-                                    }
-                                  }}
-                                  disabled={isConnecting}
-                                  className="px-3 py-1 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded border-2 border-[#0f380f] disabled:opacity-50"
+                                  onClick={analyze}
+                                  disabled={isAnalyzing}
+                                  className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f]"
                                 >
-                                  {isConnecting ? '...' : 'CONNECT'}
+                                  GENERATE
                                 </button>
                               </>
+                            ) : (
+                              <button
+                                onClick={async () => {
+                                  const injectedConnector = connectors.find(c => c.id === 'injected');
+                                  if (injectedConnector) {
+                                    try {
+                                      await connect({ connector: injectedConnector });
+                                    } catch (e) {
+                                      if (typeof window !== 'undefined' && window.ethereum) {
+                                        await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                      }
+                                    }
+                                  } else if (connectors.length > 0) {
+                                    connect({ connector: connectors[0] });
+                                  }
+                                }}
+                                disabled={isConnecting}
+                                className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f] disabled:opacity-50"
+                              >
+                                {isConnecting ? '...' : 'CONNECT'}
+                              </button>
                             )}
-                          </div>
-                        ) : (
-                          <div className="text-center w-full px-2">
-                            <AtSign className="w-6 h-6 mx-auto mb-2" style={{ color: '#0f380f' }} />
-                            <input
-                              type="text"
-                              value={farcasterInput}
-                              onChange={(e) => setFarcasterInput(e.target.value)}
-                              placeholder="username"
-                              className="w-full px-2 py-1 bg-[#9bbc0f] border-2 border-[#0f380f] rounded font-pixel text-[9px] text-[#0f380f] placeholder-[#0f380f]/50 text-center"
-                            />
-                            <p className="text-[7px] mt-1" style={{ color: '#0f380f' }}>Press A to scan</p>
                           </div>
                         )}
                       </div>
 
-                      <div className="text-center">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Launch' : 'Scan'}</p>
+                      <div className="text-center mt-2">
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Deploy' : 'Generate'}</p>
                       </div>
                     </motion.div>
                   )}
