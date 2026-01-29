@@ -13,19 +13,32 @@
   }
 }
 
-/* Animated Background */
+/* ============================================
+   PREMIUM 8K BACKGROUND - DARK CRYPTO WORLD
+   ============================================ */
+
 .bg-pokemon-world {
-  background: linear-gradient(180deg,
-    #1a0a2e 0%,
-    #2d1b4e 20%,
-    #1e3a5f 40%,
-    #0d2137 60%,
-    #1a0a2e 100%
-  );
+  background: 
+    /* Top vignette */
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(88, 28, 135, 0.3) 0%, transparent 70%),
+    /* Bottom glow */
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(147, 51, 234, 0.2) 0%, transparent 60%),
+    /* Subtle grid */
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    /* Base gradient */
+    linear-gradient(180deg,
+      #0a0a0f 0%,
+      #12121a 30%,
+      #1a1a25 60%,
+      #0f0f16 100%
+    );
+  background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px, 100% 100%;
   position: relative;
   overflow: hidden;
 }
 
+/* Floating particles */
 .bg-pokemon-world::before {
   content: '';
   position: absolute;
@@ -34,962 +47,229 @@
   right: 0;
   bottom: 0;
   background-image:
-    radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
-    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.7), transparent),
-    radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 250px 160px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(2px 2px at 300px 90px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 350px 30px, rgba(255,255,255,0.8), transparent),
-    radial-gradient(2px 2px at 400px 140px, rgba(255,255,255,0.5), transparent);
-  background-size: 400px 200px;
-  animation: twinkle 8s ease-in-out infinite;
+    radial-gradient(2px 2px at 10% 20%, rgba(147, 51, 234, 0.4), transparent),
+    radial-gradient(1px 1px at 20% 80%, rgba(88, 28, 135, 0.5), transparent),
+    radial-gradient(2px 2px at 30% 40%, rgba(168, 85, 247, 0.3), transparent),
+    radial-gradient(1px 1px at 40% 60%, rgba(147, 51, 234, 0.4), transparent),
+    radial-gradient(2px 2px at 50% 10%, rgba(88, 28, 135, 0.5), transparent),
+    radial-gradient(1px 1px at 60% 90%, rgba(168, 85, 247, 0.3), transparent),
+    radial-gradient(2px 2px at 70% 30%, rgba(147, 51, 234, 0.4), transparent),
+    radial-gradient(1px 1px at 80% 70%, rgba(88, 28, 135, 0.5), transparent),
+    radial-gradient(2px 2px at 90% 50%, rgba(168, 85, 247, 0.3), transparent),
+    radial-gradient(1px 1px at 15% 50%, rgba(147, 51, 234, 0.4), transparent),
+    radial-gradient(2px 2px at 85% 15%, rgba(88, 28, 135, 0.5), transparent),
+    radial-gradient(1px 1px at 45% 85%, rgba(168, 85, 247, 0.3), transparent);
+  background-size: 400px 400px;
+  animation: particle-float 20s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes twinkle {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.4; }
+@keyframes particle-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-10px) translateX(5px); }
+  50% { transform: translateY(-5px) translateX(-5px); }
+  75% { transform: translateY(-15px) translateX(3px); }
 }
 
-/* Floating particles */
-.particles {
+/* Ambient glow orbs */
+.bg-pokemon-world::after {
+  content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  animation: float-up 15s linear infinite;
-  opacity: 0;
-}
-
-.particle:nth-child(1) { left: 10%; animation-delay: 0s; background: #FFD700; }
-.particle:nth-child(2) { left: 20%; animation-delay: 2s; background: #FF69B4; }
-.particle:nth-child(3) { left: 30%; animation-delay: 4s; background: #00CED1; }
-.particle:nth-child(4) { left: 40%; animation-delay: 1s; background: #98FB98; }
-.particle:nth-child(5) { left: 50%; animation-delay: 3s; background: #FFD700; }
-.particle:nth-child(6) { left: 60%; animation-delay: 5s; background: #FF69B4; }
-.particle:nth-child(7) { left: 70%; animation-delay: 2.5s; background: #00CED1; }
-.particle:nth-child(8) { left: 80%; animation-delay: 4.5s; background: #98FB98; }
-.particle:nth-child(9) { left: 90%; animation-delay: 1.5s; background: #FFD700; }
-.particle:nth-child(10) { left: 15%; animation-delay: 3.5s; background: #FF69B4; }
-
-@keyframes float-up {
-  0% {
-    transform: translateY(100vh) scale(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  90% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(-100px) scale(1);
-    opacity: 0;
-  }
-}
-
-/* Gradient orbs */
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.3;
-  animation: pulse-glow 6s ease-in-out infinite;
-}
-
-.gradient-orb-1 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, #DC0A2D 0%, transparent 70%);
-  top: -100px;
-  left: -100px;
-  animation-delay: 0s;
-}
-
-.gradient-orb-2 {
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, #FFDE00 0%, transparent 70%);
+  width: 600px;
+  height: 600px;
   top: 50%;
-  right: -50px;
-  animation-delay: 2s;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(88, 28, 135, 0.1) 0%, transparent 40%);
+  filter: blur(60px);
+  animation: orb-pulse 8s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.gradient-orb-3 {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, #3B4CCA 0%, transparent 70%);
-  bottom: -100px;
-  left: 30%;
-  animation-delay: 4s;
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.5;
-  }
-}
-
-@layer components {
-  /* Pokedex Container */
-  .pokedex {
-    @apply relative mx-auto rounded-3xl p-4;
-    background: linear-gradient(145deg, #e02a4a 0%, #DC0A2D 50%, #8B0000 100%);
-    box-shadow: 
-      0 20px 60px rgba(0, 0, 0, 0.5),
-      inset 0 2px 4px rgba(255, 255, 255, 0.3),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Pokedex Screen */
-  .pokedex-screen {
-    @apply relative rounded-lg overflow-hidden;
-    background: #51AE5E;
-    box-shadow: 
-      inset 0 0 40px rgba(0, 0, 0, 0.3),
-      0 2px 4px rgba(255, 255, 255, 0.1);
-  }
-  
-  .pokedex-screen::before {
-    content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.1) 100%
-    );
-  }
-  
-  /* Scanline effect */
-  .scanlines::after {
-    content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
-    );
-  }
-  
-  /* Pixel button */
-  .pixel-btn {
-    @apply relative px-6 py-3 font-pixel text-xs uppercase tracking-wider transition-all;
-    background: #DC0A2D;
-    border: 4px solid #8B0000;
-    box-shadow: 
-      4px 4px 0 #500000,
-      inset -2px -2px 0 rgba(0, 0, 0, 0.3),
-      inset 2px 2px 0 rgba(255, 255, 255, 0.3);
-  }
-  
-  .pixel-btn:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 
-      2px 2px 0 #500000,
-      inset -2px -2px 0 rgba(0, 0, 0, 0.3),
-      inset 2px 2px 0 rgba(255, 255, 255, 0.3);
-  }
-  
-  .pixel-btn:active {
-    transform: translate(4px, 4px);
-    box-shadow: none;
-  }
-  
-  /* D-Pad */
-  .dpad {
-    @apply relative w-24 h-24;
-  }
-  
-  .dpad-center {
-    @apply absolute top-1/2 left-1/2 w-8 h-8 -translate-x-1/2 -translate-y-1/2 z-10;
-    background: #333;
-  }
-  
-  .dpad-up, .dpad-down, .dpad-left, .dpad-right {
-    @apply absolute cursor-pointer transition-all;
-    background: #333;
-    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .dpad-up:hover, .dpad-down:hover, .dpad-left:hover, .dpad-right:hover {
-    background: #444;
-  }
-  
-  .dpad-up { @apply top-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-t; }
-  .dpad-down { @apply bottom-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-b; }
-  .dpad-left { @apply left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-l; }
-  .dpad-right { @apply right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-r; }
-
-  .dpad-up:active, .dpad-down:active, .dpad-left:active, .dpad-right:active {
-    background: #555;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
-  }
-
-  /* Game Boy A/B Buttons */
-  .gb-btn {
-    @apply w-12 h-12 rounded-full font-bold text-sm cursor-pointer transition-all;
-    background: linear-gradient(145deg, #9b1d20, #7a171a);
-    color: rgba(255, 255, 255, 0.9);
-    box-shadow:
-      0 4px 0 #500000,
-      inset 0 2px 4px rgba(255, 255, 255, 0.2),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-  .gb-btn:hover {
-    background: linear-gradient(145deg, #a82225, #8a1a1d);
-  }
-
-  .gb-btn:active {
-    transform: translateY(2px);
-    box-shadow:
-      0 2px 0 #500000,
-      inset 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  .gb-btn-b {
-    background: linear-gradient(145deg, #4a4a4a, #333);
-    box-shadow:
-      0 4px 0 #222,
-      inset 0 2px 4px rgba(255, 255, 255, 0.1),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  .gb-btn-b:hover {
-    background: linear-gradient(145deg, #555, #3a3a3a);
-  }
-
-  .gb-btn-b:active {
-    box-shadow:
-      0 2px 0 #222,
-      inset 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Stat Bar */
-  .stat-bar {
-    @apply h-3 rounded-full overflow-hidden;
-    background: #306938;
-    border: 2px solid #1a4a25;
-  }
-  
-  .stat-bar-fill {
-    @apply h-full transition-all duration-1000 ease-out;
-    background: linear-gradient(90deg, #7EE787 0%, #51AE5E 100%);
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Element Badge */
-  .element-badge {
-    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Typewriter text */
-  .typewriter {
-    @apply font-pixel text-xs leading-relaxed;
-    color: #0F380F;
-  }
-  
-  /* Pokemon card */
-  .creature-card {
-    @apply relative p-4 rounded-xl;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  /* CRT effect overlay */
-  .crt-overlay {
-    @apply absolute inset-0 pointer-events-none;
-    background: radial-gradient(
-      ellipse at center,
-      transparent 0%,
-      rgba(0, 0, 0, 0.1) 80%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
-  }
-
-  /* LED indicator */
-  .led {
-    @apply w-4 h-4 rounded-full;
-    box-shadow:
-      0 0 10px currentColor,
-      inset -2px -2px 4px rgba(0, 0, 0, 0.3),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.3);
-  }
-
-  .led-blue { @apply bg-blue-500 text-blue-500; }
-  .led-red { @apply bg-red-500 text-red-500; }
-  .led-green { @apply bg-green-500 text-green-500; }
-  .led-yellow { @apply bg-yellow-400 text-yellow-400; }
-
-  /* Rolodex Container */
-  .rolodex-container {
-    @apply relative rounded-3xl;
-    background: linear-gradient(145deg, #2a2a3e 0%, #1a1a2e 50%, #0f0f1a 100%);
-    box-shadow:
-      0 20px 60px rgba(0, 0, 0, 0.5),
-      inset 0 2px 4px rgba(255, 255, 255, 0.1),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-    border: 4px solid #DC0A2D;
-  }
-
-  /* Rolodex Card */
-  .rolodex-card {
-    @apply relative p-6 rounded-2xl;
-    background: linear-gradient(145deg, #2a2a3e 0%, #1a1a2e 100%);
-    border: 4px solid #DC0A2D;
-    box-shadow:
-      0 10px 40px rgba(0, 0, 0, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.1),
-      0 0 0 4px #FFDE00,
-      0 0 0 8px #DC0A2D;
-  }
-
-  /* Entry Number Badge */
-  .entry-number {
-    @apply absolute -top-3 -left-3 px-4 py-2 rounded-lg font-pixel text-sm text-black font-bold;
-    background: linear-gradient(135deg, #FFDE00 0%, #FFB700 100%);
-    border: 3px solid #DC0A2D;
-    box-shadow:
-      3px 3px 0 #8B0000,
-      inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    z-index: 10;
-  }
-
-  /* Rolodex Screen */
-  .rolodex-screen {
-    @apply relative rounded-lg overflow-hidden aspect-square;
-    background: #51AE5E;
-    box-shadow:
-      inset 0 0 40px rgba(0, 0, 0, 0.3),
-      0 2px 4px rgba(255, 255, 255, 0.1);
-  }
-
-  /* Rolodex Navigation Buttons */
-  .rolodex-nav {
-    @apply w-14 h-14 flex items-center justify-center rounded-full transition-all;
-    background: linear-gradient(145deg, #DC0A2D 0%, #8B0000 100%);
-    border: 3px solid #500000;
-    box-shadow:
-      4px 4px 0 #300000,
-      inset 0 2px 4px rgba(255, 255, 255, 0.2);
-    color: white;
-  }
-
-  .rolodex-nav:hover:not(:disabled) {
-    transform: translate(2px, 2px);
-    box-shadow:
-      2px 2px 0 #300000,
-      inset 0 2px 4px rgba(255, 255, 255, 0.2);
-  }
-
-  .rolodex-nav:active:not(:disabled) {
-    transform: translate(4px, 4px);
-    box-shadow: none;
-  }
-
-  /* Rolodex Search Input */
-  .rolodex-search {
-    @apply transition-all;
-    box-shadow:
-      inset 0 2px 8px rgba(0, 0, 0, 0.3),
-      0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .rolodex-search:focus {
-    box-shadow:
-      inset 0 2px 8px rgba(0, 0, 0, 0.3),
-      0 0 0 3px rgba(255, 222, 0, 0.3);
-  }
-}
-
-/* Animations */
-@keyframes sparkle {
-  0%, 100% { opacity: 0; transform: scale(0); }
-  50% { opacity: 1; transform: scale(1); }
-}
-
-.animate-sparkle {
-  animation: sparkle 2s ease-in-out infinite;
-}
-
-/* Card Flip Animation */
-@keyframes card-flip-in {
-  0% {
-    transform: perspective(1000px) rotateY(-90deg) scale(0.8);
-    opacity: 0;
-  }
-  50% {
-    transform: perspective(1000px) rotateY(-10deg) scale(1.02);
-  }
-  100% {
-    transform: perspective(1000px) rotateY(0deg) scale(1);
-    opacity: 1;
-  }
-}
-
-.animate-card-flip {
-  animation: card-flip-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* Bounce/Idle Animation for Creatures */
-@keyframes creature-idle {
-  0%, 100% { transform: translateY(0); }
-  25% { transform: translateY(-4px); }
-  50% { transform: translateY(0); }
-  75% { transform: translateY(-2px); }
-}
-
-.animate-idle {
-  animation: creature-idle 2s ease-in-out infinite;
-}
-
-/* Pokemon-style shake animation */
-@keyframes pokemon-shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px) rotate(-2deg); }
-  20%, 40%, 60%, 80% { transform: translateX(4px) rotate(2deg); }
-}
-
-.animate-shake {
-  animation: pokemon-shake 0.5s ease-in-out;
-}
-
-/* Glow pulse for legendary items */
-@keyframes legendary-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.4), 0 0 90px rgba(255, 215, 0, 0.2);
-  }
-}
-
-.animate-legendary {
-  animation: legendary-glow 2s ease-in-out infinite;
-}
-
-/* Rainbow shimmer for rare items */
-@keyframes rainbow-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-rainbow {
-  background: linear-gradient(
-    90deg,
-    rgba(255,0,0,0.3) 0%,
-    rgba(255,165,0,0.3) 20%,
-    rgba(255,255,0,0.3) 40%,
-    rgba(0,255,0,0.3) 60%,
-    rgba(0,0,255,0.3) 80%,
-    rgba(238,130,238,0.3) 100%
-  );
-  background-size: 200% 100%;
-  animation: rainbow-shimmer 3s linear infinite;
-}
-
-/* Menu slide-in from bottom (Game Boy style) */
-@keyframes menu-slide-up {
-  0% {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-menu-up {
-  animation: menu-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Battle transition flash */
-@keyframes battle-flash {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
-}
-
-.animate-flash {
-  animation: battle-flash 0.2s ease-in-out 3;
-}
-
-/* HP bar fill animation */
-@keyframes hp-fill {
-  0% { width: 0%; }
-}
-
-.animate-hp-fill {
-  animation: hp-fill 1s ease-out forwards;
-}
-
-/* Stat number count up */
-@keyframes count-up {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.animate-count-up {
-  animation: count-up 0.5s ease-out forwards;
-}
-
-/* Typewriter cursor blink */
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.animate-cursor::after {
-  content: '▋';
-  animation: cursor-blink 0.8s infinite;
-}
-
-/* Pokeball wiggle */
-@keyframes pokeball-wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(-15deg); }
-  40% { transform: rotate(15deg); }
-  60% { transform: rotate(-10deg); }
-  80% { transform: rotate(10deg); }
-}
-
-.animate-wiggle {
-  animation: pokeball-wiggle 0.6s ease-in-out;
-}
-
-/* Float/hover animation */
-@keyframes gentle-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-8px) rotate(1deg); }
-  66% { transform: translateY(-4px) rotate(-1deg); }
-}
-
-.animate-float {
-  animation: gentle-float 4s ease-in-out infinite;
-}
-
-/* Page transition wipe */
-@keyframes page-wipe {
-  0% { clip-path: circle(0% at 50% 50%); }
-  100% { clip-path: circle(150% at 50% 50%); }
-}
-
-.animate-page-wipe {
-  animation: page-wipe 0.6s ease-out forwards;
-}
-
-/* Button press effect */
-.btn-press {
-  transition: transform 0.1s, box-shadow 0.1s;
-}
-
-.btn-press:active {
-  transform: scale(0.95) translateY(2px);
-}
-
-/* Search expand animation */
-@keyframes search-expand {
-  0% {
-    width: 40px;
-    opacity: 0;
-  }
-  100% {
-    width: 100%;
-    opacity: 1;
-  }
-}
-
-.animate-search-expand {
-  animation: search-expand 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Tag pop-in */
-@keyframes tag-pop {
-  0% {
-    transform: scale(0) rotate(-10deg);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.1) rotate(2deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-.animate-tag-pop {
-  animation: tag-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* Stagger children animation helper */
-.stagger-children > * {
-  opacity: 0;
-  animation: fade-in-up 0.4s ease-out forwards;
-}
-
-.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
-.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
-.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
-.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
-.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
-.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
-
-@keyframes fade-in-up {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Hover lift effect */
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
-
-/* Magnetic button effect base */
-.magnetic-btn {
-  transition: transform 0.2s ease-out;
-}
-
-/* Loading dots */
-@keyframes loading-dots {
-  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
-  40% { transform: scale(1); opacity: 1; }
-}
-
-.loading-dot {
-  animation: loading-dots 1.4s ease-in-out infinite both;
-}
-
-.loading-dot:nth-child(1) { animation-delay: -0.32s; }
-.loading-dot:nth-child(2) { animation-delay: -0.16s; }
-.loading-dot:nth-child(3) { animation-delay: 0s; }
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1a1a2e;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #DC0A2D;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #e02a4a;
+@keyframes orb-pulse {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
 }
 
 /* ============================================
-   POKEMON WORLD BACKGROUND
-   ============================================ */
-
-.pokemon-world-bg {
-  @apply fixed inset-0 overflow-hidden;
-  background: linear-gradient(180deg,
-    #87CEEB 0%,      /* Sky blue */
-    #98D8E8 30%,     /* Lighter blue */
-    #7EC850 50%,     /* Grass green */
-    #5A9A38 70%,     /* Darker grass */
-    #3D6B24 100%     /* Forest floor */
-  );
-}
-
-/* Animated clouds */
-.pokemon-world-bg::before {
-  content: '';
-  position: absolute;
-  top: 5%;
-  left: 0;
-  width: 200%;
-  height: 30%;
-  background-image:
-    radial-gradient(ellipse 80px 40px at 10% 50%, rgba(255,255,255,0.9) 0%, transparent 70%),
-    radial-gradient(ellipse 120px 50px at 30% 30%, rgba(255,255,255,0.8) 0%, transparent 70%),
-    radial-gradient(ellipse 100px 45px at 50% 60%, rgba(255,255,255,0.85) 0%, transparent 70%),
-    radial-gradient(ellipse 90px 35px at 70% 40%, rgba(255,255,255,0.9) 0%, transparent 70%),
-    radial-gradient(ellipse 110px 55px at 90% 50%, rgba(255,255,255,0.8) 0%, transparent 70%);
-  animation: clouds-drift 60s linear infinite;
-}
-
-@keyframes clouds-drift {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* Trees silhouettes */
-.pokemon-trees {
-  position: absolute;
-  bottom: 20%;
-  left: 0;
-  width: 100%;
-  height: 40%;
-  background-image:
-    /* Far trees */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'%3E%3Cellipse cx='20' cy='55' rx='15' ry='25' fill='%234A7C34'/%3E%3Cellipse cx='50' cy='50' rx='20' ry='30' fill='%23528B3C'/%3E%3Cellipse cx='80' cy='55' rx='18' ry='28' fill='%234A7C34'/%3E%3C/svg%3E");
-  background-repeat: repeat-x;
-  background-size: 200px 100px;
-  background-position: bottom;
-  opacity: 0.8;
-}
-
-/* Houses/buildings */
-.pokemon-houses {
-  position: absolute;
-  bottom: 25%;
-  left: 10%;
-  width: 80%;
-  height: 20%;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 40'%3E%3Crect x='10' y='20' width='20' height='18' fill='%23E8D4A8'/%3E%3Cpolygon points='10,20 20,8 30,20' fill='%23C94B4B'/%3E%3Crect x='16' y='28' width='6' height='10' fill='%238B6914'/%3E%3Crect x='35' y='15' width='18' height='23' fill='%23B8C4D0'/%3E%3Cpolygon points='35,15 44,5 53,15' fill='%23607D8B'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center bottom;
-  opacity: 0.6;
-}
-
-/* Grass blades */
-.pokemon-grass {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 25%;
-  background: linear-gradient(180deg, transparent 0%, #4A7C34 40%, #3D6B24 100%);
-}
-
-.pokemon-grass::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    repeating-linear-gradient(90deg,
-      transparent 0px,
-      transparent 8px,
-      #5A9A38 8px,
-      #5A9A38 10px,
-      transparent 10px,
-      transparent 20px
-    );
-  opacity: 0.5;
-}
-
-/* Sun */
-.pokemon-sun {
-  position: absolute;
-  top: 8%;
-  right: 15%;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle, #FFE566 0%, #FFD700 50%, transparent 70%);
-  border-radius: 50%;
-  box-shadow: 0 0 40px #FFD700, 0 0 80px rgba(255, 215, 0, 0.5);
-  animation: sun-glow 4s ease-in-out infinite;
-}
-
-@keyframes sun-glow {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.9; }
-}
-
-/* ============================================
-   ATOMIC PURPLE TRANSPARENT GAME BOY
+   ULTRA-PREMIUM GAME BOY DMG PRO
+   8K Realistic Industrial Design
    ============================================ */
 
 .gameboy-device {
   @apply relative mx-auto;
-  width: min(380px, 95vw);
-  /* Transparent purple shell */
-  background: linear-gradient(165deg,
-    rgba(138, 96, 168, 0.85) 0%,
-    rgba(106, 70, 138, 0.8) 30%,
-    rgba(82, 52, 112, 0.85) 60%,
-    rgba(62, 38, 88, 0.9) 100%
-  );
-  border-radius: 24px 24px 80px 80px;
-  padding: 20px 20px 40px;
+  width: min(400px, 92vw);
+  /* Premium off-white ABS plastic shell */
+  background: 
+    /* Surface texture */
+    linear-gradient(165deg,
+      #e8e4dc 0%,
+      #ddd8ce 20%,
+      #d4cfc4 40%,
+      #c9c4b8 60%,
+      #bfbab0 80%,
+      #b5b0a6 100%
+    );
+  border-radius: 20px 20px 70px 70px;
+  padding: 22px 24px 45px;
   box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 3px rgba(180, 140, 200, 0.6),
-    inset 0 2px 4px rgba(255, 255, 255, 0.3),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
-    inset 0 0 60px rgba(180, 140, 220, 0.15);
-  backdrop-filter: blur(2px);
-  overflow: hidden;
+    /* Ambient shadow */
+    0 50px 100px rgba(0, 0, 0, 0.6),
+    0 25px 50px rgba(0, 0, 0, 0.4),
+    /* Contact shadow */
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    /* Shell edge highlight */
+    inset 0 2px 3px rgba(255, 255, 255, 0.9),
+    /* Shell edge shadow */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+    /* Side depth shadows */
+    inset 2px 0 4px rgba(0, 0, 0, 0.08),
+    inset -2px 0 4px rgba(0, 0, 0, 0.08),
+    /* Subtle plastic sheen */
+    inset 0 0 80px rgba(255, 255, 255, 0.1);
+  overflow: visible;
 }
 
-/* Transparent shell shine */
+/* Shell surface texture - fine plastic grain */
 .gameboy-device::before {
   content: '';
   position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  height: 50%;
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.2) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    transparent 100%
-  );
-  border-radius: 20px 20px 40px 40px;
-  pointer-events: none;
-  z-index: 5;
-}
-
-/* Internal circuitry visible through shell */
-.gameboy-internals {
-  position: absolute;
-  inset: 10px;
+  inset: 0;
   border-radius: 20px 20px 70px 70px;
-  background:
-    /* Circuit board base */
-    linear-gradient(180deg, #1a472a 0%, #143821 50%, #0f2d1a 100%);
-  opacity: 0.4;
-  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Circuit traces */
-.gameboy-internals::before {
+/* Premium specular highlight - top edge sheen */
+.gameboy-device::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 12px;
+  height: 40%;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.08) 40%,
+    transparent 70%
+  );
+  border-radius: 16px 16px 50% 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Screen area bezel - dark smoked plastic */
+.gameboy-bezel {
+  @apply relative rounded-lg p-4 z-10;
+  background: 
+    /* Metallic dark finish */
+    linear-gradient(145deg,
+      #2a2a32 0%,
+      #1e1e24 30%,
+      #16161a 60%,
+      #121216 100%
+    );
+  box-shadow:
+    /* Bevel highlight */
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    /* Bevel shadow */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    /* Outer shadow for depth */
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    /* Subtle metallic sheen */
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Bezel texture */
+.gameboy-bezel::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    /* Horizontal traces */
-    repeating-linear-gradient(0deg,
-      transparent 0px,
-      transparent 18px,
-      rgba(192, 168, 96, 0.3) 18px,
-      rgba(192, 168, 96, 0.3) 20px
-    ),
-    /* Vertical traces */
-    repeating-linear-gradient(90deg,
-      transparent 0px,
-      transparent 25px,
-      rgba(192, 168, 96, 0.2) 25px,
-      rgba(192, 168, 96, 0.2) 27px
-    );
   border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
 }
 
-/* Chip components */
-.gameboy-internals::after {
-  content: '';
+/* Nintendo logo strip */
+.gameboy-bezel::after {
+  content: 'Nintendo';
   position: absolute;
-  bottom: 25%;
-  left: 15%;
-  width: 70%;
-  height: 30%;
-  background-image:
-    /* Main chip */
-    radial-gradient(ellipse 60px 30px at 30% 50%, rgba(20, 20, 20, 0.8) 0%, rgba(20, 20, 20, 0.8) 80%, transparent 80%),
-    /* Secondary chip */
-    radial-gradient(ellipse 40px 20px at 70% 40%, rgba(30, 30, 30, 0.7) 0%, rgba(30, 30, 30, 0.7) 80%, transparent 80%),
-    /* Capacitors */
-    radial-gradient(circle 8px at 50% 80%, rgba(40, 40, 40, 0.6) 0%, transparent 100%),
-    radial-gradient(circle 6px at 60% 75%, rgba(40, 40, 40, 0.6) 0%, transparent 100%);
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Verdana', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(180, 150, 120, 0.8);
+  text-transform: uppercase;
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.1);
 }
 
-/* Premium screen bezel - dark with purple tint */
-.gameboy-bezel {
-  @apply relative rounded-lg p-3 z-10;
-  background: linear-gradient(145deg,
-    rgba(40, 30, 50, 0.95) 0%,
-    rgba(25, 18, 35, 0.98) 100%
-  );
-  box-shadow:
-    inset 0 4px 12px rgba(0, 0, 0, 0.8),
-    0 2px 4px rgba(138, 96, 168, 0.2),
-    inset 0 0 20px rgba(138, 96, 168, 0.1);
-  border: 2px solid rgba(138, 96, 168, 0.3);
-}
-
-/* LCD Screen with authentic green look */
+/* Authentic LCD Screen - Classic pea green */
 .gameboy-lcd {
   @apply relative rounded overflow-hidden;
-  background: linear-gradient(145deg, #9bbc0f 0%, #8bac0f 50%, #7a9c0e 100%);
+  /* Classic Game Boy LCD green */
+  background: 
+    linear-gradient(145deg, 
+      #9bbc0f 0%, 
+      #8bac0f 40%, 
+      #7a9c0e 60%, 
+      #6b8c0d 100%
+    );
   aspect-ratio: 10/9;
   box-shadow:
-    inset 0 0 30px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2),
-    0 0 20px rgba(155, 188, 15, 0.3);
+    /* Inner shadow for screen recess */
+    inset 0 3px 6px rgba(0, 0, 0, 0.2),
+    inset 0 0 20px rgba(0, 0, 0, 0.1),
+    /* Screen glow */
+    0 0 15px rgba(155, 188, 15, 0.15);
+  margin-top: 24px;
+  border: 3px solid #0f380f;
 }
 
-/* Pixel grid overlay */
+/* LCD pixel grid - ultra fine */
 .gameboy-lcd::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-  background-size: 2px 2px;
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
   pointer-events: none;
   z-index: 10;
 }
 
-/* Screen reflection/glare */
+/* Glass reflection overlay */
 .gameboy-lcd::after {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
   background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.15) 0%,
+    125deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
     transparent 40%,
     transparent 60%,
-    rgba(255, 255, 255, 0.05) 100%
+    rgba(255, 255, 255, 0.03) 75%,
+    rgba(255, 255, 255, 0.08) 100%
   );
   pointer-events: none;
   z-index: 11;
-  transform: rotate(-30deg);
+  transform: rotate(-15deg);
 }
 
-/* Screen content wrapper */
+/* Screen content */
 .gameboy-lcd-content {
   @apply relative h-full overflow-y-auto overflow-x-hidden;
   scrollbar-width: none;
@@ -1000,374 +280,606 @@
   display: none;
 }
 
-/* Power indicator */
+/* Power indicator LED */
 .gameboy-power {
-  @apply flex items-center gap-2 mb-3 z-10 relative;
+  @apply flex items-center gap-2 z-10 relative;
+  position: absolute;
+  top: 38px;
+  left: 12px;
 }
 
 .gameboy-power-led {
-  @apply w-3 h-3 rounded-full;
-  background: radial-gradient(circle, #ff4444 0%, #cc0000 100%);
+  @apply w-2 h-2 rounded-full;
+  background: radial-gradient(circle at 30% 30%, #ff6666 0%, #cc0000 50%, #990000 100%);
   box-shadow:
-    0 0 8px #ff0000,
-    0 0 16px rgba(255, 0, 0, 0.6),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
-  animation: power-pulse 2s ease-in-out infinite;
+    0 0 6px #ff0000,
+    0 0 12px rgba(255, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.3);
+  animation: power-pulse 2.5s ease-in-out infinite;
 }
 
 @keyframes power-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff0000, 0 0 16px rgba(255, 0, 0, 0.6); }
-  50% { opacity: 0.8; box-shadow: 0 0 4px #ff0000, 0 0 8px rgba(255, 0, 0, 0.4); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #ff0000, 0 0 12px rgba(255, 0, 0, 0.5); }
+  50% { opacity: 0.85; box-shadow: 0 0 4px #ff0000, 0 0 8px rgba(255, 0, 0, 0.3); }
 }
 
-.gameboy-power-label {
-  @apply text-[9px] uppercase tracking-[0.2em] font-bold;
-  color: rgba(255, 255, 255, 0.5);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+.gameboy-power-text {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: rgba(180, 150, 120, 0.7);
+  text-transform: uppercase;
+  font-family: 'Verdana', sans-serif;
 }
 
-/* ClankDex Logo area */
-.gameboy-logo {
-  @apply text-center py-3 z-10 relative;
+/* Battery indicator */
+.gameboy-battery {
+  position: absolute;
+  top: 38px;
+  right: 12px;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: rgba(180, 150, 120, 0.6);
+  text-transform: uppercase;
+  font-family: 'Verdana', sans-serif;
 }
 
-.gameboy-logo-text {
-  @apply font-pixel text-sm tracking-wider inline-block;
-  background: linear-gradient(180deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-
-.gameboy-logo-sub {
-  @apply text-[8px] uppercase tracking-[0.3em] mt-1 block;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* Clanker badge */
-.clanker-badge {
-  @apply absolute -top-2 -right-2 px-2 py-1 rounded-full text-[7px] font-bold uppercase tracking-wider z-20;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  color: #1a1a2e;
-  box-shadow:
-    0 2px 8px rgba(255, 215, 0, 0.4),
-    inset 0 1px 2px rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Controls section */
+/* Control pad area */
 .gameboy-controls {
-  @apply flex justify-between items-start mt-6 px-2 z-10 relative;
+  @apply relative z-10;
+  margin-top: 35px;
+  padding: 0 20px;
 }
 
-/* Enhanced D-Pad - Dark rubber style */
-.dpad-container {
-  @apply relative;
-  width: 100px;
-  height: 100px;
+/* D-Pad - premium machined plastic */
+.d-pad {
+  position: relative;
+  width: 90px;
+  height: 90px;
 }
 
-.dpad-bg {
-  @apply absolute inset-0;
-  background: radial-gradient(circle at center,
-    rgba(40, 35, 50, 0.9) 0%,
-    rgba(25, 22, 32, 0.95) 100%
-  );
+.d-pad-base {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(145deg,
+      #2a2a30 0%,
+      #1e1e24 50%,
+      #18181c 100%
+    );
   border-radius: 50%;
   box-shadow:
-    inset 0 4px 8px rgba(0, 0, 0, 0.6),
-    0 2px 4px rgba(138, 96, 168, 0.2);
+    0 4px 8px rgba(0,0,0,0.3),
+    inset 0 1px 2px rgba(255,255,255,0.1);
 }
 
-.dpad-cross {
-  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+.d-pad-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  height: 76px;
+}
+
+.d-pad-cross::before,
+.d-pad-cross::after {
+  content: '';
+  position: absolute;
+  background: 
+    linear-gradient(145deg,
+      #222228 0%,
+      #1a1a20 100%
+    );
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.08),
+    inset 0 -1px 1px rgba(0,0,0,0.3),
+    0 2px 4px rgba(0,0,0,0.2);
+}
+
+.d-pad-cross::before {
+  width: 76px;
+  height: 24px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.d-pad-cross::after {
+  width: 24px;
+  height: 76px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* D-Pad center */
+.d-pad-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  background: 
+    radial-gradient(circle,
+      #1a1a20 0%,
+      #15151a 100%
+    );
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,0.1),
+    0 1px 2px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+/* A/B Buttons - premium rubber dome */
+.ab-buttons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.ab-buttons {
+  transform: rotate(-15deg);
+}
+
+.ab-button {
+  position: relative;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  background: 
+    radial-gradient(circle at 35% 35%,
+      #9a355a 0%,
+      #7a2545 40%,
+      #5a1835 100%
+    );
+  box-shadow:
+    /* Button shadow */
+    0 4px 8px rgba(0,0,0,0.4),
+    0 2px 4px rgba(0,0,0,0.3),
+    /* Button edge highlight */
+    inset 0 1px 2px rgba(255,255,255,0.25),
+    /* Button recess shadow */
+    inset 0 -2px 4px rgba(0,0,0,0.3);
+  transition: all 0.1s ease;
+}
+
+.ab-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.3),
+    inset 0 1px 2px rgba(255,255,255,0.2),
+    inset 0 -1px 2px rgba(0,0,0,0.2);
+}
+
+.ab-button::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 30%;
+  height: 25%;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.3) 0%,
+    transparent 100%
+  );
+  border-radius: 50%;
+}
+
+.ab-button-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%) rotate(15deg);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(100, 95, 140, 0.9);
+  font-family: 'Verdana', sans-serif;
+  letter-spacing: 1px;
+}
+
+/* Start/Select buttons - pill shaped */
+.menu-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.menu-button {
+  position: relative;
+  width: 48px;
+  height: 14px;
+  background: 
+    linear-gradient(180deg,
+      #8a8580 0%,
+      #6a6560 50%,
+      #5a5550 100%
+    );
+  border-radius: 10px;
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.4),
+    inset 0 1px 1px rgba(255,255,255,0.25),
+    inset 0 -1px 1px rgba(0,0,0,0.3);
+  transform: rotate(-15deg);
+  transition: all 0.1s ease;
+  cursor: pointer;
+}
+
+.menu-button:active {
+  transform: rotate(-15deg) translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.3),
+    inset 0 1px 1px rgba(255,255,255,0.15);
+}
+
+.menu-button-label {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%) rotate(15deg);
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(100, 95, 140, 0.9);
+  font-family: 'Verdana', sans-serif;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Speaker grill */
+.speaker-grill {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  width: 75px;
+  height: 65px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  transform: rotate(-25deg);
+  justify-content: center;
+  align-content: center;
+}
+
+.speaker-hole {
+  width: 6px;
+  height: 6px;
+  background: 
+    linear-gradient(145deg,
+      #1a1a20 0%,
+      #0f0f12 100%
+    );
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 1px rgba(0,0,0,0.5),
+    0 1px 1px rgba(255,255,255,0.1);
+}
+
+/* Decorative stripes */
+.device-stripes {
+  position: absolute;
+  bottom: 18px;
+  left: 30px;
+  display: flex;
+  gap: 3px;
+}
+
+.device-stripe {
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(180deg,
+    rgba(180, 50, 80, 0.6) 0%,
+    rgba(180, 50, 80, 0.3) 100%
+  );
+  border-radius: 1px;
+}
+
+/* Branding text */
+.device-branding {
+  position: absolute;
+  bottom: 60px;
+  left: 25px;
+  font-family: 'Verdana', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  color: rgba(100, 95, 140, 0.9);
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+}
+
+.device-branding span {
+  font-weight: 400;
+  color: rgba(100, 95, 140, 0.6);
+}
+
+/* Control hint text below device */
+.control-hint {
+  text-align: center;
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Original styles for creature cards etc */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  50% { top: 100%; }
+  100% { top: 0; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Menu styles */
+.menu-title {
+  color: #0f380f;
+  text-shadow: 1px 1px 0 rgba(155, 188, 15, 0.5);
+}
+
+.menu-item {
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.menu-item:hover {
+  background-color: #8bac0f;
+  border-color: #0f380f;
+}
+
+.menu-item.selected {
+  background-color: #0f380f;
+  color: #9bbc0f;
+}
+
+/* Scan mode */
+.scan-overlay {
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(155, 188, 15, 0.3) 50%, 
+    transparent 100%
+  );
+  animation: scan 2s linear infinite;
+}
+
+/* Creature Card styles */
+.creature-card {
+  background-color: #9bbc0f;
+  border: 3px solid #0f380f;
+  image-rendering: pixelated;
+}
+
+.creature-card-header {
+  background-color: #8bac0f;
+  border-bottom: 2px solid #0f380f;
+}
+
+.creature-stat {
+  background-color: #8bac0f;
+  border: 2px solid #0f380f;
+}
+
+/* Type badges */
+.type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 2px solid #0f380f;
+  background-color: #8bac0f;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Collection/Rolodex styles */
+.rolodex-card {
+  background-color: #9bbc0f;
+  border: 3px solid #0f380f;
+  margin-bottom: 8px;
+}
+
+.rolodex-card:hover {
+  background-color: #8bac0f;
+}
+
+/* Scrollbar styling */
+.gameboy-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gameboy-scroll::-webkit-scrollbar-track {
+  background: #8bac0f;
+}
+
+.gameboy-scroll::-webkit-scrollbar-thumb {
+  background: #0f380f;
+}
+
+/* Retro button styles */
+.btn-retro {
+  background-color: #8bac0f;
+  border: 2px solid #0f380f;
+  color: #0f380f;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-retro:hover {
+  background-color: #0f380f;
+  color: #9bbc0f;
+}
+
+.btn-retro:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* D-pad controls */
+.dpad {
+  position: relative;
   width: 80px;
   height: 80px;
 }
 
 .dpad-btn {
-  @apply absolute cursor-pointer transition-all flex items-center justify-center;
-  background: linear-gradient(145deg, #2d2838, #1f1b28);
-  box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.5),
-    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+  position: absolute;
+  background-color: #0f380f;
+  border: none;
+  cursor: pointer;
 }
 
 .dpad-btn:hover {
-  background: linear-gradient(145deg, #3a3545, #2d2838);
+  background-color: #306230;
 }
 
-.dpad-btn:active {
-  background: linear-gradient(145deg, #1f1b28, #2d2838);
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
-  transform: scale(0.95);
+.dpad-up { top: 0; left: 30px; width: 20px; height: 30px; }
+.dpad-down { bottom: 0; left: 30px; width: 20px; height: 30px; }
+.dpad-left { top: 30px; left: 0; width: 30px; height: 20px; }
+.dpad-right { top: 30px; right: 0; width: 30px; height: 20px; }
+.dpad-center { 
+  top: 30px; 
+  left: 30px; 
+  width: 20px; 
+  height: 20px; 
+  background-color: #0f380f;
 }
 
-.dpad-up {
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 28px;
-  border-radius: 6px 6px 0 0;
-}
-
-.dpad-up:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-.dpad-down {
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 28px;
-  border-radius: 0 0 6px 6px;
-}
-
-.dpad-down:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-.dpad-left {
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
-  border-radius: 6px 0 0 6px;
-}
-
-.dpad-left:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.dpad-right {
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
-  border-radius: 0 6px 6px 0;
-}
-
-.dpad-right:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.dpad-center {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 24px;
-  height: 24px;
-  background: #1f1b28;
-  border-radius: 4px;
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
-}
-
-/* A/B Button container */
-.ab-buttons {
-  @apply flex gap-4;
-  transform: rotate(-25deg);
-}
-
-.ab-btn {
-  @apply relative w-14 h-14 rounded-full font-bold text-sm cursor-pointer transition-all;
-  font-family: 'Arial Black', sans-serif;
-  letter-spacing: 0.05em;
-}
-
-/* Dark maroon A button - classic Game Boy Color style */
-.ab-btn-a {
-  background: linear-gradient(145deg, #6B2D5C, #4A1F40);
-  color: rgba(180, 140, 160, 0.7);
-  box-shadow:
-    0 5px 0 #2D1228,
-    0 8px 16px rgba(0, 0, 0, 0.5),
-    inset 0 2px 4px rgba(255, 255, 255, 0.15),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.ab-btn-a:hover {
-  background: linear-gradient(145deg, #7D3A6C, #5A2850);
-}
-
-.ab-btn-a:active {
-  transform: translateY(4px);
-  box-shadow:
-    0 1px 0 #2D1228,
-    0 2px 8px rgba(0, 0, 0, 0.5),
-    inset 0 3px 6px rgba(0, 0, 0, 0.4);
-}
-
-/* Dark maroon B button */
-.ab-btn-b {
-  background: linear-gradient(145deg, #6B2D5C, #4A1F40);
-  color: rgba(180, 140, 160, 0.7);
-  box-shadow:
-    0 5px 0 #2D1228,
-    0 8px 16px rgba(0, 0, 0, 0.5),
-    inset 0 2px 4px rgba(255, 255, 255, 0.15),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
-  margin-top: 20px;
-}
-
-.ab-btn-b:hover {
-  background: linear-gradient(145deg, #7D3A6C, #5A2850);
-}
-
-.ab-btn-b:active {
-  transform: translateY(4px);
-  box-shadow:
-    0 1px 0 #2D1228,
-    0 2px 8px rgba(0, 0, 0, 0.5),
-    inset 0 3px 6px rgba(0, 0, 0, 0.4);
-}
-
-/* Start/Select buttons - pill shaped */
-.start-select-btns {
-  @apply flex gap-6 justify-center mt-6 z-10 relative;
-  transform: rotate(-25deg);
-}
-
-.meta-btn {
-  @apply px-5 py-1.5 text-[7px] uppercase tracking-[0.2em] cursor-pointer transition-all font-bold;
-  background: linear-gradient(145deg, #4A3858, #3A2848);
-  border-radius: 20px;
-  color: rgba(180, 160, 190, 0.6);
-  box-shadow:
-    0 3px 0 #1E1428,
-    inset 0 1px 2px rgba(255, 255, 255, 0.1),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.meta-btn:hover {
-  background: linear-gradient(145deg, #5A4868, #4A3858);
-}
-
-.meta-btn:active {
-  transform: translateY(2px);
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
-}
-
-/* Speaker grille - visible through transparent shell */
-.gameboy-speaker {
-  @apply absolute bottom-8 right-6 z-10;
-  width: 55px;
-  height: 55px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-}
-
-.speaker-hole {
-  height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(40, 30, 50, 0.8) 0px,
-    rgba(40, 30, 50, 0.8) 4px,
-    rgba(60, 45, 70, 0.6) 4px,
-    rgba(60, 45, 70, 0.6) 8px
-  );
-  border-radius: 2px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-/* Clanker emblem in corner */
-.clanker-emblem {
-  @apply absolute bottom-8 left-6 z-10;
+/* A/B Buttons */
+.action-btn {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.1) 100%);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background-color: #8b1a3a;
+  border: 2px solid #0f380f;
+  box-shadow: 2px 2px 0 #0f380f;
+  cursor: pointer;
 }
 
-.clanker-emblem::before {
-  content: '⚙';
-  font-size: 18px;
-  color: rgba(255, 215, 0, 0.6);
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+.action-btn:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
 }
 
-/* Boot screen animation */
-@keyframes boot-fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+/* Start/Select */
+.menu-btn {
+  width: 50px;
+  height: 14px;
+  background-color: #7a8a8a;
+  border: 2px solid #0f380f;
+  border-radius: 10px;
+  cursor: pointer;
+  transform: rotate(-15deg);
 }
 
-@keyframes boot-logo {
-  0% { transform: translateY(20px); opacity: 0; }
-  50% { transform: translateY(-5px); opacity: 1; }
-  100% { transform: translateY(0); opacity: 1; }
+.menu-btn:active {
+  background-color: #5a6a6a;
 }
 
-.boot-animation {
-  animation: boot-fade-in 0.5s ease-out;
-}
-
-.boot-logo {
-  animation: boot-logo 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
-  opacity: 0;
-}
-
-/* Screen transition */
-@keyframes screen-slide-left {
-  0% { transform: translateX(100%); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes screen-slide-right {
-  0% { transform: translateX(-100%); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-.screen-enter {
-  animation: screen-slide-left 0.3s ease-out;
-}
-
-.screen-exit {
-  animation: screen-slide-right 0.3s ease-out reverse;
-}
-
-/* Menu item styling */
-.menu-item {
-  @apply flex items-center gap-3 px-3 py-2 rounded transition-all cursor-pointer;
-  color: #306230;
-}
-
-.menu-item:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.menu-item.selected {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-.menu-item.selected::before {
-  content: '▶';
-  margin-right: 4px;
-  animation: cursor-blink 0.8s infinite;
-}
-
-/* Screen text styles */
-.screen-title {
-  @apply font-pixel text-sm text-center py-2;
+/* Wallet connector styling */
+.wallet-connector {
+  @apply px-3 py-1 text-xs font-bold uppercase tracking-wider;
+  background-color: #8bac0f;
+  border: 2px solid #0f380f;
   color: #0f380f;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.screen-text {
-  @apply font-pixel text-xs;
-  color: #306230;
-  line-height: 1.6;
+.wallet-connector:hover {
+  background-color: #0f380f;
+  color: #9bbc0f;
+}
+
+/* Animations */
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-scanline {
+  animation: scanline 3s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Screen modes */
+.screen-scan {
+  @apply flex flex-col items-center justify-center h-full relative;
+}
+
+.screen-collection {
+  @apply h-full p-2 overflow-y-auto;
+}
+
+.screen-menu {
+  @apply flex flex-col items-center justify-center h-full gap-4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .gameboy-device {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}
+
+/* Print styles */
+@media print {
+  .gameboy-device {
+    box-shadow: none;
+  }
 }

@@ -1277,20 +1277,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-pokemon-world flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Pokemon World Background */}
-      <div className="pokemon-world-bg">
-        <div className="pokemon-sun" />
-        <div className="pokemon-trees" />
-        <div className="pokemon-houses" />
-        <div className="pokemon-grass" />
-      </div>
-
-      {/* Floating particles */}
-      <div className="particles">
-        {[...Array(10)].map((_, i) => <div key={i} className="particle" />)}
-      </div>
-
-      {/* UNIFIED GAME BOY DEVICE */}
+      {/* UNIFIED GAME BOY DEVICE - PREMIUM DESIGN */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -1298,27 +1285,17 @@ export default function Home() {
         className="relative z-10"
       >
         <div className="gameboy-device">
-          {/* Visible internals through transparent shell */}
-          <div className="gameboy-internals" />
+          {/* Battery indicator */}
+          <div className="gameboy-battery">Bat.</div>
 
           {/* Power indicator */}
           <div className="gameboy-power">
             <div className="gameboy-power-led" />
-            <span className="gameboy-power-label">Power</span>
+            <span className="gameboy-power-text">Power</span>
           </div>
 
           {/* Screen bezel */}
           <div className="gameboy-bezel">
-            {/* ClankDex Logo above screen */}
-            <div className="gameboy-logo">
-              <span className="gameboy-logo-text">
-                CLANK<span style={{ color: '#FFD700' }}>DEX</span>
-              </span>
-              <span className="gameboy-logo-sub">
-                {screenMode === 'menu' ? 'Wallet Pokedex' : screenMode.toUpperCase().replace('-', ' ')}
-              </span>
-            </div>
-
             {/* LCD Screen */}
             <div className="gameboy-lcd">
               <div className="gameboy-lcd-content">
@@ -1330,32 +1307,37 @@ export default function Home() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="p-4 h-full"
+                      className="p-3 h-full flex flex-col"
                     >
-                      <div className="screen-title mb-3">─ SELECT MODE ─</div>
-                      <div className="space-y-1">
+                      <div className="text-center mb-3">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>CLANKDEX</p>
+                        <p className="text-[8px]" style={{ color: '#0f380f', opacity: 0.7 }}>v1.0</p>
+                      </div>
+                      <div className="flex-1 space-y-1">
                         {[
-                          { mode: 'scan' as const, icon: ScanLine, label: 'SCAN', desc: 'Analyze wallet' },
-                          { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length} found` },
-                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'Learn more' },
-                          { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Questions' },
+                          { mode: 'scan' as const, icon: ScanLine, label: 'SCAN', desc: 'Analyze' },
+                          { mode: 'collection' as const, icon: BookOpen, label: 'ROLODEX', desc: `${clankdexEntries.length}` },
+                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'Learn' },
+                          { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Help' },
                         ].map((item, idx) => (
                           <button
                             key={item.mode}
                             onClick={() => setScreenMode(item.mode)}
                             onMouseEnter={() => setMenuIndex(idx)}
-                            className={`menu-item w-full ${menuIndex === idx ? 'selected' : ''}`}
+                            className={`w-full flex items-center gap-2 p-2 rounded border-2 transition-all ${
+                              menuIndex === idx 
+                                ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' 
+                                : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
+                            }`}
                           >
-                            <item.icon className="w-4 h-4" style={{ color: '#000000' }} />
-                            <div className="flex-1 text-left">
-                              <span className="font-pixel text-[10px]">{item.label}</span>
-                              <span className="text-[8px] opacity-60 ml-2">{item.desc}</span>
-                            </div>
+                            <item.icon className="w-3 h-3" />
+                            <span className="font-pixel text-[9px]">{item.label}</span>
+                            <span className="text-[7px] opacity-60 ml-auto">{item.desc}</span>
                           </button>
                         ))}
                       </div>
-                      <div className="text-center mt-3">
-                        <p className="text-[8px]" style={{ color: '#000000' }}>▲▼ Move │ A Select</p>
+                      <div className="text-center mt-2">
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>▲▼ Move │ A Select</p>
                       </div>
                     </motion.div>
                   )}
@@ -1369,19 +1351,21 @@ export default function Home() {
                       exit={{ x: -20, opacity: 0 }}
                       className="p-3 h-full flex flex-col"
                     >
-                      <div className="screen-title mb-2">─ SCAN ─</div>
+                      <div className="text-center mb-2">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>SCAN</p>
+                      </div>
 
                       {/* Mode toggle */}
                       <div className="flex gap-1 mb-2 justify-center">
                         <button
                           onClick={() => setInputMode('wallet')}
-                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'wallet' ? 'bg-[#306230] text-[#8bac0f]' : 'text-black'}`}
+                          className={`px-2 py-1 text-[7px] font-pixel rounded border-2 ${inputMode === 'wallet' ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
                         >
                           WALLET
                         </button>
                         <button
                           onClick={() => setInputMode('farcaster')}
-                          className={`px-2 py-1 text-[8px] font-pixel rounded ${inputMode === 'farcaster' ? 'bg-[#306230] text-[#8bac0f]' : 'text-black'}`}
+                          className={`px-2 py-1 text-[7px] font-pixel rounded border-2 ${inputMode === 'farcaster' ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
                         >
                           FARCASTER
                         </button>
@@ -1391,37 +1375,37 @@ export default function Home() {
                       <div className="flex-1 flex flex-col items-center justify-center">
                         {isAnalyzing ? (
                           <div className="text-center">
-                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#000000' }} />
-                            <p className="font-pixel text-[10px]" style={{ color: '#000000' }}>ANALYZING DNA...</p>
+                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#0f380f' }} />
+                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>ANALYZING DNA...</p>
                           </div>
                         ) : showCreature && creature ? (
                           <div className="text-center">
                             {imageBase64 && (
-                              <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated" />
+                              <img src={imageBase64} alt={creature.name} className="w-20 h-20 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
                             )}
-                            <p className="font-pixel text-[10px]" style={{ color: '#000000' }}>{creature.name}</p>
-                            <p className="text-[8px]" style={{ color: '#000000' }}>{creature.element} Type</p>
+                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>{creature.name}</p>
+                            <p className="text-[7px]" style={{ color: '#0f380f' }}>{creature.element} Type</p>
                             <button
                               onClick={launchCreature}
                               disabled={isMinting}
-                              className="mt-2 px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded"
+                              className="mt-2 px-3 py-1 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded border-2 border-[#0f380f] disabled:opacity-50"
                             >
-                              {isMinting ? 'LAUNCHING...' : '🚀 LAUNCH TOKEN'}
+                              {isMinting ? 'LAUNCHING...' : 'LAUNCH TOKEN'}
                             </button>
                           </div>
                         ) : inputMode === 'wallet' ? (
                           <div className="text-center">
                             {isConnected ? (
                               <>
-                                <Wallet className="w-8 h-8 mx-auto mb-2" style={{ color: '#000000' }} />
-                                <p className="font-pixel text-[8px] mb-1" style={{ color: '#000000' }}>
+                                <Wallet className="w-8 h-8 mx-auto mb-2" style={{ color: '#0f380f' }} />
+                                <p className="font-pixel text-[8px] mb-1" style={{ color: '#0f380f' }}>
                                   {address?.slice(0, 6)}...{address?.slice(-4)}
                                 </p>
-                                <p className="text-[8px]" style={{ color: '#000000' }}>Press A to scan</p>
+                                <p className="text-[7px]" style={{ color: '#0f380f' }}>Press A to scan</p>
                               </>
                             ) : (
                               <>
-                                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#000000' }} />
+                                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
                                 <button
                                   onClick={async () => {
                                     // Find injected connector
@@ -1445,30 +1429,30 @@ export default function Home() {
                                     }
                                   }}
                                   disabled={isConnecting}
-                                  className="px-3 py-1 bg-[#306230] text-[#8bac0f] font-pixel text-[8px] rounded disabled:opacity-50"
+                                  className="px-3 py-1 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded border-2 border-[#0f380f] disabled:opacity-50"
                                 >
-                                  {isConnecting ? '...' : 'CONNECT WALLET'}
+                                  {isConnecting ? '...' : 'CONNECT'}
                                 </button>
                               </>
                             )}
                           </div>
                         ) : (
                           <div className="text-center w-full px-2">
-                            <AtSign className="w-6 h-6 mx-auto mb-2" style={{ color: '#000000' }} />
+                            <AtSign className="w-6 h-6 mx-auto mb-2" style={{ color: '#0f380f' }} />
                             <input
                               type="text"
                               value={farcasterInput}
                               onChange={(e) => setFarcasterInput(e.target.value)}
                               placeholder="username"
-                              className="w-full px-2 py-1 bg-[#9bbc0f] border-2 border-[#306230] rounded font-pixel text-[10px] text-black placeholder-black/60 text-center"
+                              className="w-full px-2 py-1 bg-[#9bbc0f] border-2 border-[#0f380f] rounded font-pixel text-[9px] text-[#0f380f] placeholder-[#0f380f]/50 text-center"
                             />
-                            <p className="text-[8px] mt-1" style={{ color: '#000000' }}>Press A to scan</p>
+                            <p className="text-[7px] mt-1" style={{ color: '#0f380f' }}>Press A to scan</p>
                           </div>
                         )}
                       </div>
 
                       <div className="text-center">
-                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back │ A {showCreature ? 'Launch' : 'Scan'}</p>
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Launch' : 'Scan'}</p>
                       </div>
                     </motion.div>
                   )}
@@ -1482,14 +1466,17 @@ export default function Home() {
                       exit={{ x: -20, opacity: 0 }}
                       className="p-3 h-full flex flex-col"
                     >
-                      <div className="screen-title mb-2">─ ROLODEX ─</div>
+                      <div className="text-center mb-2">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>ROLODEX</p>
+                        <p className="text-[7px]" style={{ color: '#0f380f', opacity: 0.7 }}>{clankdexEntries.length} ENTRIES</p>
+                      </div>
 
                       {clankdexEntries.length === 0 ? (
                         <div className="flex-1 flex items-center justify-center">
                           <div className="text-center">
-                            <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#000000' }} />
-                            <p className="font-pixel text-[10px]" style={{ color: '#000000' }}>NO CREATURES YET</p>
-                            <p className="text-[8px]" style={{ color: '#000000' }}>Scan a wallet to begin</p>
+                            <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>NO CREATURES</p>
+                            <p className="text-[7px]" style={{ color: '#0f380f' }}>Scan to begin</p>
                           </div>
                         </div>
                       ) : (
@@ -1499,24 +1486,24 @@ export default function Home() {
                               <button
                                 key={entry.token_address}
                                 onClick={() => window.open(`${CLANKER_URL}/token/${entry.token_address}`, '_blank')}
-                                className={`w-full flex items-center gap-2 p-1 rounded text-left hover:opacity-70 ${currentEntryIndex === idx ? 'bg-[#306230]/20' : ''}`}
+                                className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${currentEntryIndex === idx ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
                               >
-                                <span className="font-pixel text-[8px] w-6" style={{ color: '#000000' }}>#{entry.entry_number}</span>
-                                <span className="font-pixel text-[10px] flex-1 truncate" style={{ color: '#000000' }}>{entry.name}</span>
-                                <span className="text-[8px]" style={{ color: '#000000' }}>{entry.element}</span>
+                                <span className="font-pixel text-[7px] w-6">#{entry.entry_number}</span>
+                                <span className="font-pixel text-[8px] flex-1 truncate">{entry.name}</span>
+                                <span className="text-[7px]">{entry.element}</span>
                               </button>
                             ))}
                           </div>
                           <div className="text-center mt-2">
-                            <p className="text-[8px]" style={{ color: '#000000' }}>
-                              {clankdexEntries.length} creatures │ ◄► Navigate │ Click to view
+                            <p className="text-[7px]" style={{ color: '#0f380f' }}>
+                              ◄► Navigate │ A View
                             </p>
                           </div>
                         </>
                       )}
 
                       <div className="text-center mt-1">
-                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back</p>
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1530,27 +1517,29 @@ export default function Home() {
                       exit={{ x: -20, opacity: 0 }}
                       className="p-3 h-full flex flex-col"
                     >
-                      <div className="screen-title mb-2">─ FAQ ─</div>
-                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#000000' }}>
-                        <div>
-                          <p className="font-pixel text-[9px]">What is ClankDex?</p>
-                          <p className="opacity-70">A Wallet Pokedex that generates creatures from your on-chain data.</p>
+                      <div className="text-center mb-2">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>FAQ</p>
+                      </div>
+                      <div className="flex-1 overflow-y-auto space-y-1 text-[7px]" style={{ color: '#0f380f' }}>
+                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <p className="font-pixel text-[8px] mb-0.5">What is ClankDex?</p>
+                          <p className="opacity-80">A Wallet Pokedex that generates creatures from your on-chain data.</p>
                         </div>
-                        <div>
-                          <p className="font-pixel text-[9px]">How does it work?</p>
-                          <p className="opacity-70">We analyze your wallet to create a unique creature, then launch it as a token.</p>
+                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <p className="font-pixel text-[8px] mb-0.5">How does it work?</p>
+                          <p className="opacity-80">We analyze your wallet to create a unique creature, then launch it as a token.</p>
                         </div>
-                        <div>
-                          <p className="font-pixel text-[9px]">What is Clanker?</p>
-                          <p className="opacity-70">Token deployment platform on Base. You earn creator rewards.</p>
+                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <p className="font-pixel text-[8px] mb-0.5">What is Clanker?</p>
+                          <p className="opacity-80">Token deployment platform on Base. You earn creator rewards.</p>
                         </div>
-                        <div>
-                          <p className="font-pixel text-[9px]">How do evolutions work?</p>
-                          <p className="opacity-70">Creatures evolve based on market cap: Egg → Legendary.</p>
+                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <p className="font-pixel text-[8px] mb-0.5">How do evolutions work?</p>
+                          <p className="opacity-80">Creatures evolve based on market cap: Egg → Legendary.</p>
                         </div>
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back</p>
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1564,46 +1553,48 @@ export default function Home() {
                       exit={{ x: -20, opacity: 0 }}
                       className="p-3 h-full flex flex-col"
                     >
-                      <div className="screen-title mb-2">─ HOW IT WORKS ─</div>
-                      <div className="flex-1 overflow-y-auto space-y-2 text-[8px]" style={{ color: '#000000' }}>
-                        <div className="flex items-start gap-2">
-                          <span className="font-pixel">1.</span>
+                      <div className="text-center mb-2">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>INFO</p>
+                      </div>
+                      <div className="flex-1 overflow-y-auto space-y-1 text-[7px]" style={{ color: '#0f380f' }}>
+                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <span className="font-pixel text-[8px]">1.</span>
                           <div>
-                            <p className="font-pixel text-[9px]">CONNECT</p>
-                            <p className="opacity-70">Link wallet or enter Farcaster username</p>
+                            <p className="font-pixel text-[8px]">CONNECT</p>
+                            <p className="opacity-80">Link wallet or enter Farcaster</p>
                           </div>
                         </div>
-                        <div className="flex items-start gap-2">
-                          <span className="font-pixel">2.</span>
+                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <span className="font-pixel text-[8px]">2.</span>
                           <div>
-                            <p className="font-pixel text-[9px]">ANALYZE</p>
-                            <p className="opacity-70">We scan your on-chain DNA</p>
+                            <p className="font-pixel text-[8px]">ANALYZE</p>
+                            <p className="opacity-80">We scan your on-chain DNA</p>
                           </div>
                         </div>
-                        <div className="flex items-start gap-2">
-                          <span className="font-pixel">3.</span>
+                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <span className="font-pixel text-[8px]">3.</span>
                           <div>
-                            <p className="font-pixel text-[9px]">GENERATE</p>
-                            <p className="opacity-70">AI creates unique creature</p>
+                            <p className="font-pixel text-[8px]">GENERATE</p>
+                            <p className="opacity-80">AI creates unique creature</p>
                           </div>
                         </div>
-                        <div className="flex items-start gap-2">
-                          <span className="font-pixel">4.</span>
+                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <span className="font-pixel text-[8px]">4.</span>
                           <div>
-                            <p className="font-pixel text-[9px]">LAUNCH</p>
-                            <p className="opacity-70">Deploy as token on Base</p>
+                            <p className="font-pixel text-[8px]">LAUNCH</p>
+                            <p className="opacity-80">Deploy as token on Base</p>
                           </div>
                         </div>
-                        <div className="flex items-start gap-2">
-                          <span className="font-pixel">5.</span>
+                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                          <span className="font-pixel text-[8px]">5.</span>
                           <div>
-                            <p className="font-pixel text-[9px]">EVOLVE</p>
-                            <p className="opacity-70">Watch it grow with market cap</p>
+                            <p className="font-pixel text-[8px]">EVOLVE</p>
+                            <p className="opacity-80">Watch it grow with market cap</p>
                           </div>
                         </div>
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[8px]" style={{ color: '#000000' }}>B Back</p>
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1613,71 +1604,85 @@ export default function Home() {
           </div>
 
           {/* Controls section */}
-          <div className="gameboy-controls">
+          <div className="gameboy-controls flex justify-between items-center">
             {/* D-Pad */}
-            <div className="dpad-container">
-              <div className="dpad-bg" />
-              <div className="dpad-cross">
-                <button
-                  className="dpad-btn dpad-up"
-                  onClick={() => {
-                    if (screenMode === 'menu') setMenuIndex(i => Math.max(0, i - 1));
-                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
-                  }}
-                >
-                  <ChevronRight className="w-3 h-3 -rotate-90 text-gray-400" />
-                </button>
-                <button
-                  className="dpad-btn dpad-down"
-                  onClick={() => {
-                    if (screenMode === 'menu') setMenuIndex(i => Math.min(3, i + 1));
-                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
-                  }}
-                >
-                  <ChevronRight className="w-3 h-3 rotate-90 text-gray-400" />
-                </button>
-                <button
-                  className="dpad-btn dpad-left"
-                  onClick={() => {
-                    if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
-                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
-                  }}
-                >
-                  <ChevronRight className="w-3 h-3 rotate-180 text-gray-400" />
-                </button>
-                <button
-                  className="dpad-btn dpad-right"
-                  onClick={() => {
-                    if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
-                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
-                  }}
-                >
-                  <ChevronRight className="w-3 h-3 text-gray-400" />
-                </button>
-                <div className="dpad-btn dpad-center" />
-              </div>
+            <div className="d-pad">
+              <div className="d-pad-base" />
+              <div className="d-pad-cross" />
+              <div className="d-pad-center" />
+              {/* Invisible click areas for navigation */}
+              <button
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
+                onClick={() => {
+                  if (screenMode === 'menu') setMenuIndex(i => Math.max(0, i - 1));
+                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
+                }}
+              />
+              <button
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
+                onClick={() => {
+                  if (screenMode === 'menu') setMenuIndex(i => Math.min(3, i + 1));
+                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
+                }}
+              />
+              <button
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 z-10"
+                onClick={() => {
+                  if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
+                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
+                }}
+              />
+              <button
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 z-10"
+                onClick={() => {
+                  if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
+                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
+                }}
+              />
             </div>
 
             {/* A/B Buttons */}
             <div className="ab-buttons">
-              <button onClick={handleAButton} className="ab-btn ab-btn-a">A</button>
-              <button onClick={handleBButton} className="ab-btn ab-btn-b">B</button>
+              <button onClick={handleBButton} className="ab-button">
+                <span className="ab-button-label">B</span>
+              </button>
+              <button onClick={handleAButton} className="ab-button">
+                <span className="ab-button-label">A</span>
+              </button>
             </div>
           </div>
 
           {/* Start/Select */}
-          <div className="start-select-btns">
-            <button className="meta-btn" onClick={() => setScreenMode('menu')}>SELECT</button>
-            <button className="meta-btn" onClick={() => setScreenMode('scan')}>START</button>
+          <div className="menu-buttons">
+            <button className="menu-button" onClick={() => setScreenMode('menu')}>
+              <span className="menu-button-label">SELECT</span>
+            </button>
+            <button className="menu-button" onClick={() => setScreenMode('scan')}>
+              <span className="menu-button-label">START</span>
+            </button>
           </div>
 
-          {/* Speaker grille */}
-          <div className="gameboy-speaker">
-            {[...Array(6)].map((_, i) => <div key={i} className="speaker-hole" />)}
+          {/* Decorative stripes */}
+          <div className="device-stripes">
+            <div className="device-stripe" />
+            <div className="device-stripe" />
+            <div className="device-stripe" />
           </div>
 
-          {/* Clanker emblem */}
-          <div className="clanker-emblem" title="Powered by Clanker" />
+          {/* Device branding */}
+          <div className="device-branding">
+            Clank<span>DEX</span>
+          </div>
+
+          {/* Speaker grill */}
+          <div className="speaker-grill">
+            {[...Array(24)].map((_, i) => <div key={i} className="speaker-hole" />)}
+          </div>
+        </div>
+
+        {/* Control hint */}
+        <div className="control-hint">
+          ◄ ▲ ▼ ► Navigate │ A Select │ B Back
         </div>
       </motion.div>
     </main>
