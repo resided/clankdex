@@ -77,9 +77,9 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // Deploy with Base builder code
+    // Deploy with Base builder code (bc_pung2696)
     const result = await clanker.deploy(tokenConfig, {
-      dataSuffix: '0x62e349', // Base builder code
+      dataSuffix: '0x62635f70756e6732363936', // Base builder code: bc_pung2696
     });
     
     if (result.error) {
