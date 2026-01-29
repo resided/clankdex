@@ -7,212 +7,170 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || 'REMOVED_API_KEY';
 // ENHANCED POKEMON-STYLE CREATURE GUIDE
 // ============================================
 
-// Detailed element traits for consistent visual language
+// Optimized element visuals for AI image generation
 const ELEMENT_VISUALS: Record<string, {
   colors: string,
   features: string,
   vibe: string,
-  examples: string
 }> = {
   Fire: {
-    colors: 'warm oranges, reds, yellows with black accents',
-    features: 'flame-shaped ears or tail, ember patterns on fur/scales, smoke wisps, warm glowing eyes',
-    vibe: 'passionate, energetic, fierce but friendly',
-    examples: 'like Charmander flame tail, Arcanine majestic mane'
+    colors: 'vibrant orange, flame red, ember yellow, charcoal black accents',
+    features: 'flame-tipped tail, fire mane, ember markings, warm glowing eyes, smoke wisps',
+    vibe: 'fierce yet friendly, passionate, burning spirit'
   },
   Water: {
-    colors: 'ocean blues, teals, aqua with white foam accents',
-    features: 'fin-like crests, bubble patterns, flowing aquatic shapes, fish-like or serpentine body',
-    vibe: 'graceful, flowing, adaptable, mysterious depths',
-    examples: 'like Vaporeon fins, Gyarados serpentine form'
+    colors: 'deep ocean blue, aqua teal, seafoam white, pearl iridescence',
+    features: 'flowing fins, bubble patterns, sleek aquatic body, water droplet gems, gills',
+    vibe: 'graceful, fluid, mysterious depths'
   },
   Grass: {
-    colors: 'forest greens, leaf yellows, wood browns, flower pinks',
-    features: 'leaf collar or mane, vine tails, flower buds, bark-textured skin, pollen particles',
-    vibe: 'natural, growth, gentle but resilient, living plant aspects',
-    examples: 'like Bulbasaur bulb, Leafeon leaf details'
+    colors: 'vibrant leaf green, flower pink, bark brown, sunny yellow',
+    features: 'leaf ears/tail, flower blooms, vine patterns, seed pods, nature motifs',
+    vibe: 'nurturing, growth-oriented, one with nature'
   },
   Electric: {
-    colors: 'bright yellow, electric orange, black stripes, white sparks',
-    features: 'spiky fur/feathers, lightning bolt patterns, cheek pouches, sparking tail tip',
-    vibe: 'hyperactive, fast, crackling with energy, excitable',
-    examples: 'like Pikachu cheek sparks, Jolteon spiky fur'
+    colors: 'electric yellow, lightning white, storm black, spark orange',
+    features: 'spiky fur, lightning bolt markings, glowing cheeks, static electricity effects',
+    vibe: 'hyperactive, zippy, crackling with energy'
   },
   Ice: {
-    colors: 'ice blue, snow white, crystal clear, pale cyan',
-    features: 'crystalline formations, icicle horns, frost breath, snowflake patterns, sharp elegant edges',
-    vibe: 'elegant, cold beauty, graceful, crystalline perfection',
-    examples: 'like Glaceon crystal ears, Articuno elegant wings'
+    colors: 'frost blue, snow white, crystal clear, aurora purple',
+    features: 'ice crystal formations, frozen breath, snowflake patterns, icicle horns',
+    vibe: 'elegant, serene, crystalline beauty'
   },
   Fighting: {
-    colors: 'reddish-brown, bandage white, determined eye colors',
-    features: 'muscular definition, sweat band, wrapped fists, fighting stance, intense focused eyes',
-    vibe: 'determined, disciplined, ready for battle, honorable warrior',
-    examples: 'like Hitmonlee long legs, Machamp muscular build'
+    colors: 'martial red, muscle tan, bandage white, determined brown',
+    features: 'muscular build, fighting stance, focused eyes, battle-worn details',
+    vibe: 'disciplined, honorable warrior, never gives up'
   },
   Poison: {
-    colors: 'toxic purple, sickly green, warning yellow patterns',
-    features: 'venomous features, gas clouds, warning color patterns, dripping glands, spiky toxic quills',
-    vibe: 'mysterious, dangerous but alluring, toxic beauty',
-    examples: 'like Nidoran spines, Grimer sludge body'
+    colors: 'toxic purple, slime green, warning yellow, venom magenta',
+    features: 'poison sacs, dripping toxins, skull markings, venomous fangs/barbs',
+    vibe: 'dangerous allure, toxic beauty, mischievous'
   },
   Ground: {
-    colors: 'earth brown, sand tan, rock gray, clay orange',
-    features: 'rocky armor plates, shovel claws, desert textures, sturdy厚重 build, mineral deposits',
-    vibe: 'steady, immovable, grounded, ancient earth connection',
-    examples: 'like Diglett drill nose, Marowak bone club'
+    colors: 'earth brown, desert tan, clay orange, mineral gray',
+    features: 'rocky hide, digging claws, cracked earth patterns, dust clouds',
+    vibe: 'sturdy, grounded, ancient earth power'
   },
   Flying: {
-    colors: 'sky blue, cloud white, feather silver, wind gray',
-    features: 'large majestic wings, feathered crest, aerodynamic body, cloud-like fluff, wing patterns',
-    vibe: 'free, soaring, graceful in air, above it all',
-    examples: 'like Pidgeot crest, Charizard wing structure'
+    colors: 'sky blue, cloud white, feather cream, wind silver',
+    features: 'majestic wings, aerodynamic body, feathered crest, tailfeathers',
+    vibe: 'free-spirited, graceful, lord of the skies'
   },
   Psychic: {
-    colors: 'mystical purple, pink, cosmic blue, gem tones',
-    features: 'third eye gem, forehead crystal, mystical circles, spoon or pendulum, floating objects nearby',
-    vibe: 'mysterious, wise, otherworldly, mystical aura',
-    examples: 'like Alakazam spoons, Espeon gem forehead'
+    colors: 'mystic purple, mind pink, cosmic blue, third-eye gold',
+    features: 'forehead gem, floating aura, closed-eye serenity, psychic waves',
+    vibe: 'wise, otherworldly, transcendent mind'
   },
   Bug: {
-    colors: 'chitin green, yellow warning stripes, shell brown, compound eye shine',
-    features: 'antennae, compound eyes, exoskeleton segments, wing cases, mandibles, segmented body',
-    vibe: 'swarm intelligence, transformation, persistent, hive mind',
-    examples: 'like Butterfree wings, Scyther blade arms'
+    colors: 'chitin green, shell brown, warning yellow stripes, compound-eye red',
+    features: 'antennae, compound eyes, exoskeleton, wing cases, mandibles',
+    vibe: 'industrious, metamorphic, hive-minded'
   },
   Rock: {
-    colors: 'granite gray, mineral veins, crystal clear, stone brown',
-    features: 'rocky shell armor, crystal growths, mineral inclusions, sturdy厚重 build, gem encrusted',
-    vibe: 'ancient, unyielding, mineral beauty, geological time',
-    examples: 'like Onix rock snake, Geode crystal formations'
+    colors: 'granite gray, gemstone colors, mineral brown, crystal shine',
+    features: 'rocky armor, crystal growths, ancient fossils, gem-encrusted body',
+    vibe: 'ancient, unbreakable, living geology'
   },
   Ghost: {
-    colors: 'shadow purple, ectoplasm pink, midnight black, spirit white',
-    features: 'translucent body parts, ghostly tail instead of legs, floating, spirit flames, ethereal wisps',
-    vibe: 'mysterious, spooky but cute, between worlds, playful trickster',
-    examples: 'like Gastly gas body, Haunter floating hands'
+    colors: 'spectral purple, ectoplasm cyan, shadow black, spirit white',
+    features: 'translucent body, floating wisp tail, glowing eyes, ethereal flames',
+    vibe: 'playfully spooky, mischievous spirit, between worlds'
   },
   Dragon: {
-    colors: 'deep jewel tones, scale iridescence, ancient gold, powerful reds/blues',
-    features: 'dragon scales, horn crests, powerful tail, wing membranes, ancient markings, reptilian features',
-    vibe: 'ancient power, majestic, legendary aura, primal strength',
-    examples: 'like Dragonite friendly dragon, Garchomp land shark'
+    colors: 'royal purple, scale blue, ancient gold, power red',
+    features: 'dragon scales, horn crown, powerful wings, serpentine body, ancient runes',
+    vibe: 'majestic, legendary, primal power incarnate'
   },
   Dark: {
-    colors: 'midnight black, shadow purple, ominous red eyes, eclipse dark',
-    features: 'shadowy aura, red glowing eyes, stealth features, jagged silhouette, darkness effects',
-    vibe: 'mysterious, misunderstood, edgy but cool, shadowy',
-    examples: 'like Umbreon ring patterns, Absol disaster sense'
+    colors: 'midnight black, shadow purple, blood red eyes, moon silver',
+    features: 'shadowy aura, sleek predator build, glowing eyes, crescent markings',
+    vibe: 'mysterious, misunderstood, cool antihero'
   },
   Steel: {
-    colors: 'metallic silver, iron gray, rust orange accents, polished chrome',
-    features: 'metal plating, gear mechanisms, rivets, industrial design, metallic sheen, mechanical joints',
-    vibe: 'industrial strength, precision, unbreakable, technological',
-    examples: 'like Steelix metal snake, Scizor steel claws'
+    colors: 'chrome silver, iron gray, copper accents, metallic blue',
+    features: 'metal plating, gear joints, rivets, polished armor, mechanical details',
+    vibe: 'precise, unbreakable, technological marvel'
   },
   Fairy: {
-    colors: 'pastel pink, cotton candy blue, sparkle white, rainbow pastels',
-    features: 'ribbon-like feelers, wing shapes, star patterns, heart motifs, magical sparkles, ribbons',
-    vibe: 'whimsical, magical, cute wonder, enchanting, playful magic',
-    examples: 'like Clefairy moon motifs, Sylveon ribbon feelers'
+    colors: 'pastel pink, sparkle white, cotton candy blue, stardust gold',
+    features: 'ribbon feelers, tiny wings, star patterns, heart motifs, sparkle aura',
+    vibe: 'whimsical, enchanting, deceptively powerful'
+  },
+  Normal: {
+    colors: 'cream beige, soft brown, warm gray, natural tan',
+    features: 'fluffy fur, round friendly body, expressive ears, cute paws',
+    vibe: 'friendly, adaptable, reliable companion'
   }
 };
 
-// Body type guidelines
-const BODY_TYPES: Record<string, string> = {
-  tiny: 'Tiny chibi creature (10-30cm), 2-3 heads tall, oversized head, stubby limbs, maximum cuteness, baby proportions, fits in palm',
-  small: 'Small creature (30-60cm), 2.5-3 heads tall, youthful proportions, energetic compact body, portable size',
-  medium: 'Medium creature (60-120cm), 3-4 heads tall, balanced proportions, athletic capable build, human child sized',
-  large: 'Large creature (120cm+), 4-5 heads tall, powerful imposing build, majestic presence, fully evolved look'
-};
-
-// Build comprehensive image generation prompt (works with Imagen/DALL-E)
+// Elite Pokemon-style creature prompt builder
 function buildImagePrompt(creature: any): string {
   const { name, element, hp, attack, defense, speed, special, archetype } = creature;
-  
-  // Determine body type
-  const avgStat = (hp + attack + defense + speed + special) / 5;
-  let bodyType = 'small';
-  if (avgStat < 60) bodyType = 'tiny';
-  else if (avgStat < 85) bodyType = 'small';
-  else if (avgStat < 110) bodyType = 'medium';
-  else bodyType = 'large';
-  
+
+  // Determine evolution stage based on total stats
+  const totalStats = hp + attack + defense + speed + special;
+  let evolutionStage = 'basic';
+  let sizeDesc = '';
+  if (totalStats < 300) {
+    evolutionStage = 'baby';
+    sizeDesc = 'tiny adorable baby creature, chibi proportions, oversized head, stubby limbs, maximum cuteness';
+  } else if (totalStats < 400) {
+    evolutionStage = 'basic';
+    sizeDesc = 'small youthful creature, energetic stance, curious expression, ready to grow';
+  } else if (totalStats < 500) {
+    evolutionStage = 'stage1';
+    sizeDesc = 'medium evolved creature, confident pose, developed features, showing power';
+  } else {
+    evolutionStage = 'final';
+    sizeDesc = 'large fully-evolved creature, majestic presence, powerful build, commanding aura';
+  }
+
   const elementData = ELEMENT_VISUALS[element] || ELEMENT_VISUALS.Fire;
-  const bodyDesc = BODY_TYPES[bodyType];
-  
-  // Determine dominant stat for visual emphasis
+
+  // Get top 2 stats for visual emphasis
   const stats = [
-    { name: 'HP', value: hp, visual: 'bulky, healthy, rounded body, sturdy build' },
-    { name: 'Attack', value: attack, visual: 'sharp claws, fierce stance, battle-ready pose, intimidating features' },
-    { name: 'Defense', value: defense, visual: 'armor, shell, thick skin, protective features, sturdy stance' },
-    { name: 'Speed', value: speed, visual: 'streamlined body, aerodynamic, agile pose, quick stance' },
-    { name: 'Special', value: special, visual: 'mystical aura, glowing parts, magical features, energy emanating' }
+    { name: 'HP', value: hp, trait: 'round sturdy body with healthy glow' },
+    { name: 'Attack', value: attack, trait: 'sharp claws and fierce determined eyes' },
+    { name: 'Defense', value: defense, trait: 'armored plating or protective shell' },
+    { name: 'Speed', value: speed, trait: 'sleek aerodynamic form with motion lines' },
+    { name: 'Special', value: special, trait: 'glowing mystical markings and energy aura' }
   ];
   stats.sort((a, b) => b.value - a.value);
-  const dominantStat = stats[0];
 
-  return `Create an original Pokemon-style creature character named "${name}".
+  // Build concise but powerful prompt
+  return `Professional Pokemon character art, official Ken Sugimori illustration style.
 
----
+CREATURE: "${name}" - ${element}-type ${evolutionStage} Pokemon
+DESIGN: ${sizeDesc}
+COLORS: ${elementData.colors}
+FEATURES: ${elementData.features}
+EXPRESSION: ${elementData.vibe}, ${archetype.toLowerCase()} personality
+KEY TRAITS: ${stats[0].trait}, ${stats[1].trait}
 
-VISUAL DESIGN SPECIFICATIONS:
-
-ELEMENT TYPE: ${element}
-- Color palette: ${elementData.colors}
-- Key features: ${elementData.features}
-- Personality vibe: ${elementData.vibe}
-- Reference style: ${elementData.examples}
-
-BODY TYPE: ${bodyType}
-- Description: ${bodyDesc}
-
-STAT VISUAL EMPHASIS (Dominant: ${dominantStat.name} ${dominantStat.value}):
-- Visual characteristics: ${dominantStat.visual}
-
-ARCHETYPE: ${archetype}
-- This influences expression and pose attitude
-
----
-
-ART STYLE REQUIREMENTS:
-
-✓ OFFICIAL POKEMON GAME ART STYLE (Ken Sugimori style)
-✓ Clean black outlines with confident line weight variation
-✓ Cel-shaded coloring with soft gradients for depth
-✓ Vibrant saturated colors appropriate to type
-✓ Large expressive eyes with personality
-✓ Memorable distinctive silhouette
-✓ Cute but cool aesthetic - appealing to all ages
-✓ Front-facing or 3/4 view showing character clearly
-✓ Simple pure white background (no environment)
-✓ Professional game asset quality
-✓ Creature fills most of frame, well-centered
-
----
+ART STYLE:
+- Clean vector-like linework with varying line weights
+- Soft cel-shading with subtle gradients
+- Large shiny expressive anime eyes with catchlights
+- Distinctive memorable silhouette
+- Game-ready character design
+- ${evolutionStage === 'baby' || evolutionStage === 'basic' ? 'Cute kawaii appeal' : 'Cool powerful presence'}
 
 COMPOSITION:
-- Full body visible, standing pose
-- Head at least 1/4 of image height
-- Character centered with slight breathing room
-- Dynamic but stable pose showing personality
+- Full body, 3/4 front view
+- Dynamic idle pose showing personality
+- Solid pure white background (#FFFFFF)
+- Creature centered, filling 80% of frame
+- Studio lighting, no shadows on background
 
----
-
-CRITICAL NEGATIVE CONSTRAINTS:
-✗ NO text, words, letters, or typography
-✗ NO watermarks, signatures, or artist names
-✗ NO backgrounds, scenery, or environments
-✗ NOT photographic, 3D render, or realistic
-✗ NO gradient backgrounds - pure white only
-✗ NO multiple characters - single creature only
-✗ NO complex patterns that distract from character
-✗ NO human clothing or accessories (natural creature features only)
-✗ NOT abstract or vague - must be clearly defined creature
-
----
-
-Create a single, high-quality creature character that looks like official Pokemon artwork. Make it appealing, memorable, and immediately recognizable as a ${element}-type creature.`;
+ABSOLUTE REQUIREMENTS:
+- Single creature only, no duplicates
+- No text, letters, watermarks, signatures
+- No human elements or clothing
+- No realistic rendering - stylized 2D art only
+- No busy backgrounds - pure white only
+- Must look like official Nintendo Pokemon artwork`;
 }
 
 // Generate enhanced fallback SVG
