@@ -886,6 +886,8 @@ export default function Home() {
   const [mergeableTokens, setMergeableTokens] = useState<CreatureRecord[]>([]);
   const [selectedParents, setSelectedParents] = useState<[string | null, string | null]>([null, null]);
   const [referralCode, setReferralCode] = useState<string>('');
+  const [isMerging, setIsMerging] = useState(false);
+  const [mergeResult, setMergeResult] = useState<any>(null);
 
   // Rolodex state
   const [clankdexEntries, setClankdexEntries] = useState<CreatureRecord[]>([]);
@@ -1280,6 +1282,94 @@ export default function Home() {
     }
   };
 
+  // Merge two tokens into one
+  const mergeTokens = async () => {
+    if (!selectedParents[0] || !selectedParents[1] || !address) return;
+    
+    setIsMerging(true);
+    
+    try {
+      // Get parent token details
+      const parent1 = mergeableTokens.find(t => t.token_address === selectedParents[0]);
+      const parent2 = mergeableTokens.find(t => t.token_address === selectedParents[1]);
+      
+      if (!parent1 || !parent2) {
+        throw new Error('Parent tokens not found');
+      }
+      
+      // Generate merged creature name and stats
+      const mergedName = `${parent1.name.slice(0, 4)}${parent2.name.slice(-4)}`;
+      const mergedCreature = {
+        name: mergedName,
+        element: parent1.element === parent2.element ? parent1.element : 'Normal',
+        level: Math.max(parent1.level, parent2.level) + 1,
+        hp: Math.floor((parent1.hp + parent2.hp) / 2) + 10,
+        attack: Math.floor((parent1.attack + parent2.attack) / 2) + 10,
+        defense: Math.floor((parent1.defense + parent2.defense) / 2) + 10,
+        speed: Math.floor((parent1.speed + parent2.speed) / 2) + 10,
+        special: Math.floor((parent1.special + parent2.special) / 2) + 10,
+        description: `A fusion of ${parent1.name} and ${parent2.name}`,
+      };
+      
+      // Generate image for merged creature
+      const generateResponse = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creature: mergedCreature }),
+      });
+      
+      const { imageUrl } = await generateResponse.json();
+      
+      // Call merge API
+      const mergeResponse = await fetch('/api/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parent1Address: selectedParents[0],
+          parent2Address: selectedParents[1],
+          creatorAddress: address,
+          newCreature: mergedCreature,
+          imageUrl,
+        }),
+      });
+      
+      const result = await mergeResponse.json();
+      
+      if (result.success) {
+        setMergeResult(result);
+        
+        // Refresh entries and mergeable tokens
+        const updatedEntries = await getAllCreatures();
+        setClankdexEntries(updatedEntries);
+        
+        const updatedMergeable = await getMergeableTokens(address);
+        setMergeableTokens(updatedMergeable);
+        
+        // Clear selection
+        setSelectedParents([null, null]);
+        
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#9C27B0', '#E91E63', '#FF5722', '#FFC107'],
+        });
+        
+        // Redirect after delay
+        setTimeout(() => {
+          window.open(`${CLANKER_URL}/token/${result.tokenAddress}`, '_blank');
+        }, 2000);
+      } else {
+        throw new Error(result.error || 'Merge failed');
+      }
+    } catch (error) {
+      console.error('Merge error:', error);
+      alert('Merge failed: ' + (error as Error).message);
+    } finally {
+      setIsMerging(false);
+    }
+  };
+
   const generateFallbackCreature = (addr: string): Creature => {
     const elements = Object.keys(ELEMENT_COLORS);
     const element = elements[parseInt(addr.slice(-2), 16) % elements.length];
@@ -1329,8 +1419,48 @@ export default function Home() {
       setShowCreature(false);
       setCreature(null);
       setDeployResult(null);
+      setMergeResult(null);
+      setSelectedParents([null, null]);
     }
   };
+
+  // Vote for token of the day
+  const handleVote = async (tokenAddress: string, entryNumber: number) => {
+    try {
+      const response = await fetch('/api/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tokenAddress, entryNumber }),
+      });
+      
+      if (response.ok) {
+        // Refresh token of the day
+        const today = new Date().toISOString().split('T')[0];
+        // Would need to fetch updated votes here
+        alert('Vote recorded!');
+      }
+    } catch (error) {
+      console.error('Vote error:', error);
+    }
+  };
+
+  // Load top voted tokens on daily screen mount
+  useEffect(() => {
+    if (screenMode !== 'daily') return;
+    
+    // In a real implementation, you'd fetch top voted tokens
+    // For now, we'll just use the first few entries
+    if (clankdexEntries.length > 0 && !tokenOfTheDay) {
+      // Mock: use first entry as example
+      setTokenOfTheDay({
+        date: new Date().toISOString().split('T')[0],
+        token_address: clankdexEntries[0]?.token_address,
+        entry_number: clankdexEntries[0]?.entry_number,
+        votes: 5,
+        featured: true,
+      });
+    }
+  }, [screenMode, clankdexEntries, tokenOfTheDay]);
 
   return (
     <main className="min-h-screen bg-pokemon-world flex items-center justify-center p-4 relative overflow-hidden">
@@ -1638,25 +1768,43 @@ export default function Home() {
                       <div className="text-center mb-2">
                         <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>TOKEN OF THE DAY</p>
                       </div>
-                      <div className="flex-1 flex flex-col items-center justify-center">
-                        {tokenOfTheDay ? (
-                          <div className="text-center w-full">
-                            <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[9px] mb-1" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
+                      <div className="flex-1 flex flex-col">
+                        {/* Today's Winner */}
+                        {tokenOfTheDay && (
+                          <div className="text-center mb-3 p-2 bg-[#0f380f]/20 rounded border border-[#0f380f]">
+                            <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: '#0f380f' }} />
+                            <p className="font-pixel text-[8px]" style={{ color: '#0f380f' }}>TODAY'S WINNER</p>
+                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
                             <button
                               onClick={() => window.open(`${CLANKER_URL}/token/${tokenOfTheDay.token_address}`, '_blank')}
-                              className="px-3 py-1 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded"
+                              className="mt-1 px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded"
                             >
-                              VIEW WINNER
+                              VIEW
                             </button>
                           </div>
-                        ) : (
-                          <div className="text-center">
-                            <Star className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>VOTE NOW</p>
-                            <p className="text-[7px] mt-1" style={{ color: '#0f380f' }}>Top voted wins 24h spotlight</p>
-                          </div>
                         )}
+                        
+                        {/* Vote List */}
+                        <p className="text-[8px] text-center mb-1 font-pixel" style={{ color: '#0f380f' }}>VOTE</p>
+                        <div className="flex-1 overflow-y-auto space-y-1">
+                          {clankdexEntries.slice(0, 5).map((entry) => (
+                            <div
+                              key={entry.token_address}
+                              className="flex items-center justify-between p-1.5 bg-[#8bac0f]/50 rounded border border-[#306230]"
+                            >
+                              <div className="flex items-center gap-1">
+                                <span className="font-pixel text-[7px]" style={{ color: '#0f380f' }}>#{entry.entry_number}</span>
+                                <span className="text-[7px] truncate max-w-[60px]" style={{ color: '#0f380f' }}>{entry.name}</span>
+                              </div>
+                              <button
+                                onClick={() => handleVote(entry.token_address, entry.entry_number)}
+                                className="px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] text-[7px] rounded font-pixel"
+                              >
+                                ★
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                       
                       {/* Creator Streak */}
@@ -1753,13 +1901,11 @@ export default function Home() {
                             ))}
                             {selectedParents[0] && selectedParents[1] && (
                               <button
-                                onClick={() => {
-                                  // Trigger merge
-                                  console.log('Merging:', selectedParents);
-                                }}
-                                className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f]"
+                                onClick={mergeTokens}
+                                disabled={isMerging}
+                                className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f] disabled:opacity-50"
                               >
-                                MERGE
+                                {isMerging ? '...' : 'MERGE'}
                               </button>
                             )}
                           </div>
