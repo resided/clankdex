@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import type { EvolutionRecord, CreatureRecord } from '@/lib/supabase';
-import { getAllCreatures, createEvolution } from '@/lib/supabase';
+import type { EvolutionRecord, CreatureRecord, CreatorStreak, TokenOfTheDay } from '@/lib/supabase';
+import { getAllCreatures, createEvolution, getMergeableTokens } from '@/lib/supabase';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -56,7 +56,11 @@ import {
   Square,
   Pentagon,
   Octagon,
-  Diamond
+  Diamond,
+  Trophy,
+  GitMerge,
+  Share2,
+  Award
 } from 'lucide-react';
 
 // Contract ABI for Registry
@@ -812,7 +816,7 @@ const usePriceData = (tokenAddress: string | null) => {
   return { priceData, loading, error };
 };
 
-type ScreenMode = 'menu' | 'scan' | 'creature' | 'collection' | 'faq' | 'how-it-works';
+type ScreenMode = 'menu' | 'scan' | 'creature' | 'collection' | 'faq' | 'how-it-works' | 'daily' | 'merge';
 
 const formatEntryNumber = (num: number): string => {
   return `#${num.toString().padStart(3, '0')}`;
@@ -874,7 +878,14 @@ export default function Home() {
   // Screen navigation state (emulator style)
   const [screenMode, setScreenMode] = useState<ScreenMode>('menu');
   const [menuIndex, setMenuIndex] = useState(0);
-  const menuItems = ['scan', 'collection', 'faq', 'how-it-works'] as const;
+  const menuItems = ['scan', 'collection', 'daily', 'merge', 'faq', 'how-it-works'] as const;
+  
+  // New feature states
+  const [creatorStreak, setCreatorStreak] = useState<CreatorStreak | null>(null);
+  const [tokenOfTheDay, setTokenOfTheDay] = useState<TokenOfTheDay | null>(null);
+  const [mergeableTokens, setMergeableTokens] = useState<CreatureRecord[]>([]);
+  const [selectedParents, setSelectedParents] = useState<[string | null, string | null]>([null, null]);
+  const [referralCode, setReferralCode] = useState<string>('');
 
   // Rolodex state
   const [clankdexEntries, setClankdexEntries] = useState<CreatureRecord[]>([]);
@@ -896,6 +907,35 @@ export default function Home() {
     };
     loadEntries();
   }, []);
+
+  // Load creator streak when wallet connected
+  useEffect(() => {
+    if (!isConnected || !address) return;
+    
+    const loadStreak = async () => {
+      try {
+        const response = await fetch(`/api/streak?creator=${address}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCreatorStreak(data);
+        }
+      } catch (error) {
+        console.error('Failed to load streak:', error);
+      }
+    };
+    loadStreak();
+  }, [isConnected, address]);
+
+  // Load mergeable tokens when on merge screen
+  useEffect(() => {
+    if (screenMode !== 'merge' || !isConnected || !address) return;
+    
+    const loadMergeable = async () => {
+      const tokens = await getMergeableTokens(address);
+      setMergeableTokens(tokens);
+    };
+    loadMergeable();
+  }, [screenMode, isConnected, address]);
 
   // Fetch price data for all entries when in collection mode
   useEffect(() => {
@@ -1049,6 +1089,15 @@ export default function Home() {
     }
   }, [farcasterReady, isFrameContext, frameUser]);
 
+  // Generate referral code from address
+  useEffect(() => {
+    if (address) {
+      // Create short referral code from first 8 chars of address
+      const code = `clank${address.slice(2, 8).toLowerCase()}`;
+      setReferralCode(code);
+    }
+  }, [address]);
+
   // Analyze based on current mode
   const analyze = async () => {
     if (inputMode === 'wallet') {
@@ -1148,10 +1197,14 @@ export default function Home() {
       setMintStep('deploying');
       
       // Step 2: Deploy Clanker token
+      // Check for referrer in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const referrer = urlParams.get('ref');
+      
       const endpoint = inputMode === 'wallet' ? '/api/deploy' : '/api/deploy-farcaster';
       const body = inputMode === 'wallet' 
-        ? { creature, creatorAddress: address, imageUrl }
-        : { identifier: farcasterInput, creature, imageUrl };
+        ? { creature, creatorAddress: address, imageUrl, referrerAddress: referrer }
+        : { identifier: farcasterInput, creature, imageUrl, referrerAddress: referrer };
       
       const deployResponse = await fetch(endpoint, {
         method: 'POST',
@@ -1165,6 +1218,9 @@ export default function Home() {
         setDeployResult(result);
 
         // Step 3: Save to Supabase via secure API (verifies on-chain)
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrer = urlParams.get('ref');
+        
         const saveResponse = await fetch('/api/save-creature', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1183,6 +1239,7 @@ export default function Home() {
             creator_address: address,
             farcaster_username: inputMode === 'farcaster' ? farcasterInput : undefined,
             image_url: imageUrl,
+            referrer_address: referrer,
           }),
         });
 
@@ -1317,6 +1374,8 @@ export default function Home() {
                         {[
                           { mode: 'scan' as const, icon: ScanLine, label: 'NEW', desc: 'Create' },
                           { mode: 'collection' as const, icon: BookOpen, label: 'DEX', desc: `${clankdexEntries.length}` },
+                          { mode: 'daily' as const, icon: Trophy, label: 'DAILY', desc: 'Vote' },
+                          { mode: 'merge' as const, icon: GitMerge, label: 'MERGE', desc: 'Fuse' },
                           { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'How' },
                           { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Help' },
                         ].map((item, idx) => (
@@ -1566,6 +1625,151 @@ export default function Home() {
                       </div>
                     </motion.div>
                   )}
+
+                  {/* DAILY (Token of the Day) SCREEN */}
+                  {screenMode === 'daily' && (
+                    <motion.div
+                      key="daily"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -20, opacity: 0 }}
+                      className="p-3 h-full flex flex-col"
+                    >
+                      <div className="text-center mb-2">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>TOKEN OF THE DAY</p>
+                      </div>
+                      <div className="flex-1 flex flex-col items-center justify-center">
+                        {tokenOfTheDay ? (
+                          <div className="text-center w-full">
+                            <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: '#0f380f' }} />
+                            <p className="font-pixel text-[9px] mb-1" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
+                            <button
+                              onClick={() => window.open(`${CLANKER_URL}/token/${tokenOfTheDay.token_address}`, '_blank')}
+                              className="px-3 py-1 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded"
+                            >
+                              VIEW WINNER
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <Star className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>VOTE NOW</p>
+                            <p className="text-[7px] mt-1" style={{ color: '#0f380f' }}>Top voted wins 24h spotlight</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Creator Streak */}
+                      {creatorStreak && creatorStreak.current_streak > 0 && (
+                        <div className="mt-2 p-2 bg-[#8bac0f]/50 rounded border border-[#306230]">
+                          <div className="flex items-center gap-2">
+                            <Flame className="w-4 h-4" style={{ color: '#0f380f' }} />
+                            <div>
+                              <p className="font-pixel text-[8px]" style={{ color: '#0f380f' }}>
+                                STREAK: {creatorStreak.current_streak} DAYS
+                              </p>
+                              <p className="text-[7px]" style={{ color: '#0f380f' }}>
+                                Tier: {creatorStreak.tier.toUpperCase()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Referral Code */}
+                      {isConnected && referralCode && (
+                        <div className="mt-2 p-2 bg-[#8bac0f]/50 rounded border border-[#306230]">
+                          <div className="flex items-center gap-2">
+                            <Share2 className="w-4 h-4" style={{ color: '#0f380f' }} />
+                            <div className="flex-1">
+                              <p className="text-[7px]" style={{ color: '#0f380f' }}>REF CODE:</p>
+                              <p className="font-pixel text-[8px]" style={{ color: '#0f380f' }}>{referralCode}</p>
+                            </div>
+                          </div>
+                          <p className="text-[6px] mt-1" style={{ color: '#0f380f', opacity: 0.7 }}>
+                            +0.1% fees when used
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="text-center mt-2">
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* MERGE SCREEN */}
+                  {screenMode === 'merge' && (
+                    <motion.div
+                      key="merge"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -20, opacity: 0 }}
+                      className="p-3 h-full flex flex-col"
+                    >
+                      <div className="text-center mb-2">
+                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>MERGE</p>
+                      </div>
+                      <div className="flex-1 overflow-y-auto">
+                        {!isConnected ? (
+                          <div className="text-center py-4">
+                            <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                            <p className="text-[7px]" style={{ color: '#0f380f' }}>Connect to merge</p>
+                          </div>
+                        ) : mergeableTokens.length < 2 ? (
+                          <div className="text-center py-4">
+                            <GitMerge className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                            <p className="text-[7px]" style={{ color: '#0f380f' }}>Need 2+ tokens</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-1">
+                            <p className="text-[7px] text-center mb-2" style={{ color: '#0f380f' }}>Select 2 tokens:</p>
+                            {mergeableTokens.slice(0, 4).map((token) => (
+                              <button
+                                key={token.token_address}
+                                onClick={() => {
+                                  if (selectedParents[0] === token.token_address) {
+                                    setSelectedParents([null, selectedParents[1]]);
+                                  } else if (selectedParents[1] === token.token_address) {
+                                    setSelectedParents([selectedParents[0], null]);
+                                  } else if (!selectedParents[0]) {
+                                    setSelectedParents([token.token_address, selectedParents[1]]);
+                                  } else if (!selectedParents[1]) {
+                                    setSelectedParents([selectedParents[0], token.token_address]);
+                                  }
+                                }}
+                                className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${
+                                  selectedParents.includes(token.token_address)
+                                    ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]'
+                                    : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
+                                }`}
+                              >
+                                <span className="font-pixel text-[8px]">#{token.entry_number}</span>
+                                <span className="font-pixel text-[9px] flex-1 truncate">{token.name}</span>
+                                {selectedParents.includes(token.token_address) && (
+                                  <CheckCircle2 className="w-3 h-3" />
+                                )}
+                              </button>
+                            ))}
+                            {selectedParents[0] && selectedParents[1] && (
+                              <button
+                                onClick={() => {
+                                  // Trigger merge
+                                  console.log('Merging:', selectedParents);
+                                }}
+                                className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f]"
+                              >
+                                MERGE
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                      </div>
+                    </motion.div>
+                  )}
                 </AnimatePresence>
               </div>
             </div>
@@ -1589,7 +1793,7 @@ export default function Home() {
               <button
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
                 onClick={() => {
-                  if (screenMode === 'menu') setMenuIndex(i => Math.min(3, i + 1));
+                  if (screenMode === 'menu') setMenuIndex(i => Math.min(menuItems.length - 1, i + 1));
                   if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
                 }}
               />

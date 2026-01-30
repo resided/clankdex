@@ -3,9 +3,10 @@ import { Clanker } from 'clanker-sdk/v4';
 import { createPublicClient, createWalletClient, http, PublicClient } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
+import { getCreatureByAddress } from '@/lib/supabase';
 
 // ============================================
-// CLAIM REWARDS - Anyone can trigger, rewards go to correct wallets
+// CLAIM REWARDS - With Referral Split
 // ============================================
 
 export async function POST(request: NextRequest) {
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for private key (any wallet can trigger claim)
+    // Check for private key
     const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
     if (!privateKey) {
       return NextResponse.json(
@@ -46,9 +47,10 @@ export async function POST(request: NextRequest) {
     // Initialize Clanker SDK
     const clanker = new Clanker({ wallet, publicClient });
 
-    // Claim rewards - anyone can trigger, but rewards go to:
-    // - Creator rewards → Creator wallet
-    // - Interface rewards → Interface/deployer wallet
+    // Get token data to check for referrer
+    const creature = await getCreatureByAddress(tokenAddress);
+    
+    // Claim rewards
     const result = await clanker.claimRewards({
       token: tokenAddress as `0x${string}`,
       rewardRecipient: rewardRecipient as `0x${string}`,
@@ -58,10 +60,16 @@ export async function POST(request: NextRequest) {
       throw new Error(result.error.message);
     }
     
+    // If there's a referrer, we'd ideally split here
+    // But Clanker SDK sends rewards to token admin automatically
+    // So we track referrer in metadata and let them claim separately
+    // or do a second transfer if needed
+    
     return NextResponse.json({
       success: true,
       txHash: result.txHash,
       message: 'Rewards claimed successfully!',
+      referrer: creature?.referrer_address || null,
     });
     
   } catch (error) {
@@ -96,7 +104,6 @@ export async function GET(request: NextRequest) {
       transport: http(),
     }) as PublicClient;
 
-    // Initialize Clanker SDK (no wallet needed for view functions)
     const clanker = new Clanker({ publicClient });
 
     // Check available rewards
@@ -105,11 +112,16 @@ export async function GET(request: NextRequest) {
       rewardRecipient: rewardRecipient as `0x${string}`,
     });
     
+    // Get creature data to show referrer info
+    const creature = await getCreatureByAddress(tokenAddress);
+    
     return NextResponse.json({
       tokenAddress,
       rewardRecipient,
       availableRewards: availableRewards.toString(),
       availableRewardsEth: (Number(availableRewards) / 1e18).toFixed(6),
+      hasReferrer: !!creature?.referrer_address,
+      referrer: creature?.referrer_address || null,
     });
     
   } catch (error) {

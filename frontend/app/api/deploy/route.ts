@@ -4,6 +4,7 @@ import { createPublicClient, createWalletClient, http, PublicClient } from 'viem
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
 import { Attribution } from 'ox/erc8021';
+import { updateCreatorStreak } from '@/lib/supabase';
 
 // ============================================
 // REAL CLANKER SDK V4 DEPLOYMENT
@@ -17,7 +18,7 @@ const DATA_SUFFIX = Attribution.toDataSuffix({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { creature, creatorAddress, imageUrl } = body;
+    const { creature, creatorAddress, imageUrl, referrerAddress } = body;
     
     if (!creature || !creatorAddress) {
       return NextResponse.json(
@@ -56,9 +57,10 @@ export async function POST(request: NextRequest) {
     const symbol = creature.name.slice(0, 4).toUpperCase().replace(/[^A-Z]/g, '');
     const finalSymbol = symbol.length >= 2 ? symbol : 'CLNK';
     
-    // Build metadata
+    // Build metadata with ClankDex branding
     const metadata = {
       description: creature.description || `${creature.name} - A ${creature.element}-type creature`,
+      ...referrerAddress && { referrer: referrerAddress }, // Track referrer in metadata
     };
 
     // Token config for v4
@@ -90,11 +92,15 @@ export async function POST(request: NextRequest) {
       throw new Error(deployResult.error.message);
     }
     
+    // Update creator streak (non-blocking)
+    updateCreatorStreak(creatorAddress).catch(console.error);
+    
     return NextResponse.json({
       success: true,
       tokenAddress: deployResult.address,
       txHash: result.txHash,
       symbol: finalSymbol,
+      referrerAddress,
       config: {
         name: creature.name,
         symbol: finalSymbol,

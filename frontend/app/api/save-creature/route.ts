@@ -49,7 +49,11 @@ export async function POST(request: NextRequest) {
       description,
       creator_address,
       farcaster_username,
-      image_url
+      image_url,
+      // New fields
+      referrer_address,
+      is_merged,
+      parent_tokens,
     } = body;
 
     // Validate required fields
@@ -105,7 +109,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert creature record
+    // Insert creature record with new fields
     const { data, error } = await supabase
       .from('creatures')
       .insert({
@@ -125,6 +129,10 @@ export async function POST(request: NextRequest) {
         farcaster_username,
         image_url,
         verified: true,
+        // New fields
+        referrer_address: referrer_address?.toLowerCase(),
+        is_merged: is_merged || false,
+        parent_tokens: parent_tokens || [],
       })
       .select()
       .single();
