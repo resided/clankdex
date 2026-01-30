@@ -191,7 +191,7 @@ function getHashValue(hash: string, position: number, max: number): number {
 }
 
 // Fetch wallet data from Neynar
-// TEMPORARILY DISABLED - Rate limit exceeded (3651% usage)
+// RE-ENABLED with caching to prevent rate limiting
 async function fetchWalletData(address: string) {
   // Check cache first
   const cached = getCachedNeynarData(address);
@@ -199,15 +199,6 @@ async function fetchWalletData(address: string) {
     console.log('Using cached Neynar data for:', address.slice(0, 10));
     return cached;
   }
-  
-  // Skip Neynar API call to preserve credits
-  // Return null to use hash-based generation instead
-  return null;
-  
-  /* 
-  // RE-ENABLE AFTER RATE LIMIT RESETS:
-  // Add this at the end before returning:
-  // setCachedNeynarData(address, data.user);
   
   try {
     const apiKey = process.env.NEYNAR_API_KEY;
@@ -231,7 +222,7 @@ async function fetchWalletData(address: string) {
     const data = await response.json();
     const userData = data.user || null;
     
-    // Cache the result
+    // Cache the result for 1 hour to prevent rate limiting
     if (userData) {
       setCachedNeynarData(address, userData);
     }
@@ -241,7 +232,6 @@ async function fetchWalletData(address: string) {
     console.error('Neynar API error:', error);
     return null;
   }
-  */
 }
 
 // Determine archetype from Neynar data
