@@ -3,7 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 
 const APP_URL = 'https://frontend-weld-mu-91.vercel.app';
-const OG_IMAGE_URL = `${APP_URL}/og`;  // Dynamic OG image
+const OG_IMAGE_URL = `${APP_URL}/clanky.png`;  // Clanky mascot image
 
 // Miniapp embed configuration (fc:miniapp meta tag)
 const miniappEmbed = {
@@ -15,7 +15,7 @@ const miniappEmbed = {
       type: "launch_miniapp",
       name: "ClankDex",
       url: APP_URL,
-      splashImageUrl: `${APP_URL}/splash.png`,
+      splashImageUrl: `${APP_URL}/clanky.png`,
       splashBackgroundColor: "#1a0a2e"
     }
   }
