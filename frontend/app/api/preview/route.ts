@@ -42,6 +42,24 @@ const CREATURE_STYLE_GUIDE = {
 };
 
 // ============================================
+// NEYNAR CACHE (to prevent rate limiting)
+// ============================================
+const neynarCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+function getCachedNeynarData(address: string): any | null {
+  const cached = neynarCache.get(address.toLowerCase());
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedNeynarData(address: string, data: any) {
+  neynarCache.set(address.toLowerCase(), { data, timestamp: Date.now() });
+}
+
+// ============================================
 // WALLET ARCHETYPE SYSTEM
 // Based on Neynar social data + on-chain patterns
 // ============================================
@@ -173,7 +191,24 @@ function getHashValue(hash: string, position: number, max: number): number {
 }
 
 // Fetch wallet data from Neynar
+// TEMPORARILY DISABLED - Rate limit exceeded (3651% usage)
 async function fetchWalletData(address: string) {
+  // Check cache first
+  const cached = getCachedNeynarData(address);
+  if (cached) {
+    console.log('Using cached Neynar data for:', address.slice(0, 10));
+    return cached;
+  }
+  
+  // Skip Neynar API call to preserve credits
+  // Return null to use hash-based generation instead
+  return null;
+  
+  /* 
+  // RE-ENABLE AFTER RATE LIMIT RESETS:
+  // Add this at the end before returning:
+  // setCachedNeynarData(address, data.user);
+  
   try {
     const apiKey = process.env.NEYNAR_API_KEY;
     if (!apiKey) {
@@ -194,11 +229,19 @@ async function fetchWalletData(address: string) {
     }
     
     const data = await response.json();
-    return data.user || null;
+    const userData = data.user || null;
+    
+    // Cache the result
+    if (userData) {
+      setCachedNeynarData(address, userData);
+    }
+    
+    return userData;
   } catch (error) {
     console.error('Neynar API error:', error);
     return null;
   }
+  */
 }
 
 // Determine archetype from Neynar data
