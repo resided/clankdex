@@ -36,6 +36,7 @@ module.exports = {
       },
       fontFamily: {
         pixel: ['"Press Start 2P"', 'cursive'],
+        sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['"Courier New"', 'monospace'],
       },
       animation: {

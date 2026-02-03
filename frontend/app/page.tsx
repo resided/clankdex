@@ -866,6 +866,10 @@ export default function Home() {
   const { isFrameContext, user: frameUser, isReady: farcasterReady, composeCast } = useFarcaster();
   const [inputMode, setInputMode] = useState<InputMode>('wallet');
   const [farcasterInput, setFarcasterInput] = useState('');
+  // In miniapp: always use signed-in user; never allow a different Farcaster username
+  const effectiveFarcasterUsername = (isFrameContext && frameUser?.username)
+    ? frameUser.username
+    : farcasterInput.trim();
   const [creature, setCreature] = useState<Creature | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -888,6 +892,9 @@ export default function Home() {
   const [referralCode, setReferralCode] = useState<string>('');
   const [isMerging, setIsMerging] = useState(false);
   const [mergeResult, setMergeResult] = useState<any>(null);
+
+  // In-app feedback (replaces alert) — dismissible banner
+  const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
 
   // Rolodex state
   const [clankdexEntries, setClankdexEntries] = useState<CreatureRecord[]>([]);
@@ -1143,11 +1150,15 @@ export default function Home() {
     }
   };
 
-  // Analyze Farcaster user
+  // Analyze Farcaster user (in miniapp always uses signed-in user via effectiveFarcasterUsername)
   const analyzeFarcaster = async (usernameOverride?: string) => {
-    const identifier = usernameOverride || farcasterInput.trim();
-    if (!identifier) return;
+    const identifier = usernameOverride || effectiveFarcasterUsername;
+    if (!identifier) {
+      setFeedback({ type: 'error', message: 'Enter a Farcaster username (e.g. @username)' });
+      return;
+    }
 
+    setFeedback(null);
     setIsAnalyzing(true);
     setShowCreature(false);
     setDeployResult(null);
@@ -1160,7 +1171,7 @@ export default function Home() {
       });
       
       if (!response.ok) {
-        const err = await response.json();
+        const err = await response.json().catch(() => ({}));
         throw new Error(err.error || 'Farcaster analysis failed');
       }
       
@@ -1172,7 +1183,7 @@ export default function Home() {
       setTimeout(() => setShowCreature(true), 500);
     } catch (error) {
       console.error('Farcaster analysis error:', error);
-      alert('Failed to analyze Farcaster user: ' + (error as Error).message);
+      setFeedback({ type: 'error', message: 'Failed to analyze: ' + (error as Error).message });
     } finally {
       setIsAnalyzing(false);
     }
@@ -1182,6 +1193,7 @@ export default function Home() {
   const launchCreature = async () => {
     if (!creature) return;
     
+    setFeedback(null);
     setIsMinting(true);
     setMintStep('generating');
     
@@ -1193,7 +1205,14 @@ export default function Home() {
         body: JSON.stringify({ creature }),
       });
       
-      const { imageUrl } = await generateResponse.json();
+      const imageData = await generateResponse.json().catch(() => ({}));
+      if (!generateResponse.ok) {
+        throw new Error(imageData.error || 'Image generation failed');
+      }
+      const imageUrl = imageData.imageUrl;
+      if (!imageUrl) {
+        throw new Error('No image URL returned. Please try again.');
+      }
       creature.imageURI = imageUrl;
       
       setMintStep('deploying');
@@ -1206,7 +1225,7 @@ export default function Home() {
       const endpoint = inputMode === 'wallet' ? '/api/deploy' : '/api/deploy-farcaster';
       const body = inputMode === 'wallet' 
         ? { creature, creatorAddress: address, imageUrl, referrerAddress: referrer }
-        : { identifier: farcasterInput, creature, imageUrl, referrerAddress: referrer };
+        : { identifier: effectiveFarcasterUsername, creature, imageUrl, referrerAddress: referrer };
       
       const deployResponse = await fetch(endpoint, {
         method: 'POST',
@@ -1239,7 +1258,7 @@ export default function Home() {
             special: creature.special,
             description: creature.description,
             creator_address: address,
-            farcaster_username: inputMode === 'farcaster' ? farcasterInput : undefined,
+            farcaster_username: inputMode === 'farcaster' ? effectiveFarcasterUsername : undefined,
             image_url: imageUrl,
             referrer_address: referrer,
           }),
@@ -1275,7 +1294,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Launch error:', error);
-      alert('Launch failed: ' + (error as Error).message);
+      setFeedback({ type: 'error', message: 'Launch failed: ' + (error as Error).message });
     } finally {
       setIsMinting(false);
       setMintStep('idle');
@@ -1318,7 +1337,14 @@ export default function Home() {
         body: JSON.stringify({ creature: mergedCreature }),
       });
       
-      const { imageUrl } = await generateResponse.json();
+      const imageData = await generateResponse.json().catch(() => ({}));
+      if (!generateResponse.ok) {
+        throw new Error(imageData.error || 'Image generation failed');
+      }
+      const imageUrl = imageData.imageUrl;
+      if (!imageUrl) {
+        throw new Error('No image URL returned for merge. Please try again.');
+      }
       
       // Call merge API
       const mergeResponse = await fetch('/api/merge', {
@@ -1364,7 +1390,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Merge error:', error);
-      alert('Merge failed: ' + (error as Error).message);
+      setFeedback({ type: 'error', message: 'Merge failed: ' + (error as Error).message });
     } finally {
       setIsMerging(false);
     }
@@ -1406,7 +1432,7 @@ export default function Home() {
       setScreenMode(menuItems[menuIndex]);
     } else if (screenMode === 'scan') {
       if (!isAnalyzing && !isMinting) {
-        if ((inputMode === 'wallet' && isConnected) || (inputMode === 'farcaster' && farcasterInput.trim())) {
+        if ((inputMode === 'wallet' && isConnected) || (inputMode === 'farcaster' && effectiveFarcasterUsername)) {
           analyze();
         }
       }
@@ -1434,13 +1460,11 @@ export default function Home() {
       });
       
       if (response.ok) {
-        // Refresh token of the day
-        const today = new Date().toISOString().split('T')[0];
-        // Would need to fetch updated votes here
-        alert('Vote recorded!');
+        setFeedback({ type: 'success', message: 'Vote recorded!' });
       }
     } catch (error) {
       console.error('Vote error:', error);
+      setFeedback({ type: 'error', message: 'Could not record vote. Try again.' });
     }
   };
 
@@ -1463,7 +1487,36 @@ export default function Home() {
   }, [screenMode, clankdexEntries, tokenOfTheDay]);
 
   return (
-    <main className="min-h-screen bg-pokemon-world flex items-center justify-center p-4 relative overflow-hidden">
+    <main className="min-h-screen bg-pokemon-world flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* In-app feedback banner (replaces alert) */}
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] max-w-[90vw] sm:max-w-md"
+          >
+            <div
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 shadow-lg ${
+                feedback.type === 'error'
+                  ? 'bg-red-950/95 border-red-500 text-red-100'
+                  : 'bg-green-950/95 border-green-500 text-green-100'
+              }`}
+            >
+              <span className="font-sans text-base flex-1 font-medium">{feedback.message}</span>
+              <button
+                type="button"
+                onClick={() => setFeedback(null)}
+                className="p-1 rounded hover:bg-white/20 transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* UNIFIED GAME BOY DEVICE - PREMIUM DESIGN */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -1497,8 +1550,8 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-3">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>CLANKDEX</p>
-                        <p className="text-[8px]" style={{ color: '#0f380f', opacity: 0.7 }}>v1.0</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>CLANKDEX</p>
+                        <p className="text-xs" style={{ color: '#0f380f', opacity: 0.7 }}>v1.0</p>
                       </div>
                       <div className="flex-1 space-y-2">
                         {[
@@ -1520,13 +1573,13 @@ export default function Home() {
                             }`}
                           >
                             <item.icon className="w-3 h-3" />
-                            <span className="font-pixel text-[10px]">{item.label}</span>
-                            <span className="text-[8px] opacity-60 ml-auto">{item.desc}</span>
+                            <span className="font-pixel text-xs">{item.label}</span>
+                            <span className="text-xs opacity-60 ml-auto">{item.desc}</span>
                           </button>
                         ))}
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>▲▼ Move │ A Select</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>▲▼ Move │ A Select</p>
                       </div>
                     </motion.div>
                   )}
@@ -1541,7 +1594,7 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-3">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>NEW CREATURE</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>NEW CREATURE</p>
                       </div>
 
                       {/* Content area */}
@@ -1549,19 +1602,19 @@ export default function Home() {
                         {isAnalyzing ? (
                           <div className="text-center">
                             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>ANALYZING...</p>
+                            <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>ANALYZING...</p>
                           </div>
                         ) : showCreature && creature ? (
                           <div className="text-center">
                             {imageBase64 && (
                               <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
                             )}
-                            <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>{creature.name}</p>
-                            <p className="text-[8px] mb-2" style={{ color: '#0f380f' }}>{creature.element}</p>
+                            <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{creature.name}</p>
+                            <p className="text-xs mb-2" style={{ color: '#0f380f' }}>{creature.element}</p>
                             <button
                               onClick={launchCreature}
                               disabled={isMinting}
-                              className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f] disabled:opacity-50"
+                              className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
                             >
                               {isMinting ? '...' : 'DEPLOY'}
                             </button>
@@ -1571,13 +1624,13 @@ export default function Home() {
                             <Wallet className="w-10 h-10 mx-auto mb-3" style={{ color: '#0f380f' }} />
                             {isConnected ? (
                               <>
-                                <p className="font-pixel text-[9px] mb-2" style={{ color: '#0f380f' }}>
+                                <p className="font-pixel text-[11px] mb-2" style={{ color: '#0f380f' }}>
                                   {address?.slice(0, 6)}...{address?.slice(-4)}
                                 </p>
                                 <button
                                   onClick={analyze}
                                   disabled={isAnalyzing}
-                                  className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f]"
+                                  className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f]"
                                 >
                                   GENERATE
                                 </button>
@@ -1599,7 +1652,7 @@ export default function Home() {
                                   }
                                 }}
                                 disabled={isConnecting}
-                                className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f] disabled:opacity-50"
+                                className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
                               >
                                 {isConnecting ? '...' : 'CONNECT'}
                               </button>
@@ -1609,7 +1662,7 @@ export default function Home() {
                       </div>
 
                       <div className="text-center mt-2">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Deploy' : 'Generate'}</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Deploy' : 'Generate'}</p>
                       </div>
                     </motion.div>
                   )}
@@ -1624,16 +1677,16 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-2">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>ROLODEX</p>
-                        <p className="text-[7px]" style={{ color: '#0f380f', opacity: 0.7 }}>{clankdexEntries.length} ENTRIES</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>ROLODEX</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f', opacity: 0.7 }}>{clankdexEntries.length} ENTRIES</p>
                       </div>
 
                       {clankdexEntries.length === 0 ? (
                         <div className="flex-1 flex items-center justify-center">
                           <div className="text-center">
                             <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>NO CREATURES</p>
-                            <p className="text-[7px]" style={{ color: '#0f380f' }}>Scan to begin</p>
+                            <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>NO CREATURES</p>
+                            <p className="text-[11px]" style={{ color: '#0f380f' }}>Scan to begin</p>
                           </div>
                         </div>
                       ) : (
@@ -1645,14 +1698,14 @@ export default function Home() {
                                 onClick={() => window.open(`${CLANKER_URL}/token/${entry.token_address}`, '_blank')}
                                 className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${currentEntryIndex === idx ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
                               >
-                                <span className="font-pixel text-[7px] w-6">#{entry.entry_number}</span>
-                                <span className="font-pixel text-[8px] flex-1 truncate">{entry.name}</span>
-                                <span className="text-[7px]">{entry.element}</span>
+                                <span className="font-pixel text-[11px] w-6">#{entry.entry_number}</span>
+                                <span className="font-pixel text-xs flex-1 truncate">{entry.name}</span>
+                                <span className="text-[11px]">{entry.element}</span>
                               </button>
                             ))}
                           </div>
                           <div className="text-center mt-2">
-                            <p className="text-[7px]" style={{ color: '#0f380f' }}>
+                            <p className="text-[11px]" style={{ color: '#0f380f' }}>
                               ◄► Navigate │ A View
                             </p>
                           </div>
@@ -1660,7 +1713,7 @@ export default function Home() {
                       )}
 
                       <div className="text-center mt-1">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1675,28 +1728,28 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-2">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>FAQ</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>FAQ</p>
                       </div>
-                      <div className="flex-1 overflow-y-auto space-y-1 text-[7px]" style={{ color: '#0f380f' }}>
+                      <div className="flex-1 overflow-y-auto space-y-1 text-[11px]" style={{ color: '#0f380f' }}>
                         <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-[8px] mb-0.5">What is ClankDex?</p>
+                          <p className="font-pixel text-xs mb-0.5">What is ClankDex?</p>
                           <p className="opacity-80">A Wallet Pokedex that generates creatures from your on-chain data.</p>
                         </div>
                         <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-[8px] mb-0.5">How does it work?</p>
+                          <p className="font-pixel text-xs mb-0.5">How does it work?</p>
                           <p className="opacity-80">We analyze your wallet to create a unique creature, then launch it as a token.</p>
                         </div>
                         <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-[8px] mb-0.5">What is Clanker?</p>
+                          <p className="font-pixel text-xs mb-0.5">What is Clanker?</p>
                           <p className="opacity-80">Token deployment platform on Base. You earn creator rewards.</p>
                         </div>
                         <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-[8px] mb-0.5">How do evolutions work?</p>
+                          <p className="font-pixel text-xs mb-0.5">How do evolutions work?</p>
                           <p className="opacity-80">Creatures evolve based on market cap: Egg → Legendary.</p>
                         </div>
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1711,47 +1764,47 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-2">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>INFO</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>INFO</p>
                       </div>
-                      <div className="flex-1 overflow-y-auto space-y-1 text-[7px]" style={{ color: '#0f380f' }}>
+                      <div className="flex-1 overflow-y-auto space-y-1 text-[11px]" style={{ color: '#0f380f' }}>
                         <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-[8px]">1.</span>
+                          <span className="font-pixel text-xs">1.</span>
                           <div>
-                            <p className="font-pixel text-[8px]">CONNECT</p>
+                            <p className="font-pixel text-xs">CONNECT</p>
                             <p className="opacity-80">Link wallet or enter Farcaster</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-[8px]">2.</span>
+                          <span className="font-pixel text-xs">2.</span>
                           <div>
-                            <p className="font-pixel text-[8px]">ANALYZE</p>
+                            <p className="font-pixel text-xs">ANALYZE</p>
                             <p className="opacity-80">We scan your on-chain DNA</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-[8px]">3.</span>
+                          <span className="font-pixel text-xs">3.</span>
                           <div>
-                            <p className="font-pixel text-[8px]">GENERATE</p>
+                            <p className="font-pixel text-xs">GENERATE</p>
                             <p className="opacity-80">AI creates unique creature</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-[8px]">4.</span>
+                          <span className="font-pixel text-xs">4.</span>
                           <div>
-                            <p className="font-pixel text-[8px]">LAUNCH</p>
+                            <p className="font-pixel text-xs">LAUNCH</p>
                             <p className="opacity-80">Deploy as token on Base</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-[8px]">5.</span>
+                          <span className="font-pixel text-xs">5.</span>
                           <div>
-                            <p className="font-pixel text-[8px]">EVOLVE</p>
+                            <p className="font-pixel text-xs">EVOLVE</p>
                             <p className="opacity-80">Watch it grow with market cap</p>
                           </div>
                         </div>
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1766,18 +1819,18 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-2">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>TOKEN OF THE DAY</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>TOKEN OF THE DAY</p>
                       </div>
                       <div className="flex-1 flex flex-col">
                         {/* Today's Winner */}
                         {tokenOfTheDay && (
                           <div className="text-center mb-3 p-2 bg-[#0f380f]/20 rounded border border-[#0f380f]">
                             <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[8px]" style={{ color: '#0f380f' }}>TODAY'S WINNER</p>
-                            <p className="font-pixel text-[9px]" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
+                            <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>TODAY'S WINNER</p>
+                            <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
                             <button
                               onClick={() => window.open(`${CLANKER_URL}/token/${tokenOfTheDay.token_address}`, '_blank')}
-                              className="mt-1 px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[7px] rounded"
+                              className="mt-1 px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[11px] rounded"
                             >
                               VIEW
                             </button>
@@ -1785,7 +1838,7 @@ export default function Home() {
                         )}
                         
                         {/* Vote List */}
-                        <p className="text-[8px] text-center mb-1 font-pixel" style={{ color: '#0f380f' }}>VOTE</p>
+                        <p className="text-xs text-center mb-1 font-pixel" style={{ color: '#0f380f' }}>VOTE</p>
                         <div className="flex-1 overflow-y-auto space-y-1">
                           {clankdexEntries.slice(0, 5).map((entry) => (
                             <div
@@ -1793,12 +1846,12 @@ export default function Home() {
                               className="flex items-center justify-between p-1.5 bg-[#8bac0f]/50 rounded border border-[#306230]"
                             >
                               <div className="flex items-center gap-1">
-                                <span className="font-pixel text-[7px]" style={{ color: '#0f380f' }}>#{entry.entry_number}</span>
-                                <span className="text-[7px] truncate max-w-[60px]" style={{ color: '#0f380f' }}>{entry.name}</span>
+                                <span className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>#{entry.entry_number}</span>
+                                <span className="text-[11px] truncate max-w-[60px]" style={{ color: '#0f380f' }}>{entry.name}</span>
                               </div>
                               <button
                                 onClick={() => handleVote(entry.token_address, entry.entry_number)}
-                                className="px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] text-[7px] rounded font-pixel"
+                                className="px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] text-[11px] rounded font-pixel"
                               >
                                 ★
                               </button>
@@ -1813,10 +1866,10 @@ export default function Home() {
                           <div className="flex items-center gap-2">
                             <Flame className="w-4 h-4" style={{ color: '#0f380f' }} />
                             <div>
-                              <p className="font-pixel text-[8px]" style={{ color: '#0f380f' }}>
+                              <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>
                                 STREAK: {creatorStreak.current_streak} DAYS
                               </p>
-                              <p className="text-[7px]" style={{ color: '#0f380f' }}>
+                              <p className="text-[11px]" style={{ color: '#0f380f' }}>
                                 Tier: {creatorStreak.tier.toUpperCase()}
                               </p>
                             </div>
@@ -1830,18 +1883,18 @@ export default function Home() {
                           <div className="flex items-center gap-2">
                             <Share2 className="w-4 h-4" style={{ color: '#0f380f' }} />
                             <div className="flex-1">
-                              <p className="text-[7px]" style={{ color: '#0f380f' }}>REF CODE:</p>
-                              <p className="font-pixel text-[8px]" style={{ color: '#0f380f' }}>{referralCode}</p>
+                              <p className="text-[11px]" style={{ color: '#0f380f' }}>REF CODE:</p>
+                              <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{referralCode}</p>
                             </div>
                           </div>
-                          <p className="text-[6px] mt-1" style={{ color: '#0f380f', opacity: 0.7 }}>
+                          <p className="text-[9px] mt-1" style={{ color: '#0f380f', opacity: 0.85 }}>
                             +0.1% fees when used
                           </p>
                         </div>
                       )}
                       
                       <div className="text-center mt-2">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -1856,22 +1909,22 @@ export default function Home() {
                       className="p-3 h-full flex flex-col"
                     >
                       <div className="text-center mb-2">
-                        <p className="font-pixel text-[10px]" style={{ color: '#0f380f' }}>MERGE</p>
+                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>MERGE</p>
                       </div>
                       <div className="flex-1 overflow-y-auto">
                         {!isConnected ? (
                           <div className="text-center py-4">
                             <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="text-[7px]" style={{ color: '#0f380f' }}>Connect to merge</p>
+                            <p className="text-[11px]" style={{ color: '#0f380f' }}>Connect to merge</p>
                           </div>
                         ) : mergeableTokens.length < 2 ? (
                           <div className="text-center py-4">
                             <GitMerge className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="text-[7px]" style={{ color: '#0f380f' }}>Need 2+ tokens</p>
+                            <p className="text-[11px]" style={{ color: '#0f380f' }}>Need 2+ tokens</p>
                           </div>
                         ) : (
                           <div className="space-y-1">
-                            <p className="text-[7px] text-center mb-2" style={{ color: '#0f380f' }}>Select 2 tokens:</p>
+                            <p className="text-[11px] text-center mb-2" style={{ color: '#0f380f' }}>Select 2 tokens:</p>
                             {mergeableTokens.slice(0, 4).map((token) => (
                               <button
                                 key={token.token_address}
@@ -1892,8 +1945,8 @@ export default function Home() {
                                     : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
                                 }`}
                               >
-                                <span className="font-pixel text-[8px]">#{token.entry_number}</span>
-                                <span className="font-pixel text-[9px] flex-1 truncate">{token.name}</span>
+                                <span className="font-pixel text-xs">#{token.entry_number}</span>
+                                <span className="font-pixel text-[11px] flex-1 truncate">{token.name}</span>
                                 {selectedParents.includes(token.token_address) && (
                                   <CheckCircle2 className="w-3 h-3" />
                                 )}
@@ -1903,7 +1956,7 @@ export default function Home() {
                               <button
                                 onClick={mergeTokens}
                                 disabled={isMerging}
-                                className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[8px] rounded border-2 border-[#0f380f] disabled:opacity-50"
+                                className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
                               >
                                 {isMerging ? '...' : 'MERGE'}
                               </button>
@@ -1912,7 +1965,7 @@ export default function Home() {
                         )}
                       </div>
                       <div className="text-center mt-2">
-                        <p className="text-[7px]" style={{ color: '#0f380f' }}>B Back</p>
+                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
                       </div>
                     </motion.div>
                   )}
@@ -2058,10 +2111,10 @@ function StatsPanel({
           )}
           <div>
             <h3 className="font-bold text-white">@{farcasterData.username}</h3>
-            <p className="text-gray-400 text-sm">{farcasterData.displayName}</p>
-            <div className="flex gap-4 mt-2 text-xs">
+            <p className="text-gray-200 text-sm">{farcasterData.displayName}</p>
+            <div className="flex gap-4 mt-2 text-sm">
               <span className="text-purple-400">{farcasterData.followerCount} followers</span>
-              <span className="text-gray-500">{farcasterData.castCount} casts</span>
+              <span className="text-gray-300">{farcasterData.castCount} casts</span>
             </div>
           </div>
         </motion.div>
@@ -2079,7 +2132,7 @@ function StatsPanel({
             {creature.name}
           </motion.h2>
           <motion.p 
-            className="text-gray-400 text-sm"
+            className="text-gray-200 text-sm font-sans"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -2120,7 +2173,7 @@ function StatsPanel({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <p className="text-gray-300 text-sm leading-relaxed">
+        <p className="text-gray-100 text-sm sm:text-base leading-relaxed font-sans">
           {creature.description}
         </p>
       </motion.div>
@@ -2157,12 +2210,12 @@ function StatsPanel({
                     return <IconComponent className={`w-4 h-4 ${tier.color}`} />;
                   })()}
                 </div>
-                <span className="text-[10px] text-gray-500 mt-1 hidden sm:block">{tier.name}</span>
+                <span className="text-xs text-gray-200 mt-1 hidden sm:block font-sans">{tier.name}</span>
               </motion.div>
             ))}
           </div>
           
-          <p className="text-xs text-gray-500 mt-3 text-center">
+          <p className="text-sm text-gray-200 mt-3 text-center font-sans">
             Your creature will evolve as market cap grows!
           </p>
         </motion.div>
@@ -2180,7 +2233,7 @@ function StatsPanel({
       {/* Total Stats */}
       <div className="mt-4 p-3 bg-gray-700/50 rounded-lg">
         <div className="flex justify-between items-center">
-          <span className="text-gray-400 text-sm">Total Stats</span>
+          <span className="text-gray-200 text-sm font-sans">Total Stats</span>
           <span className="font-pixel text-lg text-white">
             {creature.hp + creature.attack + creature.defense + creature.speed + creature.special}
           </span>
@@ -2190,12 +2243,12 @@ function StatsPanel({
       {/* DNA & Level */}
       <div className="mt-4 pt-4 border-t border-gray-700 grid grid-cols-2 gap-4">
         <div className="text-center">
-          <p className="text-gray-500 text-xs mb-1">LEVEL</p>
+          <p className="text-gray-300 text-sm mb-1 font-sans">LEVEL</p>
           <p className="font-pixel text-xl text-white">{creature.level}</p>
         </div>
         <div className="text-center">
-          <p className="text-gray-500 text-xs mb-1">DNA</p>
-          <p className="font-mono text-xs text-gray-400 truncate">
+          <p className="text-gray-300 text-sm mb-1 font-sans">DNA</p>
+          <p className="font-mono text-sm text-gray-200 truncate">
             0x{creature.dna.slice(-8)}
           </p>
         </div>
@@ -2248,21 +2301,21 @@ function DeploySuccess({
           </div>
         </div>
         
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 text-sm font-sans">
           <div className="flex justify-between">
-            <span className="text-gray-400">Token:</span>
-            <code className="text-white font-mono text-xs">
+            <span className="text-gray-200">Token:</span>
+            <code className="text-white font-mono text-sm">
               {deployResult.tokenAddress.slice(0, 6)}...{deployResult.tokenAddress.slice(-4)}
             </code>
           </div>
           {deployResult.config && (
             <>
               <div className="flex justify-between">
-                <span className="text-gray-400">Symbol:</span>
+                <span className="text-gray-200">Symbol:</span>
                 <span className="text-yellow-400 font-bold">{deployResult.config.symbol}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Market Cap:</span>
+                <span className="text-gray-200">Market Cap:</span>
                 <span className="text-white">{deployResult.config.marketCap} ETH</span>
               </div>
             </>
@@ -2312,7 +2365,7 @@ function DeploySuccess({
 function StatBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="font-pixel text-xs text-gray-400 w-12">{label}</span>
+      <span className="font-sans text-sm text-gray-200 w-12">{label}</span>
       <div className="flex-1 stat-bar">
         <motion.div
           initial={{ width: 0 }}
@@ -2335,7 +2388,7 @@ function InfoCard({ icon, title, description }: { icon: React.ReactNode; title: 
     >
       <div className="text-pokedex-red mb-3">{icon}</div>
       <h3 className="text-white font-bold mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm">{description}</p>
+      <p className="text-gray-200 text-sm font-sans leading-relaxed">{description}</p>
     </motion.div>
   );
 }
@@ -2408,7 +2461,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="px-4 pb-4 text-gray-400 text-sm leading-relaxed border-t border-gray-700/50 pt-3">
+            <div className="px-4 pb-4 text-gray-200 text-sm font-sans leading-relaxed border-t border-gray-700/50 pt-3">
               {answer}
             </div>
           </motion.div>
@@ -2426,7 +2479,7 @@ function FAQSection() {
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-8">
         <h2 className="font-pixel text-3xl text-white mb-2">FAQ</h2>
-        <p className="text-gray-400">Everything you need to know about ClankDex</p>
+        <p className="text-gray-200 font-sans">Everything you need to know about ClankDex</p>
       </div>
 
       <div className="space-y-3">
@@ -2490,7 +2543,7 @@ function HowItWorksSection() {
     <div className="max-w-3xl mx-auto">
       <div className="text-center mb-12">
         <h2 className="font-pixel text-3xl text-white mb-2">HOW IT WORKS</h2>
-        <p className="text-gray-400">From wallet to creature in 5 simple steps</p>
+        <p className="text-gray-200 font-sans">From wallet to creature in 5 simple steps</p>
       </div>
 
       <div className="relative">
@@ -2518,10 +2571,10 @@ function HowItWorksSection() {
                 {/* Content */}
                 <div className="flex-1 bg-gray-800/50 rounded-xl p-5 border border-gray-700">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Step {item.step}</span>
+                    <span className="text-xs font-bold text-gray-300 uppercase font-sans">Step {item.step}</span>
                   </div>
                   <h3 className="font-bold text-white text-lg mb-2">{item.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{item.description}</p>
+                  <p className="text-gray-200 text-sm font-sans leading-relaxed">{item.description}</p>
                 </div>
               </div>
             </motion.div>
@@ -2536,7 +2589,7 @@ function HowItWorksSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <p className="text-gray-400 mb-4">Ready to discover your creature?</p>
+        <p className="text-gray-200 mb-4 font-sans">Ready to discover your creature?</p>
         <motion.button
           className="px-8 py-3 bg-pokedex-red hover:bg-red-600 text-white font-bold rounded-xl transition-colors"
           whileHover={{ scale: 1.05 }}
@@ -2763,7 +2816,7 @@ function Rolodex({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search creatures..."
-              className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm transition-all"
+              className="rolodex-search w-full bg-gray-800 border-4 border-gray-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-pokedex-yellow font-pixel text-sm transition-all"
             />
             <AnimatePresence>
               {searchQuery && (
@@ -2840,7 +2893,7 @@ function Rolodex({
                 onClick={clearAllFilters}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="text-xs text-gray-500 hover:text-gray-300 underline ml-auto"
+                className="text-xs text-gray-300 hover:text-white underline ml-auto font-sans"
               >
                 Clear all
               </motion.button>
@@ -2861,7 +2914,7 @@ function Rolodex({
               <div className="bg-gray-800/50 border-2 border-gray-700 rounded-xl p-4 mb-4 space-y-4">
                 {/* Sort Options */}
                 <div>
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase mb-2 flex items-center gap-2 font-sans">
                     <ArrowUpDown className="w-3 h-3" />
                     Sort By
                   </h4>
@@ -2876,7 +2929,7 @@ function Rolodex({
 
                 {/* Evolution Tier Filter */}
                 <div>
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase mb-2 flex items-center gap-2 font-sans">
                     <Crown className="w-3 h-3" />
                     Evolution Tier
                   </h4>
@@ -2895,7 +2948,7 @@ function Rolodex({
                 {/* Element Filter */}
                 {availableElements.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-2">
+                    <h4 className="text-xs font-bold text-gray-300 uppercase mb-2 flex items-center gap-2 font-sans">
                       <Hexagon className="w-3 h-3" />
                       Element Type
                     </h4>
@@ -2935,7 +2988,7 @@ function Rolodex({
           className="flex items-center justify-between mb-4 px-2"
         >
           <p className="text-sm text-gray-400">
-            Showing <span className="text-white font-bold">{entries.length}</span> of <span className="text-gray-500">{totalEntries}</span> creatures
+            Showing <span className="text-white font-bold">{entries.length}</span> of <span className="text-gray-300">{totalEntries}</span> creatures
           </p>
           {currentEntry && priceDataCache[currentEntry.token_address.toLowerCase()] && (
             <div className="flex items-center gap-2">
@@ -3068,7 +3121,7 @@ function Rolodex({
               {searchQuery && ` (filtered from ${totalEntries})`}
             </motion.p>
             <motion.p 
-              className="text-gray-500 text-xs mt-2"
+              className="text-gray-300 text-sm mt-2 font-sans"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -3087,6 +3140,7 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
   const [availableRewards, setAvailableRewards] = useState<string>('0');
   const [isLoading, setIsLoading] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const { address } = useAccount();
 
   // Fetch available rewards
@@ -3127,14 +3181,14 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Rewards claimed! TX: ${data.txHash.slice(0, 10)}...`);
+        setFeedback({ type: 'success', message: `Rewards claimed! TX: ${data.txHash?.slice(0, 10) ?? '...'}...` });
         setAvailableRewards('0');
       } else {
-        const error = await response.json();
-        alert('Failed to claim: ' + error.details);
+        const error = await response.json().catch(() => ({}));
+        setFeedback({ type: 'error', message: 'Failed to claim: ' + (error.details ?? 'Unknown error') });
       }
     } catch (error) {
-      alert('Claim failed: ' + (error as Error).message);
+      setFeedback({ type: 'error', message: 'Claim failed: ' + (error as Error).message });
     } finally {
       setIsClaiming(false);
     }
@@ -3143,27 +3197,46 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
   const hasRewards = parseFloat(availableRewards) > 0.001;
 
   return (
-    <motion.button
-      onClick={handleClaim}
-      disabled={isClaiming || !hasRewards}
-      className={`flex flex-col items-center justify-center gap-0 px-2 py-2 rounded-lg text-xs font-bold transition-colors ${
-        hasRewards 
-          ? 'bg-green-600 hover:bg-green-500 text-white cursor-pointer' 
-          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-      }`}
-      whileHover={hasRewards ? { scale: 1.05, y: -2 } : {}}
-      whileTap={hasRewards ? { scale: 0.95, y: 0 } : {}}
-    >
-      <span className="flex items-center gap-1">
-        <TrendingUp className="w-3 h-3" />
-        {isClaiming ? '...' : 'Claim'}
-      </span>
-      {hasRewards && (
-        <span className="text-[10px] opacity-80">
-          {parseFloat(availableRewards).toFixed(4)} ETH
+    <div className="flex flex-col items-center gap-1">
+      <motion.button
+        onClick={handleClaim}
+        disabled={isClaiming || !hasRewards}
+        className={`flex flex-col items-center justify-center gap-0 px-2 py-2 rounded-lg text-xs font-bold transition-colors ${
+          hasRewards 
+            ? 'bg-green-600 hover:bg-green-500 text-white cursor-pointer' 
+            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+        }`}
+        whileHover={hasRewards ? { scale: 1.05, y: -2 } : {}}
+        whileTap={hasRewards ? { scale: 0.95, y: 0 } : {}}
+      >
+        <span className="flex items-center gap-1">
+          <TrendingUp className="w-3 h-3" />
+          {isClaiming ? '...' : 'Claim'}
         </span>
-      )}
-    </motion.button>
+        {hasRewards && (
+          <span className="text-xs opacity-80">
+            {parseFloat(availableRewards).toFixed(4)} ETH
+          </span>
+        )}
+      </motion.button>
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className={`flex items-center gap-2 px-2 py-1 rounded text-xs max-w-[140px] ${
+              feedback.type === 'error' ? 'bg-red-900/90 text-red-100' : 'bg-green-900/90 text-green-100'
+            }`}
+          >
+            <span className="truncate flex-1">{feedback.message}</span>
+            <button type="button" onClick={() => setFeedback(null)} aria-label="Dismiss">
+              <X className="w-3 h-3 flex-shrink-0" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -3338,7 +3411,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
                 )}
               </div>
               <div className="text-right">
-                <p className="text-xs text-gray-500">via {priceData.source}</p>
+                <p className="text-xs text-gray-300 font-sans">via {priceData.source}</p>
               </div>
             </div>
           </motion.div>
@@ -3439,7 +3512,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
               color={evolutionTier.name === 'Legendary' ? 'yellow' : evolutionTier.name === 'Mega' ? 'red' : 'green'}
               delay={0.3}
             />
-            <div className="flex justify-between mt-1 text-xs text-gray-500">
+            <div className="flex justify-between mt-1 text-xs text-gray-300 font-sans">
               <span>$0</span>
               <span>$1M+</span>
             </div>
@@ -3503,7 +3576,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
             }}
             whileHover={{ scale: 1.15, y: -2 }}
           >
-            <p className="text-gray-500 text-xs">{stat.label}</p>
+            <p className="text-gray-300 text-sm font-sans">{stat.label}</p>
             <motion.p 
               className={`font-pixel ${stat.color}`}
               initial={{ opacity: 0 }}
@@ -3524,7 +3597,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
         transition={{ delay: 0.6 }}
       >
         <motion.div whileHover={{ scale: 1.05 }}>
-          <p className="text-gray-500 text-xs mb-1">TOTAL STATS</p>
+          <p className="text-gray-300 text-sm mb-1 font-sans">TOTAL STATS</p>
           <motion.p 
             className="font-pixel text-xl text-white"
             initial={{ opacity: 0 }}
@@ -3535,7 +3608,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
           </motion.p>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }}>
-          <p className="text-gray-500 text-xs mb-1">TOKEN</p>
+          <p className="text-gray-300 text-sm mb-1 font-sans">TOKEN</p>
           <motion.p 
             className="font-pixel text-pokedex-yellow"
             initial={{ opacity: 0 }}
@@ -3555,7 +3628,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
         transition={{ delay: 0.7 }}
       >
         <motion.span 
-          className="text-gray-500"
+          className="text-gray-300 font-sans"
           whileHover={{ color: '#fff' }}
         >
           {creator_address ? (
@@ -3572,7 +3645,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
             <span>Unknown</span>
           )}
         </motion.span>
-        <span className="text-gray-500">
+        <span className="text-gray-300 font-sans">
           {created_at ? new Date(created_at).toLocaleDateString() : 'Unknown'}
         </span>
       </motion.div>
