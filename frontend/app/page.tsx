@@ -1522,9 +1522,6 @@ export default function Home() {
   return (
     <>
       <EnchantedForest />
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '50px', background: 'red', zIndex: 9999, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 'bold' }}>
-        DEBUG MODE: IF YOU SEE THIS, CHANGES ARE WORKING
-      </div>
       <main className="min-h-screen bg-pokemon-world flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
         {/* In-app feedback banner (replaces alert) */}
