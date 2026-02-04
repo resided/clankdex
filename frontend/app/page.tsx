@@ -100,10 +100,10 @@ const REGISTRY_ADDRESS = (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS || '0x0000000
 const CLANKER_URL = 'https://clanker.world';
 
 // Animation Components
-const AnimatedButton = ({ children, onClick, className, disabled, variant = 'primary' }: { 
-  children: React.ReactNode; 
-  onClick?: () => void; 
-  className?: string; 
+const AnimatedButton = ({ children, onClick, className, disabled, variant = 'primary' }: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'danger' | 'success';
 }) => {
@@ -155,7 +155,7 @@ const PokeballLoader = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
 const TypewriterText = ({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) => {
   const [displayText, setDisplayText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
-  
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       let i = 0;
@@ -172,7 +172,7 @@ const TypewriterText = ({ text, className, delay = 0 }: { text: string; classNam
     }, delay);
     return () => clearTimeout(timeout);
   }, [text, delay]);
-  
+
   return (
     <span className={`font-pixel ${className} animate-cursor`}>
       {displayText}
@@ -190,7 +190,7 @@ const AnimatedStatBar = ({ value, max = 255, color = 'green', delay = 0 }: { val
     yellow: 'from-yellow-400 to-yellow-600',
     purple: 'from-purple-400 to-purple-600',
   };
-  
+
   return (
     <div className="h-3 rounded-full overflow-hidden bg-gray-700 border-2 border-gray-600">
       <motion.div
@@ -250,9 +250,9 @@ const StaggerItem = ({ children, className }: { children: React.ReactNode; class
   <motion.div
     variants={{
       hidden: { opacity: 0, y: 20, scale: 0.9 },
-      visible: { 
-        opacity: 1, 
-        y: 0, 
+      visible: {
+        opacity: 1,
+        y: 0,
         scale: 1,
         transition: { type: "spring", stiffness: 300, damping: 24 }
       }
@@ -272,7 +272,7 @@ const Badge = ({ children, color = 'blue', animate = true }: { children: React.R
     purple: 'bg-purple-500/20 border-purple-500 text-purple-400',
     gray: 'bg-gray-500/20 border-gray-500 text-gray-400',
   };
-  
+
   return (
     <motion.span
       initial={animate ? { scale: 0, rotate: -10 } : false}
@@ -293,7 +293,7 @@ const MenuSlide = ({ children, isOpen, from = 'bottom' }: { children: React.Reac
     left: { hidden: { x: '-100%', opacity: 0 }, visible: { x: 0, opacity: 1 } },
     right: { hidden: { x: '100%', opacity: 0 }, visible: { x: 0, opacity: 1 } },
   };
-  
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -371,13 +371,13 @@ interface FarcasterData {
 
 // DNA Helix Scanning Animation
 const DNAScanningAnimation = ({ mode }: { mode: InputMode }) => {
-  const steps = mode === 'wallet' 
+  const steps = mode === 'wallet'
     ? ['SCANNING TRANSACTIONS...', 'ANALYZING HOLDINGS...', 'EXTRACTING DNA...', 'GENERATING CREATURE...']
     : ['SCANNING CASTS...', 'ANALYZING ENGAGEMENT...', 'MAPPING SOCIAL GRAPH...', 'GENERATING CREATURE...'];
-  
+
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(prev => {
@@ -429,7 +429,7 @@ const DNAScanningAnimation = ({ mode }: { mode: InputMode }) => {
           />
         </svg>
       </div>
-      
+
       {/* Progress Bar */}
       <div className="h-2 bg-gray-700 rounded-full overflow-hidden mb-3">
         <motion.div
@@ -438,7 +438,7 @@ const DNAScanningAnimation = ({ mode }: { mode: InputMode }) => {
           transition={{ duration: 0.1 }}
         />
       </div>
-      
+
       {/* Step Text */}
       <AnimatePresence mode="wait">
         <motion.p
@@ -474,12 +474,12 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
                 <motion.div
                   key={i}
                   className="absolute inset-0 rounded-full border-4 border-yellow-400"
-                  animate={{ 
+                  animate={{
                     rotate: 360,
                     scale: [1, 1.2, 1],
                     opacity: [0.5, 1, 0.5]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 2,
                     repeat: Infinity,
                     delay: i * 0.3,
@@ -490,7 +490,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
               ))}
               <motion.div
                 className="absolute inset-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500"
-                animate={{ 
+                animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 180, 360]
                 }}
@@ -504,7 +504,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
                 <Sparkles className="w-16 h-16 text-white" />
               </motion.div>
             </div>
-            <motion.p 
+            <motion.p
               className="mt-6 text-yellow-400 font-bold text-lg"
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 1, repeat: Infinity }}
@@ -513,7 +513,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
             </motion.p>
           </motion.div>
         )}
-        
+
         {step === 'deploying' && (
           <motion.div
             key="deploying"
@@ -529,17 +529,17 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
                 <motion.div
                   key={i}
                   className="absolute left-1/2 bottom-0 w-4 h-4 rounded-full"
-                  style={{ 
+                  style={{
                     backgroundColor: ['#FF5722', '#FF9800', '#FFC107', '#FFEB3B'][i % 4],
                     marginLeft: -8
                   }}
-                  animate={{ 
+                  animate={{
                     y: [0, 100],
                     x: [0, (Math.random() - 0.5) * 60],
                     scale: [1, 0],
                     opacity: [1, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 0.8,
                     repeat: Infinity,
                     delay: i * 0.1
@@ -564,7 +564,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
                 transition={{ duration: 0.5, repeat: Infinity }}
               />
             </div>
-            <motion.p 
+            <motion.p
               className="mt-4 text-white font-bold text-lg"
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 0.8, repeat: Infinity }}
@@ -573,7 +573,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
             </motion.p>
           </motion.div>
         )}
-        
+
         {step === 'success' && (
           <motion.div
             key="success"
@@ -586,12 +586,12 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
               <motion.div
                 key={i}
                 className="absolute w-3 h-3 rounded-full"
-                style={{ 
+                style={{
                   backgroundColor: ['#DC0A2D', '#FFDE00', '#3B4CCA', '#51AE5E', '#FF5722'][i % 5],
                   left: '50%',
                   top: '50%'
                 }}
-                animate={{ 
+                animate={{
                   x: Math.cos(i * 18 * Math.PI / 180) * 150,
                   y: Math.sin(i * 18 * Math.PI / 180) * 150,
                   scale: [1, 0],
@@ -610,7 +610,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
                 <CheckCircle2 className="w-16 h-16 text-white" />
               </div>
             </motion.div>
-            <motion.p 
+            <motion.p
               className="mt-4 text-green-400 font-bold text-xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -628,7 +628,7 @@ const LaunchAnimation = ({ step }: { step: 'generating' | 'deploying' | 'success
 // Creature Reveal Animation
 const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; imageBase64: string | null }) => {
   const [phase, setPhase] = useState<'flash' | 'particles' | 'reveal'>('flash');
-  
+
   useEffect(() => {
     const timer1 = setTimeout(() => setPhase('particles'), 300);
     const timer2 = setTimeout(() => setPhase('reveal'), 800);
@@ -651,7 +651,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
           />
         )}
       </AnimatePresence>
-      
+
       {/* Particle Burst */}
       <AnimatePresence>
         {phase === 'particles' && (
@@ -660,7 +660,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
               <motion.div
                 key={i}
                 initial={{ scale: 0, x: 0, y: 0 }}
-                animate={{ 
+                animate={{
                   scale: [0, 1.5, 0],
                   x: Math.cos(i * 30 * Math.PI / 180) * 80,
                   y: Math.sin(i * 30 * Math.PI / 180) * 80,
@@ -676,16 +676,16 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
           </>
         )}
       </AnimatePresence>
-      
+
       {/* Creature Image */}
       <motion.div
         initial={{ scale: 0, rotate: -10 }}
         animate={{ scale: 1, rotate: 0 }}
-        transition={{ 
+        transition={{
           type: "spring",
           stiffness: 200,
           damping: 15,
-          delay: 0.5 
+          delay: 0.5
         }}
         className="relative"
       >
@@ -694,11 +694,11 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
             src={imageBase64}
             alt={creature?.name}
             className="w-full h-full object-contain max-h-72 md:max-h-80"
-            animate={{ 
+            animate={{
               y: [0, -8, 0],
               rotate: [0, 2, -2, 0]
             }}
-            transition={{ 
+            transition={{
               duration: 4,
               repeat: Infinity,
               ease: "easeInOut"
@@ -717,7 +717,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <motion.span 
+            <motion.span
               className="text-8xl"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
@@ -726,7 +726,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
             </motion.span>
           </motion.div>
         )}
-        
+
         {/* Shine effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
@@ -916,7 +916,7 @@ export default function Home() {
   const [screenMode, setScreenMode] = useState<ScreenMode>('menu');
   const [menuIndex, setMenuIndex] = useState(0);
   const menuItems = ['scan', 'collection', 'daily', 'merge', 'faq', 'how-it-works'] as const;
-  
+
   // New feature states
   const [creatorStreak, setCreatorStreak] = useState<CreatorStreak | null>(null);
   const [tokenOfTheDay, setTokenOfTheDay] = useState<TokenOfTheDay | null>(null);
@@ -953,7 +953,7 @@ export default function Home() {
   // Load creator streak when wallet connected
   useEffect(() => {
     if (!isConnected || !address) return;
-    
+
     const loadStreak = async () => {
       try {
         const response = await fetch(`/api/streak?creator=${address}`);
@@ -971,7 +971,7 @@ export default function Home() {
   // Load mergeable tokens when on merge screen
   useEffect(() => {
     if (screenMode !== 'merge' || !isConnected || !address) return;
-    
+
     const loadMergeable = async () => {
       const tokens = await getMergeableTokens(address);
       setMergeableTokens(tokens);
@@ -982,7 +982,7 @@ export default function Home() {
   // Fetch price data for all entries when in collection mode
   useEffect(() => {
     if (screenMode !== 'collection' || clankdexEntries.length === 0) return;
-    
+
     const fetchAllPrices = async () => {
       const addresses = clankdexEntries.map(e => e.token_address);
       try {
@@ -999,7 +999,7 @@ export default function Home() {
         console.error('Failed to fetch batch prices:', error);
       }
     };
-    
+
     fetchAllPrices();
     // Refresh every 60 seconds
     const interval = setInterval(fetchAllPrices, 60000);
@@ -1009,23 +1009,23 @@ export default function Home() {
   // Filter and sort entries
   const filteredEntries = useMemo(() => {
     let entries = [...clankdexEntries];
-    
+
     // Text search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      entries = entries.filter(entry => 
+      entries = entries.filter(entry =>
         entry.name.toLowerCase().includes(query) ||
         entry.element.toLowerCase().includes(query) ||
         formatEntryNumber(entry.entry_number).toLowerCase().includes(query) ||
         entry.token_symbol.toLowerCase().includes(query)
       );
     }
-    
+
     // Element filter
     if (filterElement !== 'all') {
       entries = entries.filter(entry => entry.element === filterElement);
     }
-    
+
     // Tier filter (based on cached price data)
     if (filterTier !== 'all') {
       entries = entries.filter(entry => {
@@ -1035,7 +1035,7 @@ export default function Home() {
         return tier.name === filterTier;
       });
     }
-    
+
     // Sorting
     entries.sort((a, b) => {
       switch (sortBy) {
@@ -1072,7 +1072,7 @@ export default function Home() {
           return 0;
       }
     });
-    
+
     return entries;
   }, [clankdexEntries, searchQuery, filterElement, filterTier, sortBy, priceDataCache]);
 
@@ -1152,25 +1152,25 @@ export default function Home() {
   // Analyze wallet
   const analyzeWallet = async () => {
     if (!address) return;
-    
+
     setIsAnalyzing(true);
     setShowCreature(false);
     setDeployResult(null);
     setFarcasterData(null);
-    
+
     try {
       const response = await fetch('/api/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address }),
       });
-      
+
       if (!response.ok) throw new Error('Analysis failed');
-      
+
       const data = await response.json();
       setCreature(data.creature);
       setImageBase64(data.imageBase64);
-      
+
       setTimeout(() => setShowCreature(true), 500);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -1202,17 +1202,17 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier }),
       });
-      
+
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.error || 'Farcaster analysis failed');
       }
-      
+
       const data = await response.json();
       setCreature(data.creature);
       setImageBase64(data.imageBase64);
       setFarcasterData(data.farcasterData);
-      
+
       setTimeout(() => setShowCreature(true), 500);
     } catch (error) {
       console.error('Farcaster analysis error:', error);
@@ -1225,11 +1225,11 @@ export default function Home() {
   // Launch creature
   const launchCreature = async () => {
     if (!creature) return;
-    
+
     setFeedback(null);
     setIsMinting(true);
     setMintStep('generating');
-    
+
     try {
       // Step 1: Generate and upload image
       const generateResponse = await fetch('/api/generate-image', {
@@ -1237,7 +1237,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creature }),
       });
-      
+
       const imageData = await generateResponse.json().catch(() => ({}));
       if (!generateResponse.ok) {
         throw new Error(imageData.error || 'Image generation failed');
@@ -1247,34 +1247,34 @@ export default function Home() {
         throw new Error('No image URL returned. Please try again.');
       }
       creature.imageURI = imageUrl;
-      
+
       setMintStep('deploying');
-      
+
       // Step 2: Deploy Clanker token
       // Check for referrer in URL
       const urlParams = new URLSearchParams(window.location.search);
       const referrer = urlParams.get('ref');
-      
+
       const endpoint = inputMode === 'wallet' ? '/api/deploy' : '/api/deploy-farcaster';
-      const body = inputMode === 'wallet' 
+      const body = inputMode === 'wallet'
         ? { creature, creatorAddress: address, imageUrl, referrerAddress: referrer }
         : { identifier: effectiveFarcasterUsername, creature, imageUrl, referrerAddress: referrer };
-      
+
       const deployResponse = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      
+
       const result = await deployResponse.json();
-      
+
       if (result.success) {
         setDeployResult(result);
 
         // Step 3: Save to Supabase via secure API (verifies on-chain)
         const urlParams = new URLSearchParams(window.location.search);
         const referrer = urlParams.get('ref');
-        
+
         const saveResponse = await fetch('/api/save-creature', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1298,7 +1298,7 @@ export default function Home() {
         });
 
         const saveData = await saveResponse.json();
-        
+
         if (!saveResponse.ok) {
           console.error('Failed to save creature:', saveData.error);
           // Don't throw - deployment succeeded even if save failed
@@ -1306,7 +1306,7 @@ export default function Home() {
           // Refresh entries from Supabase
           const updatedEntries = await getAllCreatures();
           setClankdexEntries(updatedEntries);
-          
+
           // Step 4: Create evolution record
           await createEvolution(result.tokenAddress, saveData.creature.entry_number);
         }
@@ -1337,18 +1337,18 @@ export default function Home() {
   // Merge two tokens into one
   const mergeTokens = async () => {
     if (!selectedParents[0] || !selectedParents[1] || !address) return;
-    
+
     setIsMerging(true);
-    
+
     try {
       // Get parent token details
       const parent1 = mergeableTokens.find(t => t.token_address === selectedParents[0]);
       const parent2 = mergeableTokens.find(t => t.token_address === selectedParents[1]);
-      
+
       if (!parent1 || !parent2) {
         throw new Error('Parent tokens not found');
       }
-      
+
       // Generate merged creature name and stats
       const mergedName = `${parent1.name.slice(0, 4)}${parent2.name.slice(-4)}`;
       const mergedCreature = {
@@ -1362,14 +1362,14 @@ export default function Home() {
         special: Math.floor((parent1.special + parent2.special) / 2) + 10,
         description: `A fusion of ${parent1.name} and ${parent2.name}`,
       };
-      
+
       // Generate image for merged creature
       const generateResponse = await fetch('/api/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ creature: mergedCreature }),
       });
-      
+
       const imageData = await generateResponse.json().catch(() => ({}));
       if (!generateResponse.ok) {
         throw new Error(imageData.error || 'Image generation failed');
@@ -1378,7 +1378,7 @@ export default function Home() {
       if (!imageUrl) {
         throw new Error('No image URL returned for merge. Please try again.');
       }
-      
+
       // Call merge API
       const mergeResponse = await fetch('/api/merge', {
         method: 'POST',
@@ -1391,29 +1391,29 @@ export default function Home() {
           imageUrl,
         }),
       });
-      
+
       const result = await mergeResponse.json();
-      
+
       if (result.success) {
         setMergeResult(result);
-        
+
         // Refresh entries and mergeable tokens
         const updatedEntries = await getAllCreatures();
         setClankdexEntries(updatedEntries);
-        
+
         const updatedMergeable = await getMergeableTokens(address);
         setMergeableTokens(updatedMergeable);
-        
+
         // Clear selection
         setSelectedParents([null, null]);
-        
+
         confetti({
           particleCount: 150,
           spread: 70,
           origin: { y: 0.6 },
           colors: ['#9C27B0', '#E91E63', '#FF5722', '#FFC107'],
         });
-        
+
         // Redirect after delay
         setTimeout(() => {
           window.open(`${CLANKER_URL}/token/${result.tokenAddress}`, '_blank');
@@ -1432,7 +1432,7 @@ export default function Home() {
   const generateFallbackCreature = (addr: string): Creature => {
     const elements = Object.keys(ELEMENT_COLORS);
     const element = elements[parseInt(addr.slice(-2), 16) % elements.length];
-    
+
     return {
       name: `Clankmon #${addr.slice(-4)}`,
       species: 'Blockchain Beast',
@@ -1491,7 +1491,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tokenAddress, entryNumber }),
       });
-      
+
       if (response.ok) {
         setFeedback({ type: 'success', message: 'Vote recorded!' });
       }
@@ -1504,7 +1504,7 @@ export default function Home() {
   // Load top voted tokens on daily screen mount
   useEffect(() => {
     if (screenMode !== 'daily') return;
-    
+
     // In a real implementation, you'd fetch top voted tokens
     // For now, we'll just use the first few entries
     if (clankdexEntries.length > 0 && !tokenOfTheDay) {
@@ -1520,579 +1520,577 @@ export default function Home() {
   }, [screenMode, clankdexEntries, tokenOfTheDay]);
 
   return (
-    <main className="min-h-screen bg-pokemon-world flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Enchanted Forest Background */}
+    <>
       <EnchantedForest />
+      <main className="min-h-screen bg-pokemon-world flex flex-col items-center justify-center p-4 relative overflow-hidden">
 
-      {/* In-app feedback banner (replaces alert) */}
-      <AnimatePresence>
-        {feedback && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] max-w-[90vw] sm:max-w-md"
-          >
-            <div
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 shadow-lg ${
-                feedback.type === 'error'
+        {/* In-app feedback banner (replaces alert) */}
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] max-w-[90vw] sm:max-w-md"
+            >
+              <div
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 shadow-lg ${feedback.type === 'error'
                   ? 'bg-red-950/95 border-red-500 text-red-100'
                   : 'bg-green-950/95 border-green-500 text-green-100'
-              }`}
-            >
-              <span className="font-sans text-base flex-1 font-medium">{feedback.message}</span>
-              <button
-                type="button"
-                onClick={() => setFeedback(null)}
-                className="p-1 rounded hover:bg-white/20 transition-colors"
-                aria-label="Dismiss"
+                  }`}
               >
-                <X className="w-4 h-4" />
-              </button>
+                <span className="font-sans text-base flex-1 font-medium">{feedback.message}</span>
+                <button
+                  type="button"
+                  onClick={() => setFeedback(null)}
+                  className="p-1 rounded hover:bg-white/20 transition-colors"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* UNIFIED GAME BOY DEVICE - PREMIUM DESIGN */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="relative z-10"
+        >
+          <div className="gameboy-device">
+            {/* Battery indicator */}
+            <div className="gameboy-battery">Bat.</div>
+
+            {/* Power indicator */}
+            <div className="gameboy-power">
+              <div className="gameboy-power-led" />
+              <span className="gameboy-power-text">Power</span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* UNIFIED GAME BOY DEVICE - PREMIUM DESIGN */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10"
-      >
-        <div className="gameboy-device">
-          {/* Battery indicator */}
-          <div className="gameboy-battery">Bat.</div>
 
-          {/* Power indicator */}
-          <div className="gameboy-power">
-            <div className="gameboy-power-led" />
-            <span className="gameboy-power-text">Power</span>
-          </div>
-
-          {/* Screen bezel */}
-          <div className="gameboy-bezel">
-            {/* LCD Screen */}
-            <div className="gameboy-lcd">
-              <div className="gameboy-lcd-content">
-                <AnimatePresence mode="wait">
-                  {/* MENU SCREEN */}
-                  {screenMode === 'menu' && (
-                    <motion.div
-                      key="menu"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-3">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>CLANKDEX</p>
-                        <p className="text-xs" style={{ color: '#0f380f', opacity: 0.7 }}>v1.0</p>
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        {[
-                          { mode: 'scan' as const, icon: ScanLine, label: 'NEW', desc: 'Create' },
-                          { mode: 'collection' as const, icon: BookOpen, label: 'DEX', desc: `${clankdexEntries.length}` },
-                          { mode: 'daily' as const, icon: Trophy, label: 'DAILY', desc: 'Vote' },
-                          { mode: 'merge' as const, icon: GitMerge, label: 'MERGE', desc: 'Fuse' },
-                          { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'How' },
-                          { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Help' },
-                        ].map((item, idx) => (
-                          <button
-                            key={item.mode}
-                            onClick={() => setScreenMode(item.mode)}
-                            onMouseEnter={() => setMenuIndex(idx)}
-                            className={`w-full flex items-center gap-2 p-2.5 rounded border-2 transition-all ${
-                              menuIndex === idx 
-                                ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' 
+            {/* Screen bezel */}
+            <div className="gameboy-bezel">
+              {/* LCD Screen */}
+              <div className="gameboy-lcd">
+                <div className="gameboy-lcd-content">
+                  <AnimatePresence mode="wait">
+                    {/* MENU SCREEN */}
+                    {screenMode === 'menu' && (
+                      <motion.div
+                        key="menu"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-3">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>CLANKDEX</p>
+                          <p className="text-xs" style={{ color: '#0f380f', opacity: 0.7 }}>v1.0</p>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {[
+                            { mode: 'scan' as const, icon: ScanLine, label: 'NEW', desc: 'Create' },
+                            { mode: 'collection' as const, icon: BookOpen, label: 'DEX', desc: `${clankdexEntries.length}` },
+                            { mode: 'daily' as const, icon: Trophy, label: 'DAILY', desc: 'Vote' },
+                            { mode: 'merge' as const, icon: GitMerge, label: 'MERGE', desc: 'Fuse' },
+                            { mode: 'how-it-works' as const, icon: Sparkles, label: 'INFO', desc: 'How' },
+                            { mode: 'faq' as const, icon: Activity, label: 'FAQ', desc: 'Help' },
+                          ].map((item, idx) => (
+                            <button
+                              key={item.mode}
+                              onClick={() => setScreenMode(item.mode)}
+                              onMouseEnter={() => setMenuIndex(idx)}
+                              className={`w-full flex items-center gap-2 p-2.5 rounded border-2 transition-all ${menuIndex === idx
+                                ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]'
                                 : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
-                            }`}
-                          >
-                            <item.icon className="w-3 h-3" />
-                            <span className="font-pixel text-xs">{item.label}</span>
-                            <span className="text-xs opacity-60 ml-auto">{item.desc}</span>
-                          </button>
-                        ))}
-                      </div>
-                      <div className="text-center mt-2">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>▲▼ Move │ A Select</p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* SCAN SCREEN */}
-                  {screenMode === 'scan' && (
-                    <motion.div
-                      key="scan"
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -20, opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-3">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>NEW CREATURE</p>
-                      </div>
-
-                      {/* Content area */}
-                      <div className="flex-1 flex flex-col items-center justify-center">
-                        {isAnalyzing ? (
-                          <div className="text-center">
-                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>ANALYZING...</p>
-                          </div>
-                        ) : showCreature && creature ? (
-                          <div className="text-center">
-                            {imageBase64 && (
-                              <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
-                            )}
-                            <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{creature.name}</p>
-                            <p className="text-xs mb-2" style={{ color: '#0f380f' }}>{creature.element}</p>
-                            <button
-                              onClick={launchCreature}
-                              disabled={isMinting}
-                              className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
+                                }`}
                             >
-                              {isMinting ? '...' : 'DEPLOY'}
+                              <item.icon className="w-3 h-3" />
+                              <span className="font-pixel text-xs">{item.label}</span>
+                              <span className="text-xs opacity-60 ml-auto">{item.desc}</span>
                             </button>
-                          </div>
-                        ) : (
-                          <div className="text-center w-full px-4">
-                            <Wallet className="w-10 h-10 mx-auto mb-3" style={{ color: '#0f380f' }} />
-                            {isConnected ? (
-                              <>
-                                <p className="font-pixel text-[11px] mb-2" style={{ color: '#0f380f' }}>
-                                  {address?.slice(0, 6)}...{address?.slice(-4)}
-                                </p>
-                                <button
-                                  onClick={analyze}
-                                  disabled={isAnalyzing}
-                                  className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f]"
-                                >
-                                  GENERATE
-                                </button>
-                              </>
-                            ) : (
-                              <button
-                                onClick={async () => {
-                                  const injectedConnector = connectors.find(c => c.id === 'injected');
-                                  if (injectedConnector) {
-                                    try {
-                                      await connect({ connector: injectedConnector });
-                                    } catch (e) {
-                                      if (typeof window !== 'undefined' && window.ethereum) {
-                                        await window.ethereum.request({ method: 'eth_requestAccounts' });
-                                      }
-                                    }
-                                  } else if (connectors.length > 0) {
-                                    connect({ connector: connectors[0] });
-                                  }
-                                }}
-                                disabled={isConnecting}
-                                className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
-                              >
-                                {isConnecting ? '...' : 'CONNECT'}
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="text-center mt-2">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Deploy' : 'Generate'}</p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* COLLECTION SCREEN */}
-                  {screenMode === 'collection' && (
-                    <motion.div
-                      key="collection"
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -20, opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-2">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>ROLODEX</p>
-                        <p className="text-[11px]" style={{ color: '#0f380f', opacity: 0.7 }}>{clankdexEntries.length} ENTRIES</p>
-                      </div>
-
-                      {clankdexEntries.length === 0 ? (
-                        <div className="flex-1 flex items-center justify-center">
-                          <div className="text-center">
-                            <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>NO CREATURES</p>
-                            <p className="text-[11px]" style={{ color: '#0f380f' }}>Scan to begin</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex-1 overflow-y-auto space-y-1">
-                            {filteredEntries.slice(0, 5).map((entry, idx) => (
-                              <button
-                                key={entry.token_address}
-                                onClick={() => window.open(`${CLANKER_URL}/token/${entry.token_address}`, '_blank')}
-                                className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${currentEntryIndex === idx ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
-                              >
-                                <span className="font-pixel text-[11px] w-6">#{entry.entry_number}</span>
-                                <span className="font-pixel text-xs flex-1 truncate">{entry.name}</span>
-                                <span className="text-[11px]">{entry.element}</span>
-                              </button>
-                            ))}
-                          </div>
-                          <div className="text-center mt-2">
-                            <p className="text-[11px]" style={{ color: '#0f380f' }}>
-                              ◄► Navigate │ A View
-                            </p>
-                          </div>
-                        </>
-                      )}
-
-                      <div className="text-center mt-1">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* FAQ SCREEN */}
-                  {screenMode === 'faq' && (
-                    <motion.div
-                      key="faq"
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -20, opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-2">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>FAQ</p>
-                      </div>
-                      <div className="flex-1 overflow-y-auto space-y-1 text-[11px]" style={{ color: '#0f380f' }}>
-                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-xs mb-0.5">What is ClankDex?</p>
-                          <p className="opacity-80">A Wallet Pokedex that generates creatures from your on-chain data.</p>
-                        </div>
-                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-xs mb-0.5">How does it work?</p>
-                          <p className="opacity-80">We analyze your wallet to create a unique creature, then launch it as a token.</p>
-                        </div>
-                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-xs mb-0.5">What is Clanker?</p>
-                          <p className="opacity-80">Token deployment platform on Base. You earn creator rewards.</p>
-                        </div>
-                        <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <p className="font-pixel text-xs mb-0.5">How do evolutions work?</p>
-                          <p className="opacity-80">Creatures evolve based on market cap: Egg → Legendary.</p>
-                        </div>
-                      </div>
-                      <div className="text-center mt-2">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* HOW IT WORKS SCREEN */}
-                  {screenMode === 'how-it-works' && (
-                    <motion.div
-                      key="how-it-works"
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -20, opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-2">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>INFO</p>
-                      </div>
-                      <div className="flex-1 overflow-y-auto space-y-1 text-[11px]" style={{ color: '#0f380f' }}>
-                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-xs">1.</span>
-                          <div>
-                            <p className="font-pixel text-xs">CONNECT</p>
-                            <p className="opacity-80">Link wallet or enter Farcaster</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-xs">2.</span>
-                          <div>
-                            <p className="font-pixel text-xs">ANALYZE</p>
-                            <p className="opacity-80">We scan your on-chain DNA</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-xs">3.</span>
-                          <div>
-                            <p className="font-pixel text-xs">GENERATE</p>
-                            <p className="opacity-80">AI creates unique creature</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-xs">4.</span>
-                          <div>
-                            <p className="font-pixel text-xs">LAUNCH</p>
-                            <p className="opacity-80">Deploy as token on Base</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
-                          <span className="font-pixel text-xs">5.</span>
-                          <div>
-                            <p className="font-pixel text-xs">EVOLVE</p>
-                            <p className="opacity-80">Watch it grow with market cap</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center mt-2">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* DAILY (Token of the Day) SCREEN */}
-                  {screenMode === 'daily' && (
-                    <motion.div
-                      key="daily"
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -20, opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-2">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>TOKEN OF THE DAY</p>
-                      </div>
-                      <div className="flex-1 flex flex-col">
-                        {/* Today's Winner */}
-                        {tokenOfTheDay && (
-                          <div className="text-center mb-3 p-2 bg-[#0f380f]/20 rounded border border-[#0f380f]">
-                            <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: '#0f380f' }} />
-                            <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>TODAY'S WINNER</p>
-                            <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
-                            <button
-                              onClick={() => window.open(`${CLANKER_URL}/token/${tokenOfTheDay.token_address}`, '_blank')}
-                              className="mt-1 px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[11px] rounded"
-                            >
-                              VIEW
-                            </button>
-                          </div>
-                        )}
-                        
-                        {/* Vote List */}
-                        <p className="text-xs text-center mb-1 font-pixel" style={{ color: '#0f380f' }}>VOTE</p>
-                        <div className="flex-1 overflow-y-auto space-y-1">
-                          {clankdexEntries.slice(0, 5).map((entry) => (
-                            <div
-                              key={entry.token_address}
-                              className="flex items-center justify-between p-1.5 bg-[#8bac0f]/50 rounded border border-[#306230]"
-                            >
-                              <div className="flex items-center gap-1">
-                                <span className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>#{entry.entry_number}</span>
-                                <span className="text-[11px] truncate max-w-[60px]" style={{ color: '#0f380f' }}>{entry.name}</span>
-                              </div>
-                              <button
-                                onClick={() => handleVote(entry.token_address, entry.entry_number)}
-                                className="px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] text-[11px] rounded font-pixel"
-                              >
-                                ★
-                              </button>
-                            </div>
                           ))}
                         </div>
-                      </div>
-                      
-                      {/* Creator Streak */}
-                      {creatorStreak && creatorStreak.current_streak > 0 && (
-                        <div className="mt-2 p-2 bg-[#8bac0f]/50 rounded border border-[#306230]">
-                          <div className="flex items-center gap-2">
-                            <Flame className="w-4 h-4" style={{ color: '#0f380f' }} />
-                            <div>
-                              <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>
-                                STREAK: {creatorStreak.current_streak} DAYS
-                              </p>
-                              <p className="text-[11px]" style={{ color: '#0f380f' }}>
-                                Tier: {creatorStreak.tier.toUpperCase()}
-                              </p>
-                            </div>
-                          </div>
+                        <div className="text-center mt-2">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>▲▼ Move │ A Select</p>
                         </div>
-                      )}
-                      
-                      {/* Referral Code */}
-                      {isConnected && referralCode && (
-                        <div className="mt-2 p-2 bg-[#8bac0f]/50 rounded border border-[#306230]">
-                          <div className="flex items-center gap-2">
-                            <Share2 className="w-4 h-4" style={{ color: '#0f380f' }} />
-                            <div className="flex-1">
-                              <p className="text-[11px]" style={{ color: '#0f380f' }}>REF CODE:</p>
-                              <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{referralCode}</p>
-                            </div>
-                          </div>
-                          <p className="text-[9px] mt-1" style={{ color: '#0f380f', opacity: 0.85 }}>
-                            +0.1% fees when used
-                          </p>
-                        </div>
-                      )}
-                      
-                      <div className="text-center mt-2">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
-                      </div>
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    )}
 
-                  {/* MERGE SCREEN */}
-                  {screenMode === 'merge' && (
-                    <motion.div
-                      key="merge"
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -20, opacity: 0 }}
-                      className="p-3 h-full flex flex-col"
-                    >
-                      <div className="text-center mb-2">
-                        <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>MERGE</p>
-                      </div>
-                      <div className="flex-1 overflow-y-auto">
-                        {!isConnected ? (
-                          <div className="text-center py-4">
-                            <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="text-[11px]" style={{ color: '#0f380f' }}>Connect to merge</p>
-                          </div>
-                        ) : mergeableTokens.length < 2 ? (
-                          <div className="text-center py-4">
-                            <GitMerge className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
-                            <p className="text-[11px]" style={{ color: '#0f380f' }}>Need 2+ tokens</p>
+                    {/* SCAN SCREEN */}
+                    {screenMode === 'scan' && (
+                      <motion.div
+                        key="scan"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -20, opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-3">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>NEW CREATURE</p>
+                        </div>
+
+                        {/* Content area */}
+                        <div className="flex-1 flex flex-col items-center justify-center">
+                          {isAnalyzing ? (
+                            <div className="text-center">
+                              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" style={{ color: '#0f380f' }} />
+                              <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>ANALYZING...</p>
+                            </div>
+                          ) : showCreature && creature ? (
+                            <div className="text-center">
+                              {imageBase64 && (
+                                <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
+                              )}
+                              <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{creature.name}</p>
+                              <p className="text-xs mb-2" style={{ color: '#0f380f' }}>{creature.element}</p>
+                              <button
+                                onClick={launchCreature}
+                                disabled={isMinting}
+                                className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
+                              >
+                                {isMinting ? '...' : 'DEPLOY'}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="text-center w-full px-4">
+                              <Wallet className="w-10 h-10 mx-auto mb-3" style={{ color: '#0f380f' }} />
+                              {isConnected ? (
+                                <>
+                                  <p className="font-pixel text-[11px] mb-2" style={{ color: '#0f380f' }}>
+                                    {address?.slice(0, 6)}...{address?.slice(-4)}
+                                  </p>
+                                  <button
+                                    onClick={analyze}
+                                    disabled={isAnalyzing}
+                                    className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f]"
+                                  >
+                                    GENERATE
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  onClick={async () => {
+                                    const injectedConnector = connectors.find(c => c.id === 'injected');
+                                    if (injectedConnector) {
+                                      try {
+                                        await connect({ connector: injectedConnector });
+                                      } catch (e) {
+                                        if (typeof window !== 'undefined' && window.ethereum) {
+                                          await window.ethereum.request({ method: 'eth_requestAccounts' });
+                                        }
+                                      }
+                                    } else if (connectors.length > 0) {
+                                      connect({ connector: connectors[0] });
+                                    }
+                                  }}
+                                  disabled={isConnecting}
+                                  className="px-4 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
+                                >
+                                  {isConnecting ? '...' : 'CONNECT'}
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="text-center mt-2">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back │ A {showCreature ? 'Deploy' : 'Generate'}</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* COLLECTION SCREEN */}
+                    {screenMode === 'collection' && (
+                      <motion.div
+                        key="collection"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -20, opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-2">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>ROLODEX</p>
+                          <p className="text-[11px]" style={{ color: '#0f380f', opacity: 0.7 }}>{clankdexEntries.length} ENTRIES</p>
+                        </div>
+
+                        {clankdexEntries.length === 0 ? (
+                          <div className="flex-1 flex items-center justify-center">
+                            <div className="text-center">
+                              <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                              <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>NO CREATURES</p>
+                              <p className="text-[11px]" style={{ color: '#0f380f' }}>Scan to begin</p>
+                            </div>
                           </div>
                         ) : (
-                          <div className="space-y-1">
-                            <p className="text-[11px] text-center mb-2" style={{ color: '#0f380f' }}>Select 2 tokens:</p>
-                            {mergeableTokens.slice(0, 4).map((token) => (
+                          <>
+                            <div className="flex-1 overflow-y-auto space-y-1">
+                              {filteredEntries.slice(0, 5).map((entry, idx) => (
+                                <button
+                                  key={entry.token_address}
+                                  onClick={() => window.open(`${CLANKER_URL}/token/${entry.token_address}`, '_blank')}
+                                  className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${currentEntryIndex === idx ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]' : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'}`}
+                                >
+                                  <span className="font-pixel text-[11px] w-6">#{entry.entry_number}</span>
+                                  <span className="font-pixel text-xs flex-1 truncate">{entry.name}</span>
+                                  <span className="text-[11px]">{entry.element}</span>
+                                </button>
+                              ))}
+                            </div>
+                            <div className="text-center mt-2">
+                              <p className="text-[11px]" style={{ color: '#0f380f' }}>
+                                ◄► Navigate │ A View
+                              </p>
+                            </div>
+                          </>
+                        )}
+
+                        <div className="text-center mt-1">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* FAQ SCREEN */}
+                    {screenMode === 'faq' && (
+                      <motion.div
+                        key="faq"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -20, opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-2">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>FAQ</p>
+                        </div>
+                        <div className="flex-1 overflow-y-auto space-y-1 text-[11px]" style={{ color: '#0f380f' }}>
+                          <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <p className="font-pixel text-xs mb-0.5">What is ClankDex?</p>
+                            <p className="opacity-80">A Wallet Pokedex that generates creatures from your on-chain data.</p>
+                          </div>
+                          <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <p className="font-pixel text-xs mb-0.5">How does it work?</p>
+                            <p className="opacity-80">We analyze your wallet to create a unique creature, then launch it as a token.</p>
+                          </div>
+                          <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <p className="font-pixel text-xs mb-0.5">What is Clanker?</p>
+                            <p className="opacity-80">Token deployment platform on Base. You earn creator rewards.</p>
+                          </div>
+                          <div className="bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <p className="font-pixel text-xs mb-0.5">How do evolutions work?</p>
+                            <p className="opacity-80">Creatures evolve based on market cap: Egg → Legendary.</p>
+                          </div>
+                        </div>
+                        <div className="text-center mt-2">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* HOW IT WORKS SCREEN */}
+                    {screenMode === 'how-it-works' && (
+                      <motion.div
+                        key="how-it-works"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -20, opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-2">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>INFO</p>
+                        </div>
+                        <div className="flex-1 overflow-y-auto space-y-1 text-[11px]" style={{ color: '#0f380f' }}>
+                          <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <span className="font-pixel text-xs">1.</span>
+                            <div>
+                              <p className="font-pixel text-xs">CONNECT</p>
+                              <p className="opacity-80">Link wallet or enter Farcaster</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <span className="font-pixel text-xs">2.</span>
+                            <div>
+                              <p className="font-pixel text-xs">ANALYZE</p>
+                              <p className="opacity-80">We scan your on-chain DNA</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <span className="font-pixel text-xs">3.</span>
+                            <div>
+                              <p className="font-pixel text-xs">GENERATE</p>
+                              <p className="opacity-80">AI creates unique creature</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <span className="font-pixel text-xs">4.</span>
+                            <div>
+                              <p className="font-pixel text-xs">LAUNCH</p>
+                              <p className="opacity-80">Deploy as token on Base</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-[#8bac0f]/50 p-2 rounded border border-[#306230]">
+                            <span className="font-pixel text-xs">5.</span>
+                            <div>
+                              <p className="font-pixel text-xs">EVOLVE</p>
+                              <p className="opacity-80">Watch it grow with market cap</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-center mt-2">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* DAILY (Token of the Day) SCREEN */}
+                    {screenMode === 'daily' && (
+                      <motion.div
+                        key="daily"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -20, opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-2">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>TOKEN OF THE DAY</p>
+                        </div>
+                        <div className="flex-1 flex flex-col">
+                          {/* Today's Winner */}
+                          {tokenOfTheDay && (
+                            <div className="text-center mb-3 p-2 bg-[#0f380f]/20 rounded border border-[#0f380f]">
+                              <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: '#0f380f' }} />
+                              <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>TODAY'S WINNER</p>
+                              <p className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>#{tokenOfTheDay.entry_number}</p>
                               <button
-                                key={token.token_address}
-                                onClick={() => {
-                                  if (selectedParents[0] === token.token_address) {
-                                    setSelectedParents([null, selectedParents[1]]);
-                                  } else if (selectedParents[1] === token.token_address) {
-                                    setSelectedParents([selectedParents[0], null]);
-                                  } else if (!selectedParents[0]) {
-                                    setSelectedParents([token.token_address, selectedParents[1]]);
-                                  } else if (!selectedParents[1]) {
-                                    setSelectedParents([selectedParents[0], token.token_address]);
-                                  }
-                                }}
-                                className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${
-                                  selectedParents.includes(token.token_address)
-                                    ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]'
-                                    : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
-                                }`}
+                                onClick={() => window.open(`${CLANKER_URL}/token/${tokenOfTheDay.token_address}`, '_blank')}
+                                className="mt-1 px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-[11px] rounded"
                               >
-                                <span className="font-pixel text-xs">#{token.entry_number}</span>
-                                <span className="font-pixel text-[11px] flex-1 truncate">{token.name}</span>
-                                {selectedParents.includes(token.token_address) && (
-                                  <CheckCircle2 className="w-3 h-3" />
-                                )}
+                                VIEW
                               </button>
+                            </div>
+                          )}
+
+                          {/* Vote List */}
+                          <p className="text-xs text-center mb-1 font-pixel" style={{ color: '#0f380f' }}>VOTE</p>
+                          <div className="flex-1 overflow-y-auto space-y-1">
+                            {clankdexEntries.slice(0, 5).map((entry) => (
+                              <div
+                                key={entry.token_address}
+                                className="flex items-center justify-between p-1.5 bg-[#8bac0f]/50 rounded border border-[#306230]"
+                              >
+                                <div className="flex items-center gap-1">
+                                  <span className="font-pixel text-[11px]" style={{ color: '#0f380f' }}>#{entry.entry_number}</span>
+                                  <span className="text-[11px] truncate max-w-[60px]" style={{ color: '#0f380f' }}>{entry.name}</span>
+                                </div>
+                                <button
+                                  onClick={() => handleVote(entry.token_address, entry.entry_number)}
+                                  className="px-2 py-0.5 bg-[#0f380f] text-[#9bbc0f] text-[11px] rounded font-pixel"
+                                >
+                                  ★
+                                </button>
+                              </div>
                             ))}
-                            {selectedParents[0] && selectedParents[1] && (
-                              <button
-                                onClick={mergeTokens}
-                                disabled={isMerging}
-                                className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
-                              >
-                                {isMerging ? '...' : 'MERGE'}
-                              </button>
-                            )}
+                          </div>
+                        </div>
+
+                        {/* Creator Streak */}
+                        {creatorStreak && creatorStreak.current_streak > 0 && (
+                          <div className="mt-2 p-2 bg-[#8bac0f]/50 rounded border border-[#306230]">
+                            <div className="flex items-center gap-2">
+                              <Flame className="w-4 h-4" style={{ color: '#0f380f' }} />
+                              <div>
+                                <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>
+                                  STREAK: {creatorStreak.current_streak} DAYS
+                                </p>
+                                <p className="text-[11px]" style={{ color: '#0f380f' }}>
+                                  Tier: {creatorStreak.tier.toUpperCase()}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         )}
-                      </div>
-                      <div className="text-center mt-2">
-                        <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+
+                        {/* Referral Code */}
+                        {isConnected && referralCode && (
+                          <div className="mt-2 p-2 bg-[#8bac0f]/50 rounded border border-[#306230]">
+                            <div className="flex items-center gap-2">
+                              <Share2 className="w-4 h-4" style={{ color: '#0f380f' }} />
+                              <div className="flex-1">
+                                <p className="text-[11px]" style={{ color: '#0f380f' }}>REF CODE:</p>
+                                <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{referralCode}</p>
+                              </div>
+                            </div>
+                            <p className="text-[9px] mt-1" style={{ color: '#0f380f', opacity: 0.85 }}>
+                              +0.1% fees when used
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="text-center mt-2">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* MERGE SCREEN */}
+                    {screenMode === 'merge' && (
+                      <motion.div
+                        key="merge"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -20, opacity: 0 }}
+                        className="p-3 h-full flex flex-col"
+                      >
+                        <div className="text-center mb-2">
+                          <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>MERGE</p>
+                        </div>
+                        <div className="flex-1 overflow-y-auto">
+                          {!isConnected ? (
+                            <div className="text-center py-4">
+                              <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                              <p className="text-[11px]" style={{ color: '#0f380f' }}>Connect to merge</p>
+                            </div>
+                          ) : mergeableTokens.length < 2 ? (
+                            <div className="text-center py-4">
+                              <GitMerge className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: '#0f380f' }} />
+                              <p className="text-[11px]" style={{ color: '#0f380f' }}>Need 2+ tokens</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <p className="text-[11px] text-center mb-2" style={{ color: '#0f380f' }}>Select 2 tokens:</p>
+                              {mergeableTokens.slice(0, 4).map((token) => (
+                                <button
+                                  key={token.token_address}
+                                  onClick={() => {
+                                    if (selectedParents[0] === token.token_address) {
+                                      setSelectedParents([null, selectedParents[1]]);
+                                    } else if (selectedParents[1] === token.token_address) {
+                                      setSelectedParents([selectedParents[0], null]);
+                                    } else if (!selectedParents[0]) {
+                                      setSelectedParents([token.token_address, selectedParents[1]]);
+                                    } else if (!selectedParents[1]) {
+                                      setSelectedParents([selectedParents[0], token.token_address]);
+                                    }
+                                  }}
+                                  className={`w-full flex items-center gap-2 p-2 rounded border-2 text-left ${selectedParents.includes(token.token_address)
+                                    ? 'bg-[#0f380f] text-[#9bbc0f] border-[#0f380f]'
+                                    : 'bg-[#8bac0f] text-[#0f380f] border-[#306230]'
+                                    }`}
+                                >
+                                  <span className="font-pixel text-xs">#{token.entry_number}</span>
+                                  <span className="font-pixel text-[11px] flex-1 truncate">{token.name}</span>
+                                  {selectedParents.includes(token.token_address) && (
+                                    <CheckCircle2 className="w-3 h-3" />
+                                  )}
+                                </button>
+                              ))}
+                              {selectedParents[0] && selectedParents[1] && (
+                                <button
+                                  onClick={mergeTokens}
+                                  disabled={isMerging}
+                                  className="w-full mt-2 px-3 py-1.5 bg-[#0f380f] text-[#9bbc0f] font-pixel text-xs rounded border-2 border-[#0f380f] disabled:opacity-50"
+                                >
+                                  {isMerging ? '...' : 'MERGE'}
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-center mt-2">
+                          <p className="text-[11px]" style={{ color: '#0f380f' }}>B Back</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Controls section */}
-          <div className="gameboy-controls flex justify-between items-center">
-            {/* D-Pad */}
-            <div className="d-pad">
-              <div className="d-pad-base" />
-              <div className="d-pad-cross" />
-              <div className="d-pad-center" />
-              {/* Invisible click areas for navigation */}
-              <button
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
-                onClick={() => {
-                  if (screenMode === 'menu') setMenuIndex(i => Math.max(0, i - 1));
-                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
-                }}
-              />
-              <button
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
-                onClick={() => {
-                  if (screenMode === 'menu') setMenuIndex(i => Math.min(menuItems.length - 1, i + 1));
-                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
-                }}
-              />
-              <button
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 z-10"
-                onClick={() => {
-                  if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
-                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
-                }}
-              />
-              <button
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 z-10"
-                onClick={() => {
-                  if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
-                  if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
-                }}
-              />
+            {/* Controls section */}
+            <div className="gameboy-controls flex justify-between items-center">
+              {/* D-Pad */}
+              <div className="d-pad">
+                <div className="d-pad-base" />
+                <div className="d-pad-cross" />
+                <div className="d-pad-center" />
+                {/* Invisible click areas for navigation */}
+                <button
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
+                  onClick={() => {
+                    if (screenMode === 'menu') setMenuIndex(i => Math.max(0, i - 1));
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
+                  }}
+                />
+                <button
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 z-10"
+                  onClick={() => {
+                    if (screenMode === 'menu') setMenuIndex(i => Math.min(menuItems.length - 1, i + 1));
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
+                  }}
+                />
+                <button
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 z-10"
+                  onClick={() => {
+                    if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.max(0, i - 1));
+                  }}
+                />
+                <button
+                  className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 z-10"
+                  onClick={() => {
+                    if (screenMode === 'scan') setInputMode(inputMode === 'wallet' ? 'farcaster' : 'wallet');
+                    if (screenMode === 'collection') setCurrentEntryIndex(i => Math.min(filteredEntries.length - 1, i + 1));
+                  }}
+                />
+              </div>
+
+              {/* A/B Buttons */}
+              <div className="ab-buttons">
+                <button onClick={handleBButton} className="ab-button">
+                  <span className="ab-button-label">B</span>
+                </button>
+                <button onClick={handleAButton} className="ab-button">
+                  <span className="ab-button-label">A</span>
+                </button>
+              </div>
             </div>
 
-            {/* A/B Buttons */}
-            <div className="ab-buttons">
-              <button onClick={handleBButton} className="ab-button">
-                <span className="ab-button-label">B</span>
+            {/* Start/Select */}
+            <div className="menu-buttons">
+              <button className="menu-button" onClick={() => setScreenMode('menu')}>
+                <span className="menu-button-label">SELECT</span>
               </button>
-              <button onClick={handleAButton} className="ab-button">
-                <span className="ab-button-label">A</span>
+              <button className="menu-button" onClick={() => setScreenMode('scan')}>
+                <span className="menu-button-label">START</span>
               </button>
+            </div>
+
+            {/* Decorative stripes */}
+            <div className="device-stripes">
+              <div className="device-stripe" />
+              <div className="device-stripe" />
+              <div className="device-stripe" />
+            </div>
+
+            {/* Device branding */}
+            <div className="device-branding">
+              Clank<span>DEX</span>
+            </div>
+
+            {/* Speaker grill */}
+            <div className="speaker-grill">
+              {[...Array(24)].map((_, i) => <div key={i} className="speaker-hole" />)}
             </div>
           </div>
 
-          {/* Start/Select */}
-          <div className="menu-buttons">
-            <button className="menu-button" onClick={() => setScreenMode('menu')}>
-              <span className="menu-button-label">SELECT</span>
-            </button>
-            <button className="menu-button" onClick={() => setScreenMode('scan')}>
-              <span className="menu-button-label">START</span>
-            </button>
+          {/* Control hint */}
+          <div className="control-hint">
+            ◄ ▲ ▼ ► Navigate │ A Select │ B Back
           </div>
-
-          {/* Decorative stripes */}
-          <div className="device-stripes">
-            <div className="device-stripe" />
-            <div className="device-stripe" />
-            <div className="device-stripe" />
-          </div>
-
-          {/* Device branding */}
-          <div className="device-branding">
-            Clank<span>DEX</span>
-          </div>
-
-          {/* Speaker grill */}
-          <div className="speaker-grill">
-            {[...Array(24)].map((_, i) => <div key={i} className="speaker-hole" />)}
-          </div>
-        </div>
-
-        {/* Control hint */}
-        <div className="control-hint">
-          ◄ ▲ ▼ ► Navigate │ A Select │ B Back
-        </div>
-      </motion.div>
-    </main>
+        </motion.div>
+      </main>
+    </>
   );
 }
 
@@ -2206,12 +2204,11 @@ function StatsPanel({
       <div className="bg-gray-900 p-6 -mt-8 rounded-t-3xl relative z-20">
         {/* Rarity Badge */}
         <div className="flex justify-center -mt-10 mb-4">
-          <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase shadow-lg ${
-            getRarity(creature.element) === 'legendary' ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black' :
+          <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase shadow-lg ${getRarity(creature.element) === 'legendary' ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black' :
             getRarity(creature.element) === 'rare' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white' :
-            getRarity(creature.element) === 'uncommon' ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white' :
-            'bg-gray-600 text-white'
-          }`}>
+              getRarity(creature.element) === 'uncommon' ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white' :
+                'bg-gray-600 text-white'
+            }`}>
             {getRarity(creature.element)}
           </span>
         </div>
@@ -2270,38 +2267,37 @@ function StatsPanel({
             transition={{ delay: 0.7 }}
             className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/20"
           >
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-purple-400" />
-            <h4 className="text-sm font-bold text-purple-400">EVOLUTION PATH</h4>
-          </div>
-          
-          {/* Evolution Stages Preview */}
-          <div className="flex items-center justify-between">
-            {EVOLUTION_TIERS.map((tier, idx) => (
-              <motion.div
-                key={tier.name}
-                className="flex flex-col items-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + idx * 0.1 }}
-                whileHover={{ scale: 1.1, y: -2 }}
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
-                  idx === 0 ? 'bg-gray-600' : 'bg-gray-800 border border-gray-600'
-                }`}>
-                  {(() => {
-                    const IconComponent = tier.icon;
-                    return <IconComponent className={`w-4 h-4 ${tier.color}`} />;
-                  })()}
-                </div>
-                <span className="text-xs text-gray-200 mt-1 hidden sm:block font-sans">{tier.name}</span>
-              </motion.div>
-            ))}
-          </div>
-          
-          <p className="text-sm text-gray-200 mt-3 text-center font-sans">
-            Your creature will evolve as market cap grows!
-          </p>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-purple-400" />
+              <h4 className="text-sm font-bold text-purple-400">EVOLUTION PATH</h4>
+            </div>
+
+            {/* Evolution Stages Preview */}
+            <div className="flex items-center justify-between">
+              {EVOLUTION_TIERS.map((tier, idx) => (
+                <motion.div
+                  key={tier.name}
+                  className="flex flex-col items-center"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + idx * 0.1 }}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${idx === 0 ? 'bg-gray-600' : 'bg-gray-800 border border-gray-600'
+                    }`}>
+                    {(() => {
+                      const IconComponent = tier.icon;
+                      return <IconComponent className={`w-4 h-4 ${tier.color}`} />;
+                    })()}
+                  </div>
+                  <span className="text-xs text-gray-200 mt-1 hidden sm:block font-sans">{tier.name}</span>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="text-sm text-gray-200 mt-3 text-center font-sans">
+              Your creature will evolve as market cap grows!
+            </p>
           </motion.div>
         )}
 
@@ -2359,7 +2355,7 @@ function StatsPanel({
 
       {/* Launch Animation Overlay */}
       {isMinting && (
-        <motion.div 
+        <motion.div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -2398,7 +2394,7 @@ function DeploySuccess({
             )}
           </div>
         </div>
-        
+
         <div className="space-y-2 text-sm font-sans">
           <div className="flex justify-between">
             <span className="text-gray-200">Token:</span>
@@ -2422,7 +2418,7 @@ function DeploySuccess({
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <a 
+        <a
           href={`${CLANKER_URL}/token/${deployResult.tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -2432,7 +2428,7 @@ function DeploySuccess({
           View on Clanker
           <ExternalLink className="w-3 h-3" />
         </a>
-        <a 
+        <a
           href={`https://basescan.org/token/${deployResult.tokenAddress}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -2758,15 +2754,15 @@ function NotConnectedState({ inputMode }: { inputMode: InputMode }) {
 }
 
 // Filter Chip Component
-const FilterChip = ({ 
-  label, 
-  active, 
-  onClick, 
+const FilterChip = ({
+  label,
+  active,
+  onClick,
   color = 'blue',
   icon: Icon
-}: { 
-  label: string; 
-  active: boolean; 
+}: {
+  label: string;
+  active: boolean;
   onClick: () => void;
   color?: string;
   icon?: React.ElementType;
@@ -2795,14 +2791,14 @@ const FilterChip = ({
 };
 
 // Sort Option Button
-const SortButton = ({ 
-  label, 
-  active, 
+const SortButton = ({
+  label,
+  active,
   onClick,
   icon: Icon
-}: { 
-  label: string; 
-  active: boolean; 
+}: {
+  label: string;
+  active: boolean;
   onClick: () => void;
   icon: React.ElementType;
 }) => (
@@ -2810,11 +2806,10 @@ const SortButton = ({
     onClick={onClick}
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
-    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
-      active 
-        ? 'bg-pokedex-yellow text-black' 
-        : 'bg-gray-800 text-gray-400 hover:text-white border border-gray-700'
-    }`}
+    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all ${active
+      ? 'bg-pokedex-yellow text-black'
+      : 'bg-gray-800 text-gray-400 hover:text-white border border-gray-700'
+      }`}
   >
     <Icon className="w-3 h-3" />
     {label}
@@ -2914,7 +2909,7 @@ function Rolodex({
       className="max-w-2xl mx-auto"
     >
       {/* Search & Filter Header */}
-      <motion.div 
+      <motion.div
         className="mb-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -2953,17 +2948,16 @@ function Rolodex({
               )}
             </AnimatePresence>
           </div>
-          
+
           {/* Filter Toggle Button */}
           <motion.button
             onClick={onToggleFilters}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 border-4 transition-all ${
-              showFilters || activeFilterCount > 0
-                ? 'bg-pokedex-yellow text-black border-pokedex-yellow'
-                : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
-            }`}
+            className={`px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 border-4 transition-all ${showFilters || activeFilterCount > 0
+              ? 'bg-pokedex-yellow text-black border-pokedex-yellow'
+              : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
+              }`}
           >
             <Filter className="w-5 h-5" />
             {activeFilterCount > 0 && (
@@ -2988,22 +2982,22 @@ function Rolodex({
               className="flex flex-wrap gap-2 mb-4"
             >
               {searchQuery && (
-                <ActiveFilter 
-                  label={`Search: "${searchQuery}"`} 
+                <ActiveFilter
+                  label={`Search: "${searchQuery}"`}
                   onClear={() => onSearchChange('')}
                   color="purple"
                 />
               )}
               {filterTier !== 'all' && (
-                <ActiveFilter 
-                  label={`Tier: ${filterTier}`} 
+                <ActiveFilter
+                  label={`Tier: ${filterTier}`}
                   onClear={() => onFilterTierChange('all')}
                   color="yellow"
                 />
               )}
               {filterElement !== 'all' && (
-                <ActiveFilter 
-                  label={`Element: ${filterElement}`} 
+                <ActiveFilter
+                  label={`Element: ${filterElement}`}
                   onClear={() => onFilterElementChange('all')}
                   color={filterElement.toLowerCase() === 'fire' ? 'red' : filterElement.toLowerCase() === 'water' ? 'blue' : filterElement.toLowerCase() === 'grass' ? 'green' : 'blue'}
                 />
@@ -3122,7 +3116,7 @@ function Rolodex({
 
       {entries.length === 0 ? (
         // Empty State with animation
-        <motion.div 
+        <motion.div
           className="rolodex-container p-8"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -3135,7 +3129,7 @@ function Rolodex({
             >
               <BookOpen className="w-20 h-20 text-gray-600 mx-auto mb-6" />
             </motion.div>
-            <motion.h3 
+            <motion.h3
               className="font-pixel text-xl text-white mb-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -3143,7 +3137,7 @@ function Rolodex({
             >
               {totalEntries === 0 ? 'NO ENTRIES YET' : 'NO MATCHES FOUND'}
             </motion.h3>
-            <motion.p 
+            <motion.p
               className="text-gray-400 mb-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -3215,19 +3209,19 @@ function Rolodex({
           </div>
 
           {/* Entry Counter with animation */}
-          <motion.div 
+          <motion.div
             className="text-center mt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <motion.p 
+            <motion.p
               className="text-gray-400 text-sm"
               key={currentEntry.entry_number}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
             >
-              Showing <motion.span 
+              Showing <motion.span
                 className="text-pokedex-yellow font-bold"
                 initial={{ scale: 1.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -3239,7 +3233,7 @@ function Rolodex({
               <span className="text-white">{currentIndex + 1}</span> of <span className="text-white">{entries.length}</span>
               {searchQuery && ` (filtered from ${totalEntries})`}
             </motion.p>
-            <motion.p 
+            <motion.p
               className="text-gray-300 text-sm mt-2 font-sans"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -3266,7 +3260,7 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
   useEffect(() => {
     const fetchRewards = async () => {
       if (!tokenAddress || !creatorAddress) return;
-      
+
       try {
         const response = await fetch(`/api/claim-rewards?token=${tokenAddress}&recipient=${creatorAddress}`);
         if (response.ok) {
@@ -3286,7 +3280,7 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
 
   const handleClaim = async () => {
     if (!tokenAddress || !address) return;
-    
+
     setIsClaiming(true);
     try {
       const response = await fetch('/api/claim-rewards', {
@@ -3320,11 +3314,10 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
       <motion.button
         onClick={handleClaim}
         disabled={isClaiming || !hasRewards}
-        className={`flex flex-col items-center justify-center gap-0 px-2 py-2 rounded-lg text-xs font-bold transition-colors ${
-          hasRewards 
-            ? 'bg-green-600 hover:bg-green-500 text-white cursor-pointer' 
-            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-        }`}
+        className={`flex flex-col items-center justify-center gap-0 px-2 py-2 rounded-lg text-xs font-bold transition-colors ${hasRewards
+          ? 'bg-green-600 hover:bg-green-500 text-white cursor-pointer'
+          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+          }`}
         whileHover={hasRewards ? { scale: 1.05, y: -2 } : {}}
         whileTap={hasRewards ? { scale: 0.95, y: 0 } : {}}
       >
@@ -3344,9 +3337,8 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className={`flex items-center gap-2 px-2 py-1 rounded text-xs max-w-[140px] ${
-              feedback.type === 'error' ? 'bg-red-900/90 text-red-100' : 'bg-green-900/90 text-green-100'
-            }`}
+            className={`flex items-center gap-2 px-2 py-1 rounded text-xs max-w-[140px] ${feedback.type === 'error' ? 'bg-red-900/90 text-red-100' : 'bg-green-900/90 text-green-100'
+              }`}
           >
             <span className="truncate flex-1">{feedback.message}</span>
             <button type="button" onClick={() => setFeedback(null)} aria-label="Dismiss">
@@ -3368,17 +3360,17 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
 
   // Fetch live price data
   const { priceData, loading: priceLoading } = usePriceData(token_address);
-  
+
   // Fetch evolution data from Supabase
   const [evolutionData, setEvolutionData] = useState<EvolutionRecord | null>(null);
-  
+
   useEffect(() => {
     const fetchEvolution = async () => {
       const { getEvolutionData, updateEvolution } = await import('@/lib/supabase');
-      
+
       // Get existing evolution data
       let data = await getEvolutionData(token_address);
-      
+
       // If we have price data, check for evolution
       if (data && priceData) {
         const newTier = getEvolutionTier(priceData.marketCap);
@@ -3389,17 +3381,17 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
           data = await getEvolutionData(token_address);
         }
       }
-      
+
       setEvolutionData(data);
     };
-    
+
     fetchEvolution();
-    
+
     // Re-check every 30 seconds
     const interval = setInterval(fetchEvolution, 30000);
     return () => clearInterval(interval);
   }, [token_address, priceData?.marketCap]);
-  
+
   // Use evolution data from DB if available, otherwise fallback to price-based
   const currentTierIndex = evolutionData?.current_tier ?? (priceData ? getEvolutionTier(priceData.marketCap).index : 0);
   const evolutionTier = EVOLUTION_TIERS[currentTierIndex] || EVOLUTION_TIERS[0];
@@ -3433,7 +3425,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       className={`rolodex-card hover-lift ${evolutionTier.name === 'Legendary' ? 'animate-legendary' : ''}`}
     >
       {/* Entry Number Badge with bounce */}
-      <motion.div 
+      <motion.div
         className="entry-number"
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -3446,7 +3438,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       {/* Evolution Tier Badge with pop animation */}
       <AnimatePresence>
         {priceData && (
-          <motion.div 
+          <motion.div
             initial={{ scale: 0, y: -20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0, y: -20 }}
@@ -3463,14 +3455,14 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       </AnimatePresence>
 
       {/* Top Section with stagger */}
-      <motion.div 
+      <motion.div
         className="flex items-start justify-between mb-4"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
         <div>
-          <motion.h2 
+          <motion.h2
             className="font-pixel text-2xl text-white"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -3479,7 +3471,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
             {name}
           </motion.h2>
         </div>
-        <motion.div 
+        <motion.div
           className="flex flex-col items-end gap-2"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -3489,7 +3481,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
             {ELEMENT_ICONS[element]}
             {element}
           </Badge>
-          <motion.span 
+          <motion.span
             className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(element)]}`}
             whileHover={{ scale: 1.1 }}
           >
@@ -3501,7 +3493,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       {/* Live Price Banner with slide-in */}
       <AnimatePresence>
         {priceData && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50, height: 0 }}
             animate={{ opacity: 1, x: 0, height: 'auto' }}
             exit={{ opacity: 0, x: 50, height: 0 }}
@@ -3519,7 +3511,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
                   {formatPrice(priceData.price)}
                 </span>
                 {priceData.priceChange24h !== 0 && (
-                  <motion.span 
+                  <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className={`flex items-center text-xs ${priceData.priceChange24h > 0 ? 'text-green-400' : 'text-red-400'}`}
@@ -3539,7 +3531,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
 
       <AnimatePresence>
         {priceLoading && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -3552,7 +3544,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       </AnimatePresence>
 
       {/* Creature Display with idle animation */}
-      <motion.div 
+      <motion.div
         className={`rolodex-screen mb-4 relative overflow-hidden ${evolutionTier.name === 'Legendary' ? 'ring-4 ring-yellow-400/50 animate-legendary' : ''}`}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -3563,7 +3555,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
         {evolutionTier.name === 'Legendary' && (
           <div className="absolute inset-0 animate-rainbow pointer-events-none z-10" />
         )}
-        
+
         {image_url ? (
           <motion.div className="relative w-full h-full">
             <motion.img
@@ -3591,7 +3583,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
             className="w-full h-full flex items-center justify-center"
             style={{ backgroundColor: ELEMENT_COLORS[element] || '#333' }}
           >
-            <motion.span 
+            <motion.span
               className="text-6xl"
               animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -3605,7 +3597,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       {/* Market Cap HP Bar with enhanced animation */}
       <AnimatePresence>
         {priceData && showStats && (
-          <motion.div 
+          <motion.div
             className="mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -3616,7 +3608,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
                 <Crown className="w-3 h-3 text-yellow-400" />
                 MARKET CAP HP
               </span>
-              <motion.span 
+              <motion.span
                 className="font-pixel text-sm text-yellow-400"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -3625,9 +3617,9 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
                 {formatMarketCap(priceData.marketCap)}
               </motion.span>
             </div>
-            <AnimatedStatBar 
-              value={marketCapHP} 
-              max={100} 
+            <AnimatedStatBar
+              value={marketCapHP}
+              max={100}
               color={evolutionTier.name === 'Legendary' ? 'yellow' : evolutionTier.name === 'Mega' ? 'red' : 'green'}
               delay={0.3}
             />
@@ -3642,7 +3634,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       {/* Volume 24h with slide */}
       <AnimatePresence>
         {priceData && priceData.volume24h > 0 && showStats && (
-          <motion.div 
+          <motion.div
             className="mb-4 flex items-center justify-between p-2 bg-gray-800/50 rounded-lg"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -3662,7 +3654,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       </AnimatePresence>
 
       {/* Stats Grid with stagger animation */}
-      <motion.div 
+      <motion.div
         className="grid grid-cols-5 gap-2 mb-4"
         initial="hidden"
         animate={showStats ? "visible" : "hidden"}
@@ -3681,14 +3673,14 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
           { label: 'SPD', value: speed, color: 'text-yellow-400' },
           { label: 'SPC', value: special, color: 'text-purple-400' },
         ].map((stat) => (
-          <motion.div 
+          <motion.div
             key={stat.label}
             className="text-center"
             variants={{
               hidden: { opacity: 0, y: 20, scale: 0.5 },
-              visible: { 
-                opacity: 1, 
-                y: 0, 
+              visible: {
+                opacity: 1,
+                y: 0,
                 scale: 1,
                 transition: { type: "spring", stiffness: 400, damping: 15 }
               }
@@ -3696,7 +3688,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
             whileHover={{ scale: 1.15, y: -2 }}
           >
             <p className="text-gray-300 text-sm font-sans">{stat.label}</p>
-            <motion.p 
+            <motion.p
               className={`font-pixel ${stat.color}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -3709,7 +3701,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       </motion.div>
 
       {/* Total & Token Info with slide-up */}
-      <motion.div 
+      <motion.div
         className="border-t border-gray-700 pt-4 grid grid-cols-2 gap-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -3717,7 +3709,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       >
         <motion.div whileHover={{ scale: 1.05 }}>
           <p className="text-gray-300 text-sm mb-1 font-sans">TOTAL STATS</p>
-          <motion.p 
+          <motion.p
             className="font-pixel text-xl text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -3728,7 +3720,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }}>
           <p className="text-gray-300 text-sm mb-1 font-sans">TOKEN</p>
-          <motion.p 
+          <motion.p
             className="font-pixel text-pokedex-yellow"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -3740,13 +3732,13 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       </motion.div>
 
       {/* Footer with fade */}
-      <motion.div 
+      <motion.div
         className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between text-xs"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7 }}
       >
-        <motion.span 
+        <motion.span
           className="text-gray-300 font-sans"
           whileHover={{ color: '#fff' }}
         >
@@ -3770,7 +3762,7 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
       </motion.div>
 
       {/* Action Buttons with press effect */}
-      <motion.div 
+      <motion.div
         className="mt-4 grid grid-cols-3 gap-2"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -3787,8 +3779,8 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
           <Coins className="w-3 h-3" />
           Clanker
         </motion.a>
-        <ClaimRewardsButton 
-          tokenAddress={token_address} 
+        <ClaimRewardsButton
+          tokenAddress={token_address}
           creatorAddress={creator_address}
         />
         <motion.a
