@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { EvolutionRecord, CreatureRecord, CreatorStreak, TokenOfTheDay } from '@/lib/supabase';
 import { getAllCreatures, createEvolution, getMergeableTokens } from '@/lib/supabase';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
@@ -940,41 +940,6 @@ export default function Home() {
     return () => clearTimeout(bootTimer);
   }, []);
 
-  // 3D Tilt effect state
-  const deviceRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [lightPos, setLightPos] = useState({ x: 50, y: 50 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!deviceRef.current) return;
-
-    const rect = deviceRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    // Calculate tilt (-15 to 15 degrees)
-    const maxTilt = 12;
-    const tiltX = ((e.clientY - centerY) / (rect.height / 2)) * maxTilt;
-    const tiltY = ((e.clientX - centerX) / (rect.width / 2)) * -maxTilt;
-
-    // Light position (0-100%)
-    const lightX = ((e.clientX - rect.left) / rect.width) * 100;
-    const lightY = ((e.clientY - rect.top) / rect.height) * 100;
-
-    setTilt({ x: tiltX, y: tiltY });
-    setLightPos({ x: lightX, y: lightY });
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 });
-    setLightPos({ x: 50, y: 50 });
-    setIsHovering(false);
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    setIsHovering(true);
-  }, []);
 
   // Rolodex state
   const [clankdexEntries, setClankdexEntries] = useState<CreatureRecord[]>([]);
@@ -1605,29 +1570,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="relative z-10"
-          style={{ perspective: '1200px' }}
         >
-          <div
-            ref={deviceRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className="gameboy-device"
-            style={{
-              transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-              transition: isHovering ? 'transform 0.1s ease-out' : 'transform 0.4s ease-out',
-              transformStyle: 'preserve-3d',
-            }}
-          >
-            {/* Dynamic light reflection overlay */}
-            <div
-              className="absolute inset-0 rounded-[24px] rounded-b-[85px] pointer-events-none z-50"
-              style={{
-                background: `radial-gradient(circle at ${lightPos.x}% ${lightPos.y}%, rgba(255,255,255,0.15) 0%, transparent 50%)`,
-                opacity: isHovering ? 1 : 0,
-                transition: 'opacity 0.3s ease',
-              }}
-            />
+          <div className="gameboy-device">
             {/* Battery indicator */}
             <div className="gameboy-battery">Bat.</div>
 
