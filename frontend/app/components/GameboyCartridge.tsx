@@ -16,74 +16,74 @@ const ELEMENT_THEMES: Record<string, { gradient: string; accent: string; title: 
   Fire: {
     gradient: 'linear-gradient(220deg, #ff6b35, #f7931e)',
     accent: '#ff4500',
-    title: 'FIRE CLANKER',
-    slogan: 'BURN THE CHARTS!',
+    title: 'CLANKDEX',
+    slogan: 'FIRE EDITION',
   },
   Water: {
     gradient: 'linear-gradient(220deg, #00b4d8, #0077b6)',
     accent: '#0096c7',
-    title: 'WATER CLANKER',
-    slogan: 'MAKE IT RAIN!',
+    title: 'CLANKDEX',
+    slogan: 'WATER EDITION',
   },
   Grass: {
     gradient: 'linear-gradient(220deg, #95d5b2, #40916c)',
     accent: '#52b788',
-    title: 'GRASS CLANKER',
-    slogan: 'GROW YOUR BAG!',
+    title: 'CLANKDEX',
+    slogan: 'GRASS EDITION',
   },
   Electric: {
     gradient: 'linear-gradient(220deg, #ffea00, #ffc300)',
     accent: '#ffd60a',
-    title: 'ELECTRIC CLANKER',
-    slogan: 'SHOCK THE MARKET!',
+    title: 'CLANKDEX',
+    slogan: 'ELECTRIC EDITION',
   },
   Ice: {
     gradient: 'linear-gradient(220deg, #a2d2ff, #bde0fe)',
     accent: '#90e0ef',
-    title: 'ICE CLANKER',
-    slogan: 'COOL GAINS ONLY!',
+    title: 'CLANKDEX',
+    slogan: 'ICE EDITION',
   },
   Psychic: {
     gradient: 'linear-gradient(220deg, #e056fd, #be2edd)',
     accent: '#c77dff',
-    title: 'PSYCHIC CLANKER',
-    slogan: 'PREDICT THE PUMP!',
+    title: 'CLANKDEX',
+    slogan: 'PSYCHIC EDITION',
   },
   Dragon: {
     gradient: 'linear-gradient(220deg, #7400b8, #5e60ce)',
     accent: '#6930c3',
-    title: 'DRAGON CLANKER',
-    slogan: 'LEGENDARY GAINS!',
+    title: 'CLANKDEX',
+    slogan: 'DRAGON EDITION',
   },
   Poison: {
     gradient: 'linear-gradient(220deg, #9d4edd, #7b2cbf)',
     accent: '#9d4edd',
-    title: 'POISON CLANKER',
-    slogan: 'TOXIC RETURNS!',
+    title: 'CLANKDEX',
+    slogan: 'POISON EDITION',
   },
   Fighting: {
     gradient: 'linear-gradient(220deg, #d62828, #9d0208)',
     accent: '#dc2f02',
-    title: 'FIGHTING CLANKER',
-    slogan: 'FIGHT FOR ALPHA!',
+    title: 'CLANKDEX',
+    slogan: 'FIGHTING EDITION',
   },
   Ground: {
     gradient: 'linear-gradient(220deg, #bc6c25, #dda15e)',
     accent: '#bc6c25',
-    title: 'GROUND CLANKER',
-    slogan: 'SOLID FOUNDATION!',
+    title: 'CLANKDEX',
+    slogan: 'GROUND EDITION',
   },
   Flying: {
     gradient: 'linear-gradient(220deg, #89c2d9, #a9d6e5)',
     accent: '#61a5c2',
-    title: 'FLYING CLANKER',
-    slogan: 'TO THE MOON!',
+    title: 'CLANKDEX',
+    slogan: 'FLYING EDITION',
   },
   Bug: {
     gradient: 'linear-gradient(220deg, #80b918, #55a630)',
     accent: '#70e000',
-    title: 'BUG CLANKER',
-    slogan: 'SWARM THE DEX!',
+    title: 'CLANKDEX',
+    slogan: 'BUG EDITION',
   },
 };
 
@@ -113,13 +113,12 @@ export default function GameboyCartridge({
       {/* Cartridge Top Notch */}
       <div className="cartridge-top" />
 
-      {/* Header with Clanker Branding */}
+      {/* Header with ClankDex Branding */}
       <div className="cartridge-header">
         <div className="cartridge-header-overlay">
           <div className="cartridge-brand">
             <div className="brand-text">
-              <span className="brand">Clanker</span>
-              <span className="model">BASE L2</span>
+              <span className="model">CLANKDEX</span>
               <span className="sign">TM</span>
             </div>
           </div>
@@ -136,16 +135,16 @@ export default function GameboyCartridge({
               <div className="label-title">{displayTitle}</div>
               <div className="label-slogan">{displaySlogan}</div>
 
-              {/* Base L2 Seal */}
+              {/* ClankDex Seal */}
               <div className="base-seal">
-                <span>BASE</span>
-                <span className="seal-subtitle">VERIFIED</span>
+                <span>DEX</span>
+                <span className="seal-subtitle">OFFICIAL</span>
               </div>
 
-              {/* Clanker Seal */}
+              {/* ClankDex Gold Seal */}
               <div className="clanker-seal">
                 <div className="seal-inner">
-                  <span>CLANKER</span>
+                  <span>CLANK</span>
                   <span className="seal-subtitle">ORIGINAL</span>
                 </div>
               </div>
