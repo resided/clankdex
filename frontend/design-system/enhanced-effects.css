@@ -1,0 +1,328 @@
+/* ============================================
+   ENHANCED VISUAL EFFECTS FOR CLANKDEX
+   Apply these on top of Figma designs
+   ============================================ */
+
+/* 1. GLASSMORPHISM CARDS */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 2. NEON GLOW EFFECTS */
+.neon-glow {
+  box-shadow: 
+    0 0 5px rgba(220, 10, 45, 0.5),
+    0 0 10px rgba(220, 10, 45, 0.3),
+    0 0 20px rgba(220, 10, 45, 0.2),
+    0 0 40px rgba(220, 10, 45, 0.1);
+}
+
+.neon-text {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 20px currentColor;
+}
+
+/* 3. CRYSTAL/GLASS BUTTONS */
+.crystal-button {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.crystal-button:hover {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(220, 10, 45, 0.3);
+}
+
+/* 4. ANIMATED GRADIENT BORDERS */
+.gradient-border {
+  position: relative;
+  background: #1a1a2e;
+  border-radius: 16px;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: linear-gradient(
+    45deg,
+    #DC0A2D,
+    #FFDE00,
+    #3B4CCA,
+    #DC0A2D
+  );
+  background-size: 300% 300%;
+  animation: gradient-rotate 4s ease infinite;
+  z-index: -1;
+}
+
+@keyframes gradient-rotate {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* 5. PIXELATED CARD HOVER */
+.pixel-card {
+  image-rendering: pixelated;
+  transition: all 0.3s steps(4);
+}
+
+.pixel-card:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* 6. SCANLINE OVERLAY */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* 7. CRT SCREEN EFFECT */
+.crt-screen {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  animation: scanline-move 8s linear infinite;
+}
+
+@keyframes scanline-move {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* 8. FLOATING PARTICLES BACKGROUND */
+.particles-bg {
+  position: relative;
+}
+
+.particles-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(220,10,45,0.3), transparent),
+    radial-gradient(2px 2px at 90px 40px, rgba(255,222,0,0.3), transparent),
+    radial-gradient(2px 2px at 130px 80px, rgba(59,76,202,0.3), transparent);
+  background-size: 150px 100px;
+  animation: particle-drift 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes particle-drift {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(-100px) translateX(50px); }
+}
+
+/* 9. 3D TILT CARD */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.tilt-card:hover {
+  transform: 
+    perspective(1000px)
+    rotateX(5deg)
+    rotateY(-5deg)
+    scale(1.02);
+}
+
+/* 10. SHIMMER LOADING EFFECT */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% { left: 150%; }
+}
+
+/* 11. TYPE BADGE EFFECTS */
+.type-badge-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.2s;
+}
+
+.type-badge-3d::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  transform: translateZ(-4px);
+  filter: brightness(0.7);
+}
+
+.type-badge-3d:hover {
+  transform: translateY(-2px) translateZ(4px);
+}
+
+/* 12. GLOWING STATS BAR */
+.stat-bar-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-bar-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5)
+  );
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* 13. PIXEL BUTTON PRESS */
+.pixel-button {
+  position: relative;
+  transition: all 0.1s;
+  box-shadow: 
+    0 4px 0 rgba(0,0,0,0.3),
+    0 6px 10px rgba(0,0,0,0.2);
+}
+
+.pixel-button:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 0 0 rgba(0,0,0,0.3),
+    0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 14. EVOLUTION SPARKLE */
+.evolution-sparkle {
+  position: relative;
+}
+
+.evolution-sparkle::before,
+.evolution-sparkle::after {
+  content: '✦';
+  position: absolute;
+  color: #FFDE00;
+  font-size: 20px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.evolution-sparkle::before {
+  top: -10px;
+  left: -10px;
+  animation-delay: 0s;
+}
+
+.evolution-sparkle::after {
+  bottom: -10px;
+  right: -10px;
+  animation-delay: 1s;
+}
+
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0; 
+    transform: scale(0) rotate(0deg); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1) rotate(180deg); 
+  }
+}
+
+/* 15. BATTLE ARENA BACKGROUND */
+.battle-arena {
+  background: 
+    radial-gradient(ellipse at 50% 100%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 0%, rgba(220, 10, 45, 0.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 0%, rgba(59, 76, 202, 0.2) 0%, transparent 40%),
+    linear-gradient(180deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+}
