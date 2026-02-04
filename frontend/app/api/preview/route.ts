@@ -11,34 +11,14 @@ const CREATURE_STYLE_GUIDE = {
     "Glowing eyes that reflect its essence",
     "Proportional body parts with ethereal qualities",
     "Smooth, clean lines with subtle particle effects",
-    "Colors match the creature's elemental affinity",
+    "Unique color palette based on wallet identity",
     "Pure white background",
     "No text, no watermarks, no signatures",
     "Front-facing or 3/4 view pose",
     "Digital art style with soft glow effects",
   ],
-  
+
   artStyle: "digital art, original creature design, ethereal digital entity, soft glowing effects, clean illustration, game asset quality",
-  
-  elementTraits: {
-    Fire: "ember particles, warm glowing aura, flame wisps, molten core visible through skin",
-    Water: "flowing liquid form, bubble trails, deep ocean hues, bioluminescent spots",
-    Grass: "organic growth patterns, pollen dust, photosynthetic glow, root-like tendrils",
-    Electric: "energy arcs, ionized air particles, conductivity patterns, plasma trails",
-    Ice: "crystalline formations, frost breath, frozen aura, snowflake patterns",
-    Fighting: "tense posture, kinetic energy waves, muscular definition, battle-ready stance",
-    Poison: "toxic aura, bubbling secretions, warning color patterns, spore clouds",
-    Ground: "mineral deposits, tectonic plates, sediment layers, geological formations",
-    Flying: "air currents, cloud wisps, gravitational lightness, wind-swept features",
-    Psychic: "third eye glow, telekinetic waves, ethereal mist, consciousness ripples",
-    Bug: "hive patterns, compound eye shine, chitin glow, swarm consciousness aura",
-    Rock: "mineral veins, crystal inclusions, petrified growths, sedimentary layers",
-    Ghost: "phasing effect, spirit tether, ectoplasm trails, soul fragments",
-    Dragon: "primal markings, ancient runes, power scales, elemental convergence",
-    Dark: "shadow tendrils, void pockets, darkness absorption, eclipse aura",
-    Steel: "forged plating, gear integrations, metallic sheen, industrial fusion",
-    Fairy: "glamour dust, enchantment swirls, magical resonance, wonder essence",
-  }
 };
 
 // ============================================
@@ -70,14 +50,6 @@ type Archetype = {
   description: string;
   prefixes: string[];
   suffixes: string[];
-  elements: string[];
-  statBias: {
-    hp?: number;
-    attack?: number;
-    defense?: number;
-    speed?: number;
-    special?: number;
-  };
 };
 
 // Archetype definitions with lore
@@ -88,96 +60,71 @@ const ARCHETYPES: Record<string, Archetype> = {
     description: 'Sees patterns before others. High engagement, thought leadership.',
     prefixes: ['Seer', 'Viz', 'Prophet', 'Augur', 'Sage', 'Myst', 'Seer', 'Farsee', 'Omen', 'Divi'],
     suffixes: ['sight', 'tell', 'gaze', 'mind', 'eye', 'sense', 'know', 'ward', 'loom', 'cast'],
-    elements: ['Psychic', 'Fairy', 'Dark'],
-    statBias: { special: 30, speed: 10 },
   },
-  
+
   INFLUENCER: {
     name: 'Influencer',
     description: 'Commands attention. High follower count, viral presence.',
     prefixes: ['Star', 'Nova', 'Lum', 'Radi', 'Beacon', 'Flare', 'Glow', 'Bright', 'Shine', 'Spark'],
     suffixes: ['light', 'beam', 'glow', 'burst', 'flash', 'spark', 'drift', 'fall', 'rise', 'call'],
-    elements: ['Fire', 'Electric', 'Flying'],
-    statBias: { attack: 20, speed: 20 },
   },
-  
+
   CONNECTOR: {
     name: 'Connector',
     description: 'Bridges communities. Balanced following/followers, high interaction.',
     prefixes: ['Link', 'Nex', 'Bridg', 'Weav', 'Tie', 'Bond', 'Join', 'Merge', 'Sync', 'Hub'],
     suffixes: ['web', 'net', 'thread', 'cord', 'knot', 'loop', 'ring', 'chain', 'link', 'tie'],
-    elements: ['Grass', 'Bug', 'Steel'],
-    statBias: { hp: 20, defense: 20 },
   },
-  
+
   LURKER: {
     name: 'Lurker',
     description: 'Observes from shadows. Low posts, high consumption.',
     prefixes: ['Shade', 'Umbr', 'Gloom', 'Murk', 'Veil', 'Haze', 'Dusk', 'Night', 'Dim', 'Faint'],
     suffixes: ['shade', 'veil', 'cloak', 'mist', 'fog', 'hush', 'quiet', 'still', 'calm', 'rest'],
-    elements: ['Dark', 'Ghost', 'Ice'],
-    statBias: { defense: 30, special: 10 },
   },
-  
+
   BUILDER: {
     name: 'Builder',
     description: 'Creates without rest. Developer, high technical engagement.',
     prefixes: ['Forge', 'Smith', 'Craft', 'Build', 'Make', 'Shape', 'Form', 'Mold', 'Cast', 'Weld'],
     suffixes: ['work', 'make', 'form', 'cast', 'mold', 'shape', 'build', 'craft', 'forge', 'smith'],
-    elements: ['Steel', 'Rock', 'Ground'],
-    statBias: { defense: 25, attack: 15 },
   },
-  
+
   DEGEN: {
     name: 'Degen',
     description: 'High risk, high reward. Gambler spirit, volatile activity patterns.',
     prefixes: ['Chaos', 'Rage', 'Fury', 'Wild', 'Mad', 'Frenzy', 'Storm', 'Blitz', 'Flash', 'Burst'],
     suffixes: ['rage', 'fury', 'storm', 'chaos', 'wild', 'mad', 'frenzy', 'rush', 'dash', 'blaze'],
-    elements: ['Fire', 'Electric', 'Fighting'],
-    statBias: { attack: 40, defense: -10, speed: 20 },
   },
-  
+
   WHALE: {
     name: 'Whale',
     description: 'Massive presence. High value, moves markets.',
     prefixes: ['Levi', 'Titan', 'Giga', 'Mega', 'Ultra', 'Super', 'Hyper', 'Maxi', 'Grand', 'Vast'],
     suffixes: ['thane', 'titan', 'giant', 'mass', 'bulk', 'heft', 'weight', 'depth', 'void', 'abyss'],
-    elements: ['Water', 'Dragon', 'Ice'],
-    statBias: { hp: 40, attack: 20, speed: -20 },
   },
-  
+
   SAGE: {
     name: 'Sage',
     description: 'Ancient wisdom. Long-time holder, steady presence.',
     prefixes: ['Elder', 'Ancient', 'Old', 'Prime', 'First', 'Origin', 'Root', 'Core', 'Base', 'Fund'],
     suffixes: ['wise', 'sage', 'mind', 'thought', 'soul', 'spirit', 'heart', 'truth', 'law', 'way'],
-    elements: ['Psychic', 'Dragon', 'Fairy'],
-    statBias: { special: 25, hp: 15, defense: 10 },
   },
-  
+
   NOMAD: {
     name: 'Nomad',
     description: 'Wanders chains. Multi-chain, explorer, never settles.',
     prefixes: ['Drift', 'Roam', 'Wand', 'Migra', 'Travel', 'Journey', 'Quest', 'Seek', 'Find', 'Path'],
     suffixes: ['walk', 'path', 'road', 'way', 'trail', 'trek', 'roam', 'drift', 'flow', 'wind'],
-    elements: ['Flying', 'Ground', 'Bug'],
-    statBias: { speed: 40, defense: -10 },
   },
-  
+
   GUARDIAN: {
     name: 'Guardian',
     description: 'Protects others. Security focused, helpful community member.',
     prefixes: ['Shield', 'Guard', 'Ward', 'Protect', 'Keep', 'Save', 'Safe', 'Secure', 'Lock', 'Aegis'],
     suffixes: ['shield', 'guard', 'wall', 'ward', 'keep', 'hold', 'safe', 'secure', 'lock', 'bond'],
-    elements: ['Steel', 'Rock', 'Ground'],
-    statBias: { defense: 40, hp: 20 },
   },
 };
-
-const ELEMENTS = [
-  'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting', 'Poison', 'Ground', 
-  'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
-];
 
 // Hash function for deterministic generation
 function hashString(str: string): string {
@@ -282,236 +229,51 @@ function generateLoreName(hash: string, archetype: keyof typeof ARCHETYPES): str
   return `${prefix}${suffix}`;
 }
 
-// Generate creature from wallet with full lore
+// Generate creature from wallet with archetype-based identity
 async function generateCreatureFromWallet(address: string, neynarData: any | null) {
   const hash = hashString(address);
-  
+
   // Determine archetype
   const archetypeKey = determineArchetype(neynarData, hash);
   const archetype = ARCHETYPES[archetypeKey];
-  
+
   // Generate lore-based name
   const name = generateLoreName(hash, archetypeKey);
-  
-  // Determine element based on archetype preference + hash
-  const preferredElements = archetype.elements;
-  const elementIndex = getHashValue(hash, 5, 100) < 70 
-    ? getHashValue(hash, 6, preferredElements.length) // 70% chance of preferred element
-    : getHashValue(hash, 7, ELEMENTS.length); // 30% chance of random
-  const element = preferredElements[elementIndex] || ELEMENTS[getHashValue(hash, 7, ELEMENTS.length)];
-  
-  // Generate species type
-  const speciesTypes: Record<string, string[]> = {
-    Fire: ['Ember Entity', 'Flame Manifest', 'Heat Spirit', 'Pyro Form'],
-    Water: ['Aqua Being', 'Tide Essence', 'Current Form', 'Deep Entity'],
-    Grass: ['Flora Spirit', 'Growth Manifest', 'Nature Entity', 'Bloom Form'],
-    Electric: ['Volt Entity', 'Current Being', 'Spark Manifest', 'Charge Form'],
-    Ice: ['Frost Entity', 'Cold Manifest', 'Crystal Being', 'Glacial Form'],
-    Fighting: ['Combat Entity', 'Force Manifest', 'Battle Form', 'Strive Being'],
-    Poison: ['Toxin Entity', 'Venom Form', 'Toxic Manifest', 'Plague Being'],
-    Ground: ['Earth Entity', 'Terrain Form', 'Soil Manifest', 'Land Being'],
-    Flying: ['Sky Entity', 'Air Manifest', 'Cloud Form', 'Wind Being'],
-    Psychic: ['Mind Entity', 'Thought Form', 'Psyche Manifest', 'Mental Being'],
-    Bug: ['Swarm Entity', 'Hive Form', 'Insect Manifest', 'Colony Being'],
-    Rock: ['Stone Entity', 'Mineral Form', 'Earth Manifest', 'Crag Being'],
-    Ghost: ['Spirit Entity', 'Phantom Form', 'Specter Manifest', 'Soul Being'],
-    Dragon: ['Wyrm Entity', 'Drake Form', 'Ancient Manifest', 'Primal Being'],
-    Dark: ['Shadow Entity', 'Void Form', 'Darkness Manifest', 'Umbral Being'],
-    Steel: ['Metal Entity', 'Iron Form', 'Alloy Manifest', 'Forge Being'],
-    Fairy: ['Fae Entity', 'Enchant Form', 'Magic Manifest', 'Wonder Being'],
+
+  // Generate color palette from hash (unique per wallet)
+  const hue1 = getHashValue(hash, 5, 360);
+  const hue2 = (hue1 + 30 + getHashValue(hash, 6, 60)) % 360;
+  const colorPalette = [
+    `hsl(${hue1}, 70%, 50%)`,
+    `hsl(${hue1}, 60%, 60%)`,
+    `hsl(${hue2}, 70%, 50%)`,
+    `hsl(${hue2}, 60%, 60%)`,
+  ];
+
+  // Generate description based on archetype
+  const descriptions: Record<string, string> = {
+    ORACLE: `${name} emerged from the blockchain with the gift of foresight. Its presence speaks of patterns seen before others.`,
+    INFLUENCER: `${name} burst onto the chain with undeniable magnetism. It commands attention wherever it goes.`,
+    CONNECTOR: `${name} formed from the web of connections that bind the network. It bridges communities effortlessly.`,
+    LURKER: `${name} manifested in the shadows, watching and waiting. It observes more than it speaks.`,
+    BUILDER: `${name} was forged through countless hours of creation. It shapes the digital world with purpose.`,
+    DEGEN: `${name} exploded into existence through sheer force of will. High risk, high reward is its way.`,
+    WHALE: `${name} rose from the depths with immense power. Its presence alone shifts the tides.`,
+    SAGE: `${name} awakened after ages of silent observation. Ancient wisdom flows through it.`,
+    NOMAD: `${name} wandered in from beyond the known chains. It carries stories from distant networks.`,
+    GUARDIAN: `${name} materialized as a protector of the realm. It stands vigilant, always ready.`,
   };
-  
-  const species = speciesTypes[element][getHashValue(hash, 8, 4)];
-  
-  // Generate stats with archetype bias
-  const baseHp = 50 + getHashValue(hash, 9, 100);
-  const baseAttack = 50 + getHashValue(hash, 10, 100);
-  const baseDefense = 50 + getHashValue(hash, 11, 100);
-  const baseSpeed = 50 + getHashValue(hash, 12, 100);
-  const baseSpecial = 50 + getHashValue(hash, 13, 100);
-  
-  // Apply archetype stat bias
-  const hp = Math.min(150, Math.max(20, baseHp + (archetype.statBias.hp || 0)));
-  const attack = Math.min(150, Math.max(20, baseAttack + (archetype.statBias.attack || 0)));
-  const defense = Math.min(150, Math.max(20, baseDefense + (archetype.statBias.defense || 0)));
-  const speed = Math.min(150, Math.max(20, baseSpeed + (archetype.statBias.speed || 0)));
-  const special = Math.min(150, Math.max(20, baseSpecial + (archetype.statBias.special || 0)));
-  
-  // Generate color palette based on element
-  const colorPalettes: Record<string, string[]> = {
-    Fire: ['#FF5722', '#FF9800', '#FFC107', '#FFEB3B'],
-    Water: ['#2196F3', '#03A9F4', '#00BCD4', '#009688'],
-    Grass: ['#4CAF50', '#8BC34A', '#CDDC39', '#FFC107'],
-    Electric: ['#FFEB3B', '#FFC107', '#FF9800', '#FF5722'],
-    Ice: ['#00BCD4', '#E0F7FA', '#B2EBF2', '#80DEEA'],
-    Fighting: ['#795548', '#8D6E63', '#A1887F', '#BCAAA4'],
-    Poison: ['#9C27B0', '#AB47BC', '#BA68C8', '#CE93D8'],
-    Ground: ['#795548', '#8D6E63', '#A1887F', '#D7CCC8'],
-    Flying: ['#87CEEB', '#B0E0E6', '#ADD8E6', '#E0F7FA'],
-    Psychic: ['#E91E63', '#F06292', '#F48FB1', '#F8BBD9'],
-    Bug: ['#8BC34A', '#AED581', '#C5E1A5', '#DCEDC8'],
-    Rock: ['#757575', '#9E9E9E', '#BDBDBD', '#E0E0E0'],
-    Ghost: ['#7B1FA2', '#9C27B0', '#AB47BC', '#BA68C8'],
-    Dragon: ['#3F51B5', '#5C6BC0', '#7986CB', '#9FA8DA'],
-    Dark: ['#424242', '#616161', '#757575', '#9E9E9E'],
-    Steel: ['#607D8B', '#78909C', '#90A4AE', '#B0BEC5'],
-    Fairy: ['#F48FB1', '#F8BBD9', '#FCE4EC', '#FFF0F5'],
-  };
-  
-  const colorPalette = colorPalettes[element] || colorPalettes.Fire;
-  
-  // Generate stat-focused description that explains WHY the creature has these stats
-  function generateStatDescription(): string {
-    const parts: string[] = [];
-    
-    // Opening based on archetype
-    const openings: Record<string, string> = {
-      ORACLE: `${name} emerged from the blockchain with the gift of foresight. `,
-      INFLUENCER: `${name} burst onto the chain with undeniable magnetism. `,
-      CONNECTOR: `${name} formed from the web of connections that bind the network. `,
-      LURKER: `${name} manifested in the shadows, watching and waiting. `,
-      BUILDER: `${name} was forged through countless hours of creation. `,
-      DEGEN: `${name} exploded into existence through sheer force of will. `,
-      WHALE: `${name} rose from the depths with immense power. `,
-      SAGE: `${name} awakened after ages of silent observation. `,
-      NOMAD: `${name} wandered in from beyond the known chains. `,
-      GUARDIAN: `${name} materialized as a protector of the realm. `,
-    };
-    parts.push(openings[archetypeKey] || `${name} emerged from the digital ether. `);
-    
-    // Explain highest stat
-    const stats = [
-      { name: 'HP', value: hp, desc: 'vitality and endurance' },
-      { name: 'Attack', value: attack, desc: 'offensive power' },
-      { name: 'Defense', value: defense, desc: 'resilience and protection' },
-      { name: 'Speed', value: speed, desc: 'agility and reflexes' },
-      { name: 'Special', value: special, desc: 'unique abilities and intuition' },
-    ];
-    stats.sort((a, b) => b.value - a.value);
-    const highest = stats[0];
-    
-    const statExplanations: Record<string, Record<string, string>> = {
-      ORACLE: {
-        HP: 'Its longevity comes from seeing danger before it strikes.',
-        Attack: 'It strikes with the precision of knowledge.',
-        Defense: 'Its wisdom shields it from harm.',
-        Speed: 'It moves swiftly to intercept fate.',
-        Special: 'Its psychic powers are unmatched.',
-      },
-      INFLUENCER: {
-        HP: 'Its fame gives it lasting presence.',
-        Attack: 'Its words cut deep and true.',
-        Defense: 'Its followers shield it from criticism.',
-        Speed: 'Trends move fast, and so does it.',
-        Special: 'Its charisma bends reality.',
-      },
-      CONNECTOR: {
-        HP: 'Its network sustains it through any storm.',
-        Attack: 'It leverages relationships as weapons.',
-        Defense: 'Many allies mean many shields.',
-        Speed: 'Information travels fast through its web.',
-        Special: 'It understands the space between all things.',
-      },
-      LURKER: {
-        HP: 'Its silence preserves its energy.',
-        Attack: 'It strikes from unseen angles.',
-        Defense: 'You cannot hit what you cannot see.',
-        Speed: 'Shadows move faster than light.',
-        Special: 'It knows secrets that others miss.',
-      },
-      BUILDER: {
-        HP: 'Its creations endure the test of time.',
-        Attack: 'Each project hits harder than the last.',
-        Defense: 'Solid foundations resist all attacks.',
-        Speed: 'Rapid iteration beats perfect planning.',
-        Special: 'Innovation is its greatest weapon.',
-      },
-      DEGEN: {
-        HP: 'High risk means high reward... usually.',
-        Attack: 'It goes all-in every single time.',
-        Defense: 'Reckless abandon is its shield.',
-        Speed: 'FOMO waits for no one.',
-        Special: 'Luck favors the bold.',
-      },
-      WHALE: {
-        HP: 'Its vast reserves provide endless stamina.',
-        Attack: 'Markets move at its command.',
-        Defense: 'Wealth is the ultimate armor.',
-        Speed: 'When it moves, the chain trembles.',
-        Special: 'Its presence alone shifts trends.',
-      },
-      SAGE: {
-        HP: 'Time has tested and tempered it.',
-        Attack: 'Experience makes every strike count.',
-        Defense: 'Patience is the ultimate defense.',
-        Speed: 'It acts only at the perfect moment.',
-        Special: 'Ancient knowledge flows through it.',
-      },
-      NOMAD: {
-        HP: 'Surviving across chains builds resilience.',
-        Attack: 'It brings techniques from foreign lands.',
-        Defense: 'No single chain can contain it.',
-        Speed: 'It travels faster than transactions.',
-        Special: 'It sees patterns across all networks.',
-      },
-      GUARDIAN: {
-        HP: 'Its duty sustains it through all battles.',
-        Attack: 'It strikes only to protect.',
-        Defense: 'None shall pass its watch.',
-        Speed: 'It intercepts threats instantly.',
-        Special: 'Its shield absorbs all harm.',
-      },
-    };
-    
-    parts.push(`Its ${highest.name} (${highest.value}) reflects ${highest.desc}—${statExplanations[archetypeKey]?.[highest.name] || 'its natural strength.'} `);
-    
-    // Explain element affinity
-    const elementDescs: Record<string, string> = {
-      Fire: 'The flames within fuel its passion.',
-      Water: 'Flowing like the tides, it adapts.',
-      Grass: 'Rooted deep, it draws power from the earth.',
-      Electric: 'Lightning courses through its veins.',
-      Ice: 'Cold calculation guides its actions.',
-      Fighting: 'It seeks challenges to grow stronger.',
-      Poison: 'Its methods are subtle but effective.',
-      Ground: 'Steady and unmovable as bedrock.',
-      Flying: 'It sees what others cannot from above.',
-      Psychic: 'The mind is its true battlefield.',
-      Bug: 'Small but relentless in numbers.',
-      Rock: 'Unyielding, it waits for the right moment.',
-      Ghost: 'Between worlds, it knows many secrets.',
-      Dragon: 'Ancient power sleeps within.',
-      Dark: 'It thrives where light fears to tread.',
-      Steel: 'Forged in pressure, unbreakable now.',
-      Fairy: 'Wonder and mischief guide its path.',
-    };
-    parts.push(elementDescs[element] || 'Its nature is mysterious.');
-    
-    return parts.join('');
-  }
-  
-  const description = generateStatDescription();
-  
+
+  const description = descriptions[archetypeKey] || `${name} emerged from the digital ether, unique and mysterious.`;
+
   // Generate DNA from address
   const dna = BigInt('0x' + hash.slice(0, 16)).toString();
-  
-  // Build visual traits
-  const visualTraits = CREATURE_STYLE_GUIDE.elementTraits[element as keyof typeof CREATURE_STYLE_GUIDE.elementTraits];
-  
+
   return {
     name,
-    species,
     dna,
-    element,
-    level: 1,
-    hp,
-    attack,
-    defense,
-    speed,
-    special,
     description,
     colorPalette,
-    visualTraits,
     archetype: archetypeKey,
     archetypeLore: archetype.description,
     neynarData: neynarData ? {

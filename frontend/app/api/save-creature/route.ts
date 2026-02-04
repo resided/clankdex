@@ -35,29 +35,23 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { 
-      token_address, 
-      token_symbol, 
-      name, 
-      element, 
-      level = 1,
-      hp, 
-      attack, 
-      defense, 
-      speed, 
-      special, 
+    const {
+      token_address,
+      token_symbol,
+      name,
+      archetype,
       description,
       creator_address,
       farcaster_username,
       image_url,
-      // New fields
+      // Other fields
       referrer_address,
       is_merged,
       parent_tokens,
     } = body;
 
     // Validate required fields
-    if (!token_address || !name || !element) {
+    if (!token_address || !name) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -109,7 +103,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert creature record with new fields
+    // Insert creature record
     const { data, error } = await supabase
       .from('creatures')
       .insert({
@@ -117,19 +111,13 @@ export async function POST(request: NextRequest) {
         token_address: token_address.toLowerCase(),
         token_symbol: token_symbol || name.slice(0, 6).toUpperCase(),
         name,
-        element,
-        level,
-        hp: hp || 50,
-        attack: attack || 50,
-        defense: defense || 50,
-        speed: speed || 50,
-        special: special || 50,
+        archetype: archetype || 'BUILDER',
         description,
         creator_address: creator_address?.toLowerCase(),
         farcaster_username,
         image_url,
         verified: true,
-        // New fields
+        // Other fields
         referrer_address: referrer_address?.toLowerCase(),
         is_merged: is_merged || false,
         parent_tokens: parent_tokens || [],

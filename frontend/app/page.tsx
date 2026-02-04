@@ -326,17 +326,11 @@ type InputMode = 'wallet' | 'farcaster';
 
 interface Creature {
   name: string;
-  species: string;
   dna: string;
-  element: string;
-  level: number;
-  hp: number;
-  attack: number;
-  defense: number;
-  speed: number;
-  special: number;
   description: string;
   colorPalette: string[];
+  archetype?: string;
+  archetypeLore?: string;
   imageURI?: string;
 }
 
@@ -722,7 +716,7 @@ const CreatureReveal = ({ creature, imageBase64 }: { creature: Creature | null; 
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             >
-              {ELEMENT_ICONS[creature?.element || 'Fire']}
+              {ARCHETYPE_ICONS[creature?.archetype || 'BUILDER']}
             </motion.span>
           </motion.div>
         )}
@@ -750,7 +744,7 @@ interface PriceData {
 
 // Filter and sort types
 type FilterTier = 'all' | 'Egg' | 'Baby' | 'Basic' | 'Stage 1' | 'Stage 2' | 'Mega' | 'Legendary';
-type FilterElement = 'all' | string;
+type FilterArchetype = 'all' | string;
 type SortOption = 'newest' | 'oldest' | 'highestMc' | 'lowestMc' | 'highestPrice' | 'lowestPrice' | 'totalStats';
 
 // Evolution tiers based on market cap
@@ -823,66 +817,57 @@ const formatEntryNumber = (num: number): string => {
   return `#${num.toString().padStart(3, '0')}`;
 };
 
-const ELEMENT_ICONS: Record<string, React.ReactNode> = {
-  Fire: <Flame className="w-4 h-4" />,
-  Water: <Droplets className="w-4 h-4" />,
-  Grass: <Leaf className="w-4 h-4" />,
-  Electric: <Zap className="w-4 h-4" />,
-  Ice: <Wind className="w-4 h-4" />,
-  Fighting: <Sword className="w-4 h-4" />,
-  Poison: <Eye className="w-4 h-4" />,
-  Ground: <Shield className="w-4 h-4" />,
-  Flying: <Wind className="w-4 h-4" />,
-  Psychic: <Eye className="w-4 h-4" />,
-  Bug: <Leaf className="w-4 h-4" />,
-  Dragon: <Flame className="w-4 h-4" />,
+// Archetype-based theming (replaces element system)
+const ARCHETYPE_ICONS: Record<string, React.ReactNode> = {
+  ORACLE: <Eye className="w-4 h-4" />,
+  INFLUENCER: <Star className="w-4 h-4" />,
+  CONNECTOR: <Share2 className="w-4 h-4" />,
+  LURKER: <Eye className="w-4 h-4" />,
+  BUILDER: <Hexagon className="w-4 h-4" />,
+  DEGEN: <Zap className="w-4 h-4" />,
+  WHALE: <Droplets className="w-4 h-4" />,
+  SAGE: <BookOpen className="w-4 h-4" />,
+  NOMAD: <Wind className="w-4 h-4" />,
+  GUARDIAN: <Shield className="w-4 h-4" />,
 };
 
-const ELEMENT_COLORS: Record<string, string> = {
-  Fire: 'bg-red-500',
-  Water: 'bg-blue-500',
-  Grass: 'bg-green-500',
-  Electric: 'bg-yellow-400',
-  Ice: 'bg-cyan-400',
-  Fighting: 'bg-amber-700',
-  Poison: 'bg-purple-500',
-  Ground: 'bg-amber-600',
-  Flying: 'bg-sky-300',
-  Psychic: 'bg-pink-500',
-  Bug: 'bg-lime-500',
-  Dragon: 'bg-violet-600',
+const ARCHETYPE_COLORS: Record<string, string> = {
+  ORACLE: 'bg-purple-500',
+  INFLUENCER: 'bg-yellow-500',
+  CONNECTOR: 'bg-green-500',
+  LURKER: 'bg-gray-600',
+  BUILDER: 'bg-blue-500',
+  DEGEN: 'bg-red-500',
+  WHALE: 'bg-cyan-500',
+  SAGE: 'bg-indigo-500',
+  NOMAD: 'bg-orange-500',
+  GUARDIAN: 'bg-emerald-500',
 };
 
-// Pokédex-style gradient backgrounds for card headers
-const ELEMENT_GRADIENTS: Record<string, string> = {
-  Fire: 'from-orange-500 via-red-500 to-red-600',
-  Water: 'from-blue-400 via-blue-500 to-blue-600',
-  Grass: 'from-green-400 via-green-500 to-emerald-600',
-  Electric: 'from-yellow-300 via-yellow-400 to-amber-500',
-  Ice: 'from-cyan-300 via-cyan-400 to-blue-400',
-  Fighting: 'from-amber-600 via-orange-700 to-red-800',
-  Poison: 'from-purple-400 via-purple-500 to-violet-600',
-  Ground: 'from-amber-500 via-orange-600 to-amber-700',
-  Flying: 'from-sky-300 via-blue-300 to-indigo-400',
-  Psychic: 'from-pink-400 via-pink-500 to-fuchsia-600',
-  Bug: 'from-lime-400 via-green-500 to-emerald-500',
-  Dragon: 'from-violet-500 via-purple-600 to-indigo-700',
+const ARCHETYPE_GRADIENTS: Record<string, string> = {
+  ORACLE: 'from-purple-400 via-purple-500 to-violet-600',
+  INFLUENCER: 'from-yellow-400 via-amber-500 to-orange-500',
+  CONNECTOR: 'from-green-400 via-emerald-500 to-teal-600',
+  LURKER: 'from-gray-500 via-gray-600 to-slate-700',
+  BUILDER: 'from-blue-400 via-blue-500 to-indigo-600',
+  DEGEN: 'from-red-400 via-red-500 to-rose-600',
+  WHALE: 'from-cyan-400 via-cyan-500 to-blue-500',
+  SAGE: 'from-indigo-400 via-indigo-500 to-purple-600',
+  NOMAD: 'from-orange-400 via-orange-500 to-amber-600',
+  GUARDIAN: 'from-emerald-400 via-emerald-500 to-green-600',
 };
 
-// Hex colors for inline styles (matching Figma Pokédex)
-const ELEMENT_HEX_COLORS: Record<string, string> = {
-  Fire: '#FF5722',
-  Water: '#2196F3',
-  Grass: '#4CAF50',
-  Electric: '#FFEB3B',
-  Ice: '#00BCD4',
-  Fighting: '#795548',
-  Poison: '#9C27B0',
-  Ground: '#8D6E63',
-  Flying: '#90CAF9',
-  Psychic: '#E91E63',
-  Bug: '#8BC34A',
-  Dragon: '#673AB7',
+const ARCHETYPE_HEX_COLORS: Record<string, string> = {
+  ORACLE: '#9C27B0',
+  INFLUENCER: '#FFC107',
+  CONNECTOR: '#4CAF50',
+  LURKER: '#607D8B',
+  BUILDER: '#2196F3',
+  DEGEN: '#F44336',
+  WHALE: '#00BCD4',
+  SAGE: '#3F51B5',
+  NOMAD: '#FF9800',
+  GUARDIAN: '#009688',
 };
 
 const RARITY_COLORS: Record<string, string> = {
@@ -948,7 +933,7 @@ export default function Home() {
 
   // Advanced filter state
   const [filterTier, setFilterTier] = useState<FilterTier>('all');
-  const [filterElement, setFilterElement] = useState<FilterElement>('all');
+  const [filterArchetype, setFilterArchetype] = useState<FilterArchetype>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [priceDataCache, setPriceDataCache] = useState<Record<string, PriceData>>({});
@@ -1027,15 +1012,15 @@ export default function Home() {
       const query = searchQuery.toLowerCase();
       entries = entries.filter(entry =>
         entry.name.toLowerCase().includes(query) ||
-        entry.element.toLowerCase().includes(query) ||
+        (entry.archetype || '').toLowerCase().includes(query) ||
         formatEntryNumber(entry.entry_number).toLowerCase().includes(query) ||
         entry.token_symbol.toLowerCase().includes(query)
       );
     }
 
-    // Element filter
-    if (filterElement !== 'all') {
-      entries = entries.filter(entry => entry.element === filterElement);
+    // Archetype filter
+    if (filterArchetype !== 'all') {
+      entries = entries.filter(entry => entry.archetype === filterArchetype);
     }
 
     // Tier filter (based on cached price data)
@@ -1076,9 +1061,8 @@ export default function Home() {
           return pA - pB;
         }
         case 'totalStats': {
-          const statsA = a.hp + a.attack + a.defense + a.speed + a.special;
-          const statsB = b.hp + b.attack + b.defense + b.speed + b.special;
-          return statsB - statsA;
+          // Removed - stats no longer used
+          return 0;
         }
         default:
           return 0;
@@ -1086,7 +1070,7 @@ export default function Home() {
     });
 
     return entries;
-  }, [clankdexEntries, searchQuery, filterElement, filterTier, sortBy, priceDataCache]);
+  }, [clankdexEntries, searchQuery, filterArchetype, filterTier, sortBy, priceDataCache]);
 
   // Keyboard navigation - Game Boy style controls
   useEffect(() => {
@@ -1294,13 +1278,7 @@ export default function Home() {
             token_address: result.tokenAddress,
             token_symbol: result.config?.symbol || creature.name.slice(0, 6).toUpperCase(),
             name: creature.name,
-            element: creature.element,
-            level: creature.level,
-            hp: creature.hp,
-            attack: creature.attack,
-            defense: creature.defense,
-            speed: creature.speed,
-            special: creature.special,
+            archetype: creature.archetype,
             description: creature.description,
             creator_address: address,
             farcaster_username: inputMode === 'farcaster' ? effectiveFarcasterUsername : undefined,
@@ -1361,17 +1339,11 @@ export default function Home() {
         throw new Error('Parent tokens not found');
       }
 
-      // Generate merged creature name and stats
+      // Generate merged creature name
       const mergedName = `${parent1.name.slice(0, 4)}${parent2.name.slice(-4)}`;
       const mergedCreature = {
         name: mergedName,
-        element: parent1.element === parent2.element ? parent1.element : 'Normal',
-        level: Math.max(parent1.level, parent2.level) + 1,
-        hp: Math.floor((parent1.hp + parent2.hp) / 2) + 10,
-        attack: Math.floor((parent1.attack + parent2.attack) / 2) + 10,
-        defense: Math.floor((parent1.defense + parent2.defense) / 2) + 10,
-        speed: Math.floor((parent1.speed + parent2.speed) / 2) + 10,
-        special: Math.floor((parent1.special + parent2.special) / 2) + 10,
+        archetype: parent1.archetype || parent2.archetype || 'BUILDER',
         description: `A fusion of ${parent1.name} and ${parent2.name}`,
       };
 
@@ -1442,33 +1414,16 @@ export default function Home() {
   };
 
   const generateFallbackCreature = (addr: string): Creature => {
-    const elements = Object.keys(ELEMENT_COLORS);
-    const element = elements[parseInt(addr.slice(-2), 16) % elements.length];
+    const archetypes = Object.keys(ARCHETYPE_COLORS);
+    const archetype = archetypes[parseInt(addr.slice(-2), 16) % archetypes.length];
 
     return {
       name: `Clankmon #${addr.slice(-4)}`,
-      species: 'Blockchain Beast',
       dna: BigInt(addr).toString(),
-      element,
-      level: 1,
-      hp: 50 + Math.floor(Math.random() * 50),
-      attack: 50 + Math.floor(Math.random() * 50),
-      defense: 50 + Math.floor(Math.random() * 50),
-      speed: 50 + Math.floor(Math.random() * 50),
-      special: 50 + Math.floor(Math.random() * 50),
-      description: `A mysterious ${element.toLowerCase()}-type creature from the blockchain depths.`,
+      archetype,
+      description: `A mysterious creature from the blockchain depths.`,
       colorPalette: ['#DC0A2D', '#FF5722', '#FFC107'],
     };
-  };
-
-  const getRarity = (element: string) => {
-    const rarities: Record<string, string> = {
-      Fire: 'common', Water: 'common', Grass: 'common', Fighting: 'common', Ground: 'common', Bug: 'common',
-      Electric: 'uncommon', Poison: 'uncommon', Flying: 'uncommon',
-      Ice: 'rare', Psychic: 'rare',
-      Dragon: 'legendary'
-    };
-    return rarities[element] || 'common';
   };
 
   // Get current action button handler based on screen mode
@@ -1725,7 +1680,7 @@ export default function Home() {
                                 <img src={imageBase64} alt={creature.name} className="w-24 h-24 mx-auto mb-2 pixelated border-2 border-[#0f380f] rounded" />
                               )}
                               <p className="font-pixel text-xs" style={{ color: '#0f380f' }}>{creature.name}</p>
-                              <p className="text-xs mb-2" style={{ color: '#0f380f' }}>{creature.element}</p>
+                              <p className="text-xs mb-2" style={{ color: '#0f380f' }}>{creature.archetype || 'Creature'}</p>
                               <button
                                 onClick={launchCreature}
                                 disabled={isMinting}
@@ -1815,7 +1770,7 @@ export default function Home() {
                                 >
                                   <span className="font-pixel text-[11px] w-6">#{entry.entry_number}</span>
                                   <span className="font-pixel text-xs flex-1 truncate">{entry.name}</span>
-                                  <span className="text-[11px]">{entry.element}</span>
+                                  <span className="text-[11px]">{entry.archetype || 'Creature'}</span>
                                 </button>
                               ))}
                             </div>
@@ -2192,18 +2147,9 @@ function StatsPanel({
   deployResult: DeployResult | null;
   onShare: (text: string, embeds?: string[]) => void;
 }) {
-  const getRarity = (element: string) => {
-    const rarities: Record<string, string> = {
-      Fire: 'common', Water: 'common', Grass: 'common', Fighting: 'common', Ground: 'common', Bug: 'common',
-      Electric: 'uncommon', Poison: 'uncommon', Flying: 'uncommon',
-      Ice: 'rare', Psychic: 'rare',
-      Dragon: 'legendary'
-    };
-    return rarities[element] || 'common';
-  };
-
-  const elementGradient = ELEMENT_GRADIENTS[creature.element] || ELEMENT_GRADIENTS.Fire;
-  const elementHex = ELEMENT_HEX_COLORS[creature.element] || ELEMENT_HEX_COLORS.Fire;
+  const archetype = creature.archetype || 'BUILDER';
+  const archetypeGradient = ARCHETYPE_GRADIENTS[archetype] || ARCHETYPE_GRADIENTS.BUILDER;
+  const archetypeHex = ARCHETYPE_HEX_COLORS[archetype] || ARCHETYPE_HEX_COLORS.BUILDER;
 
   return (
     <motion.div
@@ -2213,7 +2159,7 @@ function StatsPanel({
       className="pokedex-card rounded-2xl overflow-hidden border border-gray-700 shadow-2xl"
     >
       {/* Pokédex-style Colored Header */}
-      <div className={`relative bg-gradient-to-br ${elementGradient} p-6 pb-16`}>
+      <div className={`relative bg-gradient-to-br ${archetypeGradient} p-6 pb-16`}>
         {/* Pokeball pattern background */}
         <div className="absolute inset-0 overflow-hidden opacity-10">
           <div className="absolute -right-16 -top-16 w-48 h-48 rounded-full border-[16px] border-white/50" />
@@ -2237,7 +2183,7 @@ function StatsPanel({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              {creature.species}
+              {creature.archetypeLore || 'A unique blockchain creature'}
             </motion.p>
           </div>
           <motion.div
@@ -2246,13 +2192,13 @@ function StatsPanel({
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <span className="font-pixel text-lg text-white/90 drop-shadow">#{creature.level.toString().padStart(3, '0')}</span>
             <div className="flex gap-2">
               <span
-                className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg"
+                className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg flex items-center gap-1"
                 style={{ backgroundColor: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)' }}
               >
-                {creature.element}
+                {ARCHETYPE_ICONS[archetype]}
+                {archetype}
               </span>
             </div>
           </motion.div>
@@ -2283,14 +2229,13 @@ function StatsPanel({
 
       {/* Card Body - White/Dark section */}
       <div className="bg-gray-900 p-6 -mt-8 rounded-t-3xl relative z-20">
-        {/* Rarity Badge */}
+        {/* Archetype Badge */}
         <div className="flex justify-center -mt-10 mb-4">
-          <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase shadow-lg ${getRarity(creature.element) === 'legendary' ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black' :
-            getRarity(creature.element) === 'rare' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white' :
-              getRarity(creature.element) === 'uncommon' ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white' :
-                'bg-gray-600 text-white'
-            }`}>
-            {getRarity(creature.element)}
+          <span
+            className="px-4 py-1 rounded-full text-xs font-bold uppercase shadow-lg text-white"
+            style={{ backgroundColor: archetypeHex }}
+          >
+            {archetype}
           </span>
         </div>
 
@@ -2306,23 +2251,16 @@ function StatsPanel({
             <div className="text-center p-3 bg-gray-800/50 rounded-lg">
               <div className="flex items-center justify-center gap-1 text-gray-200 mb-1">
                 <Coins className="w-4 h-4" />
-                <span className="font-pixel text-sm">{creature.level * 0.5}</span>
+                <span className="font-pixel text-sm">0.5</span>
               </div>
               <p className="text-gray-500 text-xs">Est. MCap (ETH)</p>
             </div>
             <div className="text-center p-3 bg-gray-800/50 rounded-lg">
               <div className="flex items-center justify-center gap-1 text-gray-200 mb-1">
-                <Droplet className="w-4 h-4" />
-                <span className="font-pixel text-sm">{(creature.hp + creature.attack) / 20}</span>
+                {ARCHETYPE_ICONS[creature.archetype || 'BUILDER']}
+                <span className="font-pixel text-sm">{creature.archetype || 'BUILDER'}</span>
               </div>
-              <p className="text-gray-500 text-xs">Liquidity (ETH)</p>
-            </div>
-            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-              <div className="flex items-center justify-center gap-1 text-gray-200 mb-1">
-                <Activity className="w-4 h-4" />
-                <span className="font-pixel text-sm">{creature.speed}%</span>
-              </div>
-              <p className="text-gray-500 text-xs">Volatility</p>
+              <p className="text-gray-500 text-xs">Archetype</p>
             </div>
           </div>
         </motion.div>
@@ -2330,7 +2268,7 @@ function StatsPanel({
         {/* Description */}
         <motion.div
           className="mb-6 p-4 rounded-xl"
-          style={{ backgroundColor: `${elementHex}15`, borderLeft: `3px solid ${elementHex}` }}
+          style={{ backgroundColor: `${archetypeHex}15`, borderLeft: `3px solid ${archetypeHex}` }}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
@@ -2382,43 +2320,24 @@ function StatsPanel({
           </motion.div>
         )}
 
-        {/* Base Stats - Pokédex style */}
+        {/* DNA & Archetype Info */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
+          className="mt-6 p-4 bg-gray-800/50 rounded-xl"
         >
-          <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">Base Stats</h3>
-          <div className="space-y-3">
-            <PokedexStatBar label="HP" value={creature.hp} max={100} color={elementHex} />
-            <PokedexStatBar label="ATK" value={creature.attack} max={100} color={elementHex} />
-            <PokedexStatBar label="DEF" value={creature.defense} max={100} color={elementHex} />
-            <PokedexStatBar label="SPD" value={creature.speed} max={100} color={elementHex} />
-            <PokedexStatBar label="SPC" value={creature.special} max={100} color={elementHex} />
-          </div>
-
-          {/* Total Stats */}
-          <div className="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center">
-            <span className="text-gray-400 text-sm font-sans">Total</span>
+          <div className="flex items-center gap-3 mb-3">
             <span
-              className="font-pixel text-lg px-3 py-1 rounded-lg"
-              style={{ backgroundColor: `${elementHex}20`, color: elementHex }}
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `${archetypeHex}30` }}
             >
-              {creature.hp + creature.attack + creature.defense + creature.speed + creature.special}
+              {ARCHETYPE_ICONS[archetype]}
             </span>
-          </div>
-        </motion.div>
-
-        {/* DNA & Token Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-6 p-4 bg-gray-800/50 rounded-xl grid grid-cols-2 gap-4"
-        >
-          <div>
-            <p className="text-gray-500 text-xs mb-1">LEVEL</p>
-            <p className="font-pixel text-lg text-white">{creature.level}</p>
+            <div>
+              <p className="text-gray-500 text-xs mb-1">ARCHETYPE</p>
+              <p className="font-pixel text-sm text-white">{archetype}</p>
+            </div>
           </div>
           <div>
             <p className="text-gray-500 text-xs mb-1">DNA HASH</p>
@@ -2522,7 +2441,7 @@ function DeploySuccess({
 
       <button
         onClick={() => {
-          const text = `I just summoned ${creature.name} on @clankdex! A ${creature.element}-type creature with ${creature.hp + creature.attack + creature.defense + creature.speed + creature.special} total stats.`;
+          const text = `I just summoned ${creature.name} on @clankdex! A unique ${creature.archetype || 'blockchain'} creature born from my wallet identity.`;
           // Share the miniapp URL which will render the embed
           const miniappUrl = 'https://frontend-weld-mu-91.vercel.app';
           onShare(text, [miniappUrl]);
@@ -2940,8 +2859,8 @@ function Rolodex({
   onScanNew,
   filterTier,
   onFilterTierChange,
-  filterElement,
-  onFilterElementChange,
+  filterArchetype,
+  onFilterArchetypeChange,
   sortBy,
   onSortChange,
   showFilters,
@@ -2958,8 +2877,8 @@ function Rolodex({
   onScanNew: () => void;
   filterTier: FilterTier;
   onFilterTierChange: (tier: FilterTier) => void;
-  filterElement: FilterElement;
-  onFilterElementChange: (element: FilterElement) => void;
+  filterArchetype: FilterArchetype;
+  onFilterArchetypeChange: (element: FilterArchetype) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   showFilters: boolean;
@@ -2968,18 +2887,18 @@ function Rolodex({
 }) {
   const currentEntry = entries[currentIndex];
 
-  // Get unique elements from entries
-  const availableElements = useMemo(() => {
-    const elements = new Set(entries.map(e => e.element));
-    return Array.from(elements).sort();
+  // Get unique archetypes from entries
+  const availableArchetypes = useMemo(() => {
+    const archetypes = new Set(entries.map(e => e.archetype).filter(Boolean));
+    return Array.from(archetypes).sort() as string[];
   }, [entries]);
 
   // Count active filters
-  const activeFilterCount = (filterTier !== 'all' ? 1 : 0) + (filterElement !== 'all' ? 1 : 0);
+  const activeFilterCount = (filterTier !== 'all' ? 1 : 0) + (filterArchetype !== 'all' ? 1 : 0);
 
   const clearAllFilters = () => {
     onFilterTierChange('all');
-    onFilterElementChange('all');
+    onFilterArchetypeChange('all');
     onSearchChange('');
   };
 
@@ -3076,11 +2995,11 @@ function Rolodex({
                   color="yellow"
                 />
               )}
-              {filterElement !== 'all' && (
+              {filterArchetype !== 'all' && (
                 <ActiveFilter
-                  label={`Element: ${filterElement}`}
-                  onClear={() => onFilterElementChange('all')}
-                  color={filterElement.toLowerCase() === 'fire' ? 'red' : filterElement.toLowerCase() === 'water' ? 'blue' : filterElement.toLowerCase() === 'grass' ? 'green' : 'blue'}
+                  label={`Archetype: ${filterArchetype}`}
+                  onClear={() => onFilterArchetypeChange('all')}
+                  color={filterArchetype.toLowerCase() === 'fire' ? 'red' : filterArchetype.toLowerCase() === 'water' ? 'blue' : filterArchetype.toLowerCase() === 'grass' ? 'green' : 'blue'}
                 />
               )}
               <motion.button
@@ -3139,29 +3058,28 @@ function Rolodex({
                   </div>
                 </div>
 
-                {/* Element Filter */}
-                {availableElements.length > 0 && (
+                {/* Archetype Filter */}
+                {availableArchetypes.length > 0 && (
                   <div>
                     <h4 className="text-xs font-bold text-gray-300 uppercase mb-2 flex items-center gap-2 font-sans">
                       <Hexagon className="w-3 h-3" />
-                      Element Type
+                      Archetype
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      <FilterChip label="All" active={filterElement === 'all'} onClick={() => onFilterElementChange('all')} color="gray" />
-                      {availableElements.map(element => {
+                      <FilterChip label="All" active={filterArchetype === 'all'} onClick={() => onFilterArchetypeChange('all')} color="gray" />
+                      {availableArchetypes.map(archetype => {
                         const colorMap: Record<string, string> = {
-                          Fire: 'red', Water: 'blue', Grass: 'green', Electric: 'yellow',
-                          Ice: 'blue', Fighting: 'red', Poison: 'purple', Ground: 'orange',
-                          Flying: 'blue', Psychic: 'purple', Bug: 'green', Rock: 'gray',
-                          Ghost: 'purple', Dragon: 'red', Dark: 'gray', Steel: 'gray', Fairy: 'purple'
+                          ORACLE: 'purple', INFLUENCER: 'yellow', CONNECTOR: 'green', LURKER: 'gray',
+                          BUILDER: 'blue', DEGEN: 'red', WHALE: 'blue', SAGE: 'purple',
+                          NOMAD: 'orange', GUARDIAN: 'green'
                         };
                         return (
                           <FilterChip
-                            key={element}
-                            label={element}
-                            active={filterElement === element}
-                            onClick={() => onFilterElementChange(element)}
-                            color={colorMap[element] || 'blue'}
+                            key={archetype}
+                            label={archetype}
+                            active={filterArchetype === archetype}
+                            onClick={() => onFilterArchetypeChange(archetype)}
+                            color={colorMap[archetype] || 'blue'}
                           />
                         );
                       })}
@@ -3434,10 +3352,10 @@ function ClaimRewardsButton({ tokenAddress, creatorAddress }: { tokenAddress: st
 
 // Rolodex Card Component with Rich Animations
 function RolodexCard({ entry }: { entry: CreatureRecord }) {
-  const { name, element, entry_number, token_address, token_symbol, hp, attack, defense, speed, special, image_url, created_at, creator_address, farcaster_username } = entry;
-  const totalStats = hp + attack + defense + speed + special;
+  const { name, archetype, entry_number, token_address, token_symbol, image_url, created_at, creator_address, farcaster_username } = entry;
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const archetypeKey = archetype || 'BUILDER';
 
   // Fetch live price data
   const { priceData, loading: priceLoading } = usePriceData(token_address);
@@ -3486,16 +3404,6 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
     const timer = setTimeout(() => setShowStats(true), 300);
     return () => clearTimeout(timer);
   }, [entry]);
-
-  const getRarity = (element: string) => {
-    const rarities: Record<string, string> = {
-      Fire: 'common', Water: 'common', Grass: 'common', Fighting: 'common', Ground: 'common', Bug: 'common',
-      Electric: 'uncommon', Poison: 'uncommon', Flying: 'uncommon',
-      Ice: 'rare', Psychic: 'rare',
-      Dragon: 'legendary'
-    };
-    return rarities[element] || 'common';
-  };
 
   return (
     <motion.div
@@ -3558,16 +3466,10 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Badge color={element.toLowerCase() === 'fire' ? 'red' : element.toLowerCase() === 'water' ? 'blue' : element.toLowerCase() === 'grass' ? 'green' : 'blue'}>
-            {ELEMENT_ICONS[element]}
-            {element}
+          <Badge color={ARCHETYPE_COLORS[archetypeKey]?.replace('bg-', '') || 'blue'}>
+            {ARCHETYPE_ICONS[archetypeKey]}
+            {archetypeKey}
           </Badge>
-          <motion.span
-            className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(element)]}`}
-            whileHover={{ scale: 1.1 }}
-          >
-            {getRarity(element)}
-          </motion.span>
         </motion.div>
       </motion.div>
 
@@ -3662,14 +3564,14 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
         ) : (
           <motion.div
             className="w-full h-full flex items-center justify-center"
-            style={{ backgroundColor: ELEMENT_COLORS[element] || '#333' }}
+            style={{ backgroundColor: ARCHETYPE_HEX_COLORS[archetypeKey] || '#333' }}
           >
             <motion.span
               className="text-6xl"
               animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {ELEMENT_ICONS[element]}
+              {ARCHETYPE_ICONS[archetypeKey]}
             </motion.span>
           </motion.div>
         )}
@@ -3734,78 +3636,39 @@ function RolodexCard({ entry }: { entry: CreatureRecord }) {
         )}
       </AnimatePresence>
 
-      {/* Stats Grid with stagger animation */}
+      {/* Archetype Info */}
       <motion.div
-        className="grid grid-cols-5 gap-2 mb-4"
-        initial="hidden"
-        animate={showStats ? "visible" : "hidden"}
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.05, delayChildren: 0.3 }
-          }
-        }}
+        className="mb-4 p-3 bg-gray-800/50 rounded-lg flex items-center gap-3"
+        initial={{ opacity: 0, y: 20 }}
+        animate={showStats ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ delay: 0.3 }}
       >
-        {[
-          { label: 'HP', value: hp, color: 'text-green-400' },
-          { label: 'ATK', value: attack, color: 'text-red-400' },
-          { label: 'DEF', value: defense, color: 'text-blue-400' },
-          { label: 'SPD', value: speed, color: 'text-yellow-400' },
-          { label: 'SPC', value: special, color: 'text-purple-400' },
-        ].map((stat) => (
-          <motion.div
-            key={stat.label}
-            className="text-center"
-            variants={{
-              hidden: { opacity: 0, y: 20, scale: 0.5 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                transition: { type: "spring", stiffness: 400, damping: 15 }
-              }
-            }}
-            whileHover={{ scale: 1.15, y: -2 }}
-          >
-            <p className="text-gray-300 text-sm font-sans">{stat.label}</p>
-            <motion.p
-              className={`font-pixel ${stat.color}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              {stat.value}
-            </motion.p>
-          </motion.div>
-        ))}
+        <span
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: `${ARCHETYPE_HEX_COLORS[archetypeKey]}30` }}
+        >
+          {ARCHETYPE_ICONS[archetypeKey]}
+        </span>
+        <div>
+          <p className="text-gray-400 text-xs">ARCHETYPE</p>
+          <p className="font-pixel text-white">{archetypeKey}</p>
+        </div>
       </motion.div>
 
-      {/* Total & Token Info with slide-up */}
+      {/* Token Info with slide-up */}
       <motion.div
-        className="border-t border-gray-700 pt-4 grid grid-cols-2 gap-4"
+        className="border-t border-gray-700 pt-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
       >
-        <motion.div whileHover={{ scale: 1.05 }}>
-          <p className="text-gray-300 text-sm mb-1 font-sans">TOTAL STATS</p>
+        <motion.div whileHover={{ scale: 1.02 }} className="flex items-center justify-between">
+          <p className="text-gray-300 text-sm font-sans">TOKEN</p>
           <motion.p
-            className="font-pixel text-xl text-white"
+            className="font-pixel text-pokedex-yellow text-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
-          >
-            {totalStats}
-          </motion.p>
-        </motion.div>
-        <motion.div whileHover={{ scale: 1.05 }}>
-          <p className="text-gray-300 text-sm mb-1 font-sans">TOKEN</p>
-          <motion.p
-            className="font-pixel text-pokedex-yellow"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
           >
             ${token_symbol}
           </motion.p>

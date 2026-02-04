@@ -36,20 +36,21 @@ export interface CreatureRecord {
   token_address: string;
   token_symbol: string;
   name: string;
-  element: string;
-  level: number;
-  hp: number;
-  attack: number;
-  defense: number;
-  speed: number;
-  special: number;
+  archetype?: string;         // New: Oracle, Builder, Degen, etc.
+  element?: string;           // Deprecated: kept for backwards compat
+  level?: number;             // Deprecated
+  hp?: number;                // Deprecated
+  attack?: number;            // Deprecated
+  defense?: number;           // Deprecated
+  speed?: number;             // Deprecated
+  special?: number;           // Deprecated
   description: string;
   creator_address?: string;
   farcaster_username?: string;
   image_url?: string;
   verified: boolean;
   created_at?: string;
-  // New fields
+  // Other fields
   referrer_address?: string;  // Who referred the creator
   is_merged?: boolean;        // If this token was created from merging
   parent_tokens?: string[];   // Addresses of parent tokens (if merged)

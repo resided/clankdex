@@ -59,60 +59,40 @@ Use this file for non-trivial tasks (3+ steps or architectural decisions).
 
 ---
 
-### Gamified Tokenomics (Stats → Token Economics) — 2026-02-04
+### Creature Simplification — 2026-02-04
 
 #### Context
-Use creature stats to influence actual token parameters via Clanker SDK v4.
-Makes the creature generation meaningful - stats determine token structure.
+User decided to simplify the creature system. Stats and elements added complexity without meaningful benefit. The core differentiator is: AI-generated creature image + unique name based on wallet/Farcaster identity.
 
 #### Plan
-- [ ] **Phase 1: Stats Mapping Design**
-  - Define stat ranges and their token parameter mappings
-  - Power (0-100) → Starting market cap multiplier
-  - Defense (0-100) → Vesting lockup duration (0 = none, 100 = max 90 days)
-  - Speed (0-100) → Vesting unlock speed (linear vs cliff)
-  - Element type → Fee structure preset
-
-- [ ] **Phase 2: Rarity System**
-  - Define rarity tiers: Common (60%), Uncommon (25%), Rare (12%), Legendary (3%)
-  - Rarity calculated from total stat roll
-  - Common: Basic token, no vesting
-  - Uncommon: Can enable vesting vault (optional)
-  - Rare: Vesting vault + community reward split
-  - Legendary: Max vesting + treasury allocation + special metadata
-
-- [ ] **Phase 3: Deploy Integration**
-  - Update `/api/deploy` to accept creature stats
-  - Map stats to Clanker SDK parameters:
-    - `vault.supplyPercentage` based on defense
-    - `vault.lockupDuration` based on defense
-    - `vault.vestingDuration` based on speed
-    - `pool.startingMarketCap` based on power
-    - `fees` based on element type
-  - Add rarity to token metadata/description
-
-- [ ] **Phase 4: Referral Rewards**
-  - Use Clanker's `rewards` array for splits
-  - Creator: 70-80%
-  - Referrer (if exists): 15-20%
-  - ClankDex treasury: 5-10%
-
-- [ ] **Phase 5: Evolution Bonuses**
-  - Merged creatures get stat bonuses
-  - Higher rarity floor for evolved creatures
-  - Better tokenomics (higher market cap, better vesting)
+- [x] Remove stats (hp, attack, defense, speed, special) from creature generation
+- [x] Remove elements (Fire, Water, etc.) from creature generation
+- [x] Keep archetype system (Oracle, Influencer, Builder, etc.) for identity-based theming
+- [x] Update preview API to generate simpler creatures
+- [x] Update page.tsx Creature type and UI components
+- [x] Update save-creature API to not require stats/elements
+- [x] Update filtering to use archetype instead of element
+- [x] Update RolodexCard to display archetype instead of stats
 
 #### Verification
-- [ ] Stats correctly map to token parameters
-- [ ] Rarity distribution matches expected %
-- [ ] Clanker deploy succeeds with all parameter combos
-- [ ] Referral splits work correctly
-- [ ] UI shows stats → tokenomics relationship clearly
+- [x] TypeScript compiles without errors
+- [ ] App runs and creatures can be generated
+- [ ] Collection displays correctly with archetype info
 
-#### Questions to Resolve
-- What are sensible market cap ranges? (need to check Clanker defaults)
-- Max vesting duration that makes sense? (7 days min per SDK)
-- Should users see tokenomics BEFORE deploy or is surprise part of fun?
+#### Review
+- **Summary**: Removed stats (HP/ATK/DEF/SPD/SPC) and Pokemon-style elements from creature generation. Creatures now only have: name, description, archetype, colorPalette, DNA hash. Archetypes (Oracle, Influencer, Builder, Degen, etc.) are kept for identity-based theming and filtering.
+- **Files changed**:
+  - `api/preview/route.ts` - Simplified creature generation
+  - `api/save-creature/route.ts` - Removed stats/element fields
+  - `lib/supabase.ts` - Updated CreatureRecord type
+  - `page.tsx` - Updated Creature interface, UI components, filtering
+- **Database note**: Old creatures with element/stats will still display (backwards compat), new creatures will have archetype only
+
+---
+
+### ~~Gamified Tokenomics (Stats → Token Economics)~~ — CANCELLED
+
+**Reason**: Cancelled as part of creature simplification. Stats and elements have been removed from the system.
 
 ---
 
