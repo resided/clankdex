@@ -25,6 +25,32 @@ Use this file for non-trivial tasks (3+ steps or architectural decisions).
 
 ## Current / Recent
 
+### Game Boy 3D tilt and polish — 2026-02-04
+
+#### Plan
+- [x] Add mouse position tracking with useRef
+- [x] Calculate tilt angles (±12°) based on cursor position
+- [x] Apply CSS 3D transforms with perspective
+- [x] Add dynamic light reflection overlay that follows cursor
+- [x] Enhance LCD with scanlines and stronger glow
+- [x] Improve button hover/active states
+- [x] Add translateZ depth to interactive elements
+- [x] Enhance power LED glow
+
+#### Verification
+- [x] Tilt responds smoothly to mouse movement
+- [x] Returns to neutral on mouse leave
+- [x] Light reflection follows cursor
+- [x] Buttons feel more interactive
+- [x] No performance issues with transforms
+
+#### Review
+- **Summary**: Added premium 3D tilt effect that tracks mouse position, dynamic specular highlight, enhanced LCD scanlines/glow, improved button interactivity with hover states and depth.
+- **Files changed**: `page.tsx` (mouse tracking state/handlers), `globals.css` (enhanced styling)
+- **Follow-ups**: Could add mobile gyroscope support, subtle ambient floating animation
+
+---
+
 ### Boot screen with logo animation — 2026-02-04
 
 #### Plan
