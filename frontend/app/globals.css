@@ -57,21 +57,24 @@
   border-radius: 24px 24px 85px 85px;
   padding: 26px 28px 55px;
   box-shadow:
-    /* Ambient shadow */
-    0 60px 120px rgba(0, 0, 0, 0.6),
-    0 30px 60px rgba(0, 0, 0, 0.4),
+    /* Ambient shadow - enhanced */
+    0 70px 140px rgba(0, 0, 0, 0.5),
+    0 35px 70px rgba(0, 0, 0, 0.35),
     /* Contact shadow */
-    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 15px 30px rgba(0, 0, 0, 0.25),
+    /* Soft glow from screen */
+    0 0 80px rgba(155, 188, 15, 0.15),
     /* Shell edge highlight */
-    inset 0 2px 3px rgba(255, 255, 255, 0.9),
+    inset 0 2px 3px rgba(255, 255, 255, 0.95),
     /* Shell edge shadow */
-    inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.12),
     /* Side depth shadows */
-    inset 2px 0 4px rgba(0, 0, 0, 0.08),
-    inset -2px 0 4px rgba(0, 0, 0, 0.08),
-    /* Subtle plastic sheen */
-    inset 0 0 80px rgba(255, 255, 255, 0.1);
+    inset 2px 0 4px rgba(0, 0, 0, 0.06),
+    inset -2px 0 4px rgba(0, 0, 0, 0.06);
   overflow: visible;
+  /* Enable 3D transforms */
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 /* Shell surface texture - fine plastic grain */
@@ -165,25 +168,43 @@
   aspect-ratio: 10/9;
   box-shadow:
     /* Inner shadow for screen recess */
-    inset 0 3px 6px rgba(0, 0, 0, 0.2),
-    inset 0 0 20px rgba(0, 0, 0, 0.1),
-    /* Screen glow */
-    0 0 15px rgba(155, 188, 15, 0.15);
+    inset 0 4px 8px rgba(0, 0, 0, 0.25),
+    inset 0 0 25px rgba(0, 0, 0, 0.15),
+    /* Screen glow - enhanced */
+    0 0 30px rgba(155, 188, 15, 0.25),
+    0 0 60px rgba(155, 188, 15, 0.1);
   margin-top: 30px;
   border: 4px solid #0f380f;
+  /* 3D depth */
+  transform: translateZ(10px);
 }
 
-/* LCD pixel grid - ultra fine */
+/* LCD pixel grid + scanlines */
 .gameboy-lcd::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-  background-size: 3px 3px;
+    /* Pixel grid */
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    /* Scanlines */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  background-size: 3px 3px, 3px 3px, 100% 4px;
   pointer-events: none;
   z-index: 10;
+  animation: scanline-flicker 0.1s linear infinite;
+}
+
+@keyframes scanline-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.98; }
 }
 
 /* Glass reflection overlay */
@@ -195,12 +216,12 @@
   width: 160%;
   height: 160%;
   background: linear-gradient(125deg,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.06) 25%,
       transparent 40%,
       transparent 60%,
       rgba(255, 255, 255, 0.03) 75%,
-      rgba(255, 255, 255, 0.08) 100%);
+      rgba(255, 255, 255, 0.1) 100%);
   pointer-events: none;
   z-index: 11;
   transform: rotate(-15deg);
@@ -430,24 +451,32 @@
   height: 10px;
   background: radial-gradient(circle at 30% 30%, #ff6666 0%, #cc0000 50%, #990000 100%);
   box-shadow:
-    0 0 8px #ff0000,
-    0 0 16px rgba(255, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 0 10px #ff0000,
+    0 0 20px rgba(255, 0, 0, 0.6),
+    0 0 30px rgba(255, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
     inset 0 -1px 1px rgba(0, 0, 0, 0.3);
-  animation: power-pulse 2.5s ease-in-out infinite;
+  animation: power-pulse 2s ease-in-out infinite;
 }
 
 @keyframes power-pulse {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 8px #ff0000, 0 0 16px rgba(255, 0, 0, 0.5);
+    box-shadow:
+      0 0 10px #ff0000,
+      0 0 20px rgba(255, 0, 0, 0.6),
+      0 0 30px rgba(255, 0, 0, 0.3),
+      inset 0 1px 1px rgba(255, 255, 255, 0.5),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.3);
   }
-
   50% {
-    opacity: 0.85;
-    box-shadow: 0 0 5px #ff0000, 0 0 10px rgba(255, 0, 0, 0.3);
+    opacity: 0.9;
+    box-shadow:
+      0 0 6px #ff0000,
+      0 0 12px rgba(255, 0, 0, 0.4),
+      0 0 18px rgba(255, 0, 0, 0.2),
+      inset 0 1px 1px rgba(255, 255, 255, 0.5),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -483,6 +512,7 @@
   position: relative;
   width: 110px;
   height: 110px;
+  transform: translateZ(6px);
 }
 
 .d-pad-base {
@@ -495,7 +525,7 @@
       #18181c 100%);
   border-radius: 50%;
   box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 6px 12px rgba(0, 0, 0, 0.35),
     inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
@@ -506,6 +536,12 @@
   transform: translate(-50%, -50%);
   width: 92px;
   height: 92px;
+  cursor: pointer;
+  transition: transform 0.05s ease;
+}
+
+.d-pad-cross:active {
+  transform: translate(-50%, -50%) scale(0.98);
 }
 
 .d-pad-cross::before,
@@ -517,9 +553,18 @@
       #222228 0%,
       #1a1a20 100%);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
     inset 0 -1px 1px rgba(0, 0, 0, 0.3),
-    0 2px 4px rgba(0, 0, 0, 0.2);
+    0 3px 6px rgba(0, 0, 0, 0.25);
+  transition: background 0.1s ease;
+}
+
+.d-pad-cross:hover::before,
+.d-pad-cross:hover::after {
+  background:
+    linear-gradient(145deg,
+      #2a2a30 0%,
+      #202028 100%);
 }
 
 .d-pad-cross::before {
@@ -553,7 +598,7 @@
   border-radius: 50%;
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.3);
+    0 2px 4px rgba(0, 0, 0, 0.3);
   z-index: 2;
 }
 
@@ -577,17 +622,35 @@
       #5a1835 100%);
   box-shadow:
     /* Button shadow */
-    0 5px 10px rgba(0, 0, 0, 0.4),
-    0 3px 5px rgba(0, 0, 0, 0.3),
+    0 6px 12px rgba(0, 0, 0, 0.4),
+    0 3px 6px rgba(0, 0, 0, 0.3),
     /* Button edge highlight */
-    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 2px 3px rgba(255, 255, 255, 0.3),
     /* Button recess shadow */
     inset 0 -2px 4px rgba(0, 0, 0, 0.3);
   transition: all 0.1s ease;
+  cursor: pointer;
+  /* 3D depth */
+  transform: translateZ(8px);
+}
+
+.ab-button:hover {
+  background:
+    radial-gradient(circle at 35% 35%,
+      #aa4068 0%,
+      #8a3050 40%,
+      #6a2040 100%);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.35),
+    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    /* Subtle glow */
+    0 0 15px rgba(154, 53, 90, 0.3);
 }
 
 .ab-button:active {
-  transform: translateY(2px);
+  transform: translateZ(4px) translateY(2px);
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.2),
@@ -602,9 +665,14 @@
   width: 30%;
   height: 25%;
   background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.35) 0%,
       transparent 100%);
   border-radius: 50%;
+  transition: opacity 0.1s ease;
+}
+
+.ab-button:active::after {
+  opacity: 0.5;
 }
 
 .ab-button-label {
@@ -641,13 +709,25 @@
     0 4px 8px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.25),
     inset 0 -1px 1px rgba(0, 0, 0, 0.3);
-  transform: rotate(-15deg);
+  transform: rotate(-15deg) translateZ(5px);
   transition: all 0.1s ease;
   cursor: pointer;
 }
 
+.menu-button:hover {
+  background:
+    linear-gradient(180deg,
+      #9a9590 0%,
+      #7a7570 50%,
+      #6a6560 100%);
+  box-shadow:
+    0 5px 10px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.3);
+}
+
 .menu-button:active {
-  transform: rotate(-15deg) translateY(1px);
+  transform: rotate(-15deg) translateZ(2px) translateY(1px);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 1px 1px rgba(255, 255, 255, 0.15);
@@ -1091,8 +1171,23 @@
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .gameboy-device {
-    transform: scale(0.9);
+    transform: scale(0.9) !important;
     transform-origin: top center;
+  }
+}
+
+/* Hover state for entire device */
+@media (hover: hover) {
+  .gameboy-device:hover {
+    box-shadow:
+      0 80px 160px rgba(0, 0, 0, 0.55),
+      0 40px 80px rgba(0, 0, 0, 0.4),
+      0 18px 36px rgba(0, 0, 0, 0.3),
+      0 0 100px rgba(155, 188, 15, 0.2),
+      inset 0 2px 3px rgba(255, 255, 255, 0.95),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.12),
+      inset 2px 0 4px rgba(0, 0, 0, 0.06),
+      inset -2px 0 4px rgba(0, 0, 0, 0.06);
   }
 }
 
