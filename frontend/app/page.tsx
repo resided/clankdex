@@ -929,6 +929,17 @@ export default function Home() {
   // In-app feedback (replaces alert) — dismissible banner
   const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
 
+  // Boot screen state
+  const [isBooting, setIsBooting] = useState(true);
+
+  // Boot sequence timer
+  useEffect(() => {
+    const bootTimer = setTimeout(() => {
+      setIsBooting(false);
+    }, 2800); // 2.8s boot sequence
+    return () => clearTimeout(bootTimer);
+  }, []);
+
   // Rolodex state
   const [clankdexEntries, setClankdexEntries] = useState<CreatureRecord[]>([]);
   const [currentEntryIndex, setCurrentEntryIndex] = useState(0);
@@ -1575,8 +1586,77 @@ export default function Home() {
               <div className="gameboy-lcd">
                 <div className="gameboy-lcd-content">
                   <AnimatePresence mode="wait">
+                    {/* BOOT SCREEN */}
+                    {isBooting && (
+                      <motion.div
+                        key="boot"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="h-full flex flex-col items-center justify-center"
+                        style={{ background: '#0f380f' }}
+                      >
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
+                          className="relative"
+                        >
+                          {/* Logo with glow effect */}
+                          <motion.div
+                            animate={{
+                              boxShadow: [
+                                '0 0 20px rgba(155, 188, 15, 0.3)',
+                                '0 0 40px rgba(155, 188, 15, 0.6)',
+                                '0 0 20px rgba(155, 188, 15, 0.3)',
+                              ],
+                            }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                            className="rounded-lg overflow-hidden"
+                          >
+                            <img
+                              src="/clankdex-logo.png"
+                              alt="ClankDex"
+                              className="w-32 h-32 object-contain"
+                              style={{ imageRendering: 'pixelated' }}
+                            />
+                          </motion.div>
+                        </motion.div>
+
+                        {/* Loading text */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 1, duration: 0.5 }}
+                          className="mt-4 text-center"
+                        >
+                          <p className="text-xs font-pixel" style={{ color: '#9bbc0f' }}>
+                            CLANKDEX
+                          </p>
+                          <motion.p
+                            animate={{ opacity: [1, 0.3, 1] }}
+                            transition={{ duration: 0.8, repeat: Infinity }}
+                            className="text-[10px] mt-2"
+                            style={{ color: '#8bac0f' }}
+                          >
+                            LOADING...
+                          </motion.p>
+                        </motion.div>
+
+                        {/* Boot progress bar */}
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: '60%' }}
+                          transition={{ delay: 0.8, duration: 1.8, ease: 'easeInOut' }}
+                          className="h-1 mt-4 rounded"
+                          style={{ background: '#9bbc0f' }}
+                        />
+                      </motion.div>
+                    )}
+
                     {/* MENU SCREEN */}
-                    {screenMode === 'menu' && (
+                    {!isBooting && screenMode === 'menu' && (
                       <motion.div
                         key="menu"
                         initial={{ opacity: 0 }}
@@ -1619,7 +1699,7 @@ export default function Home() {
                     )}
 
                     {/* SCAN SCREEN */}
-                    {screenMode === 'scan' && (
+                    {!isBooting && screenMode === 'scan' && (
                       <motion.div
                         key="scan"
                         initial={{ x: 20, opacity: 0 }}
@@ -1702,7 +1782,7 @@ export default function Home() {
                     )}
 
                     {/* COLLECTION SCREEN */}
-                    {screenMode === 'collection' && (
+                    {!isBooting && screenMode === 'collection' && (
                       <motion.div
                         key="collection"
                         initial={{ x: 20, opacity: 0 }}
@@ -1753,7 +1833,7 @@ export default function Home() {
                     )}
 
                     {/* FAQ SCREEN */}
-                    {screenMode === 'faq' && (
+                    {!isBooting && screenMode === 'faq' && (
                       <motion.div
                         key="faq"
                         initial={{ x: 20, opacity: 0 }}
@@ -1789,7 +1869,7 @@ export default function Home() {
                     )}
 
                     {/* HOW IT WORKS SCREEN */}
-                    {screenMode === 'how-it-works' && (
+                    {!isBooting && screenMode === 'how-it-works' && (
                       <motion.div
                         key="how-it-works"
                         initial={{ x: 20, opacity: 0 }}
@@ -1844,7 +1924,7 @@ export default function Home() {
                     )}
 
                     {/* DAILY (Token of the Day) SCREEN */}
-                    {screenMode === 'daily' && (
+                    {!isBooting && screenMode === 'daily' && (
                       <motion.div
                         key="daily"
                         initial={{ x: 20, opacity: 0 }}
@@ -1934,7 +2014,7 @@ export default function Home() {
                     )}
 
                     {/* MERGE SCREEN */}
-                    {screenMode === 'merge' && (
+                    {!isBooting && screenMode === 'merge' && (
                       <motion.div
                         key="merge"
                         initial={{ x: 20, opacity: 0 }}
