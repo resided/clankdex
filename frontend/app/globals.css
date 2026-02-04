@@ -310,7 +310,7 @@
 
 /* ============================================
    ENCHANTED FOREST BACKGROUND
-   Solid color with bottom forest strip
+   Pure CSS animated mystical forest
    ============================================ */
 
 .enchanted-forest {
@@ -319,105 +319,143 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
-  /* Solid dark forest color */
-  background-color: #1a2f2a;
+  /* Rich dark forest gradient */
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 0%, #1a3a2f 0%, transparent 50%),
+    radial-gradient(ellipse 100% 60% at 20% 100%, #0d2818 0%, transparent 40%),
+    radial-gradient(ellipse 100% 60% at 80% 100%, #0a2015 0%, transparent 40%),
+    linear-gradient(180deg,
+      #0f2419 0%,
+      #132b1f 30%,
+      #0d2215 60%,
+      #081a10 100%);
 }
 
-/* Layer 1: Back - Hidden (was causing transparency issues) */
-.layer-back {
-  display: none;
-}
-
-/* Layer 2: Mid - Hidden (was causing transparency issues) */
-.layer-mid {
-  display: none;
-}
-
-/* Layer 3: Front - Bottom grass/flowers only */
-.layer-front {
+/* Ambient fog/mist layer */
+.forest-mist {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 180px;
-  background: url('/forest_layer_3.png') bottom left/auto 100% repeat-x;
-  image-rendering: pixelated;
-  z-index: 3;
-  animation: parallax-scroll 20s linear infinite;
-}
-
-@keyframes parallax-scroll {
-  from {
-    background-position: 0 bottom;
-  }
-
-  to {
-    background-position: -1920px bottom;
-  }
-}
-
-/* Magical mist layer - refined for image overlay */
-.enchanted-mist {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(180deg,
-      transparent 0%,
-      rgba(150, 200, 150, 0.05) 30%,
-      rgba(100, 180, 130, 0.1) 60%,
-      rgba(80, 160, 120, 0.15) 80%,
-      rgba(60, 140, 100, 0.2) 100%);
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 40% at 30% 70%, rgba(100, 160, 120, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 30% at 70% 80%, rgba(80, 140, 100, 0.06) 0%, transparent 50%);
   animation: mist-drift 20s ease-in-out infinite;
 }
 
 @keyframes mist-drift {
-
-  0%,
-  100% {
-    transform: translateX(0);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: translateX(2%);
-    opacity: 1;
-  }
+  0%, 100% { transform: translateX(0); opacity: 0.8; }
+  50% { transform: translateX(3%); opacity: 1; }
 }
 
-/* Floating magical particles */
-.enchanted-particle {
+/* Tree silhouettes - back layer */
+.forest-trees-back {
   position: absolute;
   bottom: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(180, 255, 180, 0.9) 0%, rgba(100, 255, 150, 0.5) 50%, transparent 70%);
-  box-shadow: 0 0 10px rgba(150, 255, 150, 0.6);
-  pointer-events: none;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background:
+    /* Distant trees */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M0,100 L0,60 Q10,40 20,60 L20,45 Q30,20 40,45 L40,55 Q50,35 60,55 L60,50 Q70,25 80,50 L80,60 Q90,45 100,60 L100,40 Q110,15 120,40 L120,55 Q130,40 140,55 L140,45 Q150,20 160,45 L160,60 Q170,50 180,60 L180,50 Q190,30 200,50 L200,100 Z' fill='%230a1810'/%3E%3C/svg%3E") repeat-x bottom/400px 100%;
+  opacity: 0.7;
+  animation: trees-sway-slow 30s ease-in-out infinite;
 }
 
-/* Firefly effect */
-.enchanted-firefly {
+/* Tree silhouettes - mid layer */
+.forest-trees-mid {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M0,100 L0,70 Q5,55 15,70 L15,50 Q25,25 35,50 L35,65 Q45,50 55,65 L55,45 Q65,20 75,45 L75,60 Q85,45 95,60 L95,55 Q105,30 115,55 L115,65 Q125,55 135,65 L135,50 Q145,25 155,50 L155,60 Q165,50 175,60 L175,55 Q185,35 195,55 L200,55 L200,100 Z' fill='%23071510'/%3E%3C/svg%3E") repeat-x bottom/300px 100%;
+  animation: trees-sway-mid 25s ease-in-out infinite reverse;
+}
+
+/* Tree silhouettes - front layer */
+.forest-trees-front {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M0,100 L0,75 Q8,60 16,75 L16,55 Q28,30 40,55 L40,70 Q50,55 60,70 L60,50 Q72,25 84,50 L84,65 Q94,55 104,65 L104,60 Q116,35 128,60 L128,70 Q138,60 148,70 L148,55 Q160,30 172,55 L172,70 Q182,60 192,70 L200,75 L200,100 Z' fill='%23051008'/%3E%3C/svg%3E") repeat-x bottom/250px 100%;
+  animation: trees-sway-fast 20s ease-in-out infinite;
+}
+
+/* Ground/grass layer */
+.forest-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    #040d06 30%,
+    #030a05 100%);
+}
+
+/* Grass blades overlay */
+.forest-grass {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'%3E%3Cpath d='M0,30 L2,20 L4,30 L6,15 L8,30 L10,22 L12,30 L14,18 L16,30 L18,25 L20,30 L22,12 L24,30 L26,20 L28,30 L30,16 L32,30 L34,22 L36,30 L38,14 L40,30 L42,24 L44,30 L46,18 L48,30 L50,20 L52,30 L54,15 L56,30 L58,22 L60,30 L62,17 L64,30 L66,25 L68,30 L70,13 L72,30 L74,21 L76,30 L78,16 L80,30 L82,23 L84,30 L86,19 L88,30 L90,24 L92,30 L94,14 L96,30 L98,20 L100,30 Z' fill='%230a1a0f'/%3E%3C/svg%3E") repeat-x bottom/150px 100%;
+  animation: grass-wave 8s ease-in-out infinite;
+}
+
+@keyframes trees-sway-slow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-10px); }
+}
+
+@keyframes trees-sway-mid {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+@keyframes trees-sway-fast {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-5px); }
+}
+
+@keyframes grass-wave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.05); }
+}
+
+/* Firefly */
+.firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: radial-gradient(circle, #ffffaa 0%, #ffff66 40%, transparent 70%);
-  box-shadow:
-    0 0 8px #ffff88,
-    0 0 15px #ffff44,
-    0 0 25px rgba(255, 255, 100, 0.4);
+  box-shadow: 0 0 8px #ffff88, 0 0 15px #ffff44;
   pointer-events: none;
 }
 
-/* Ambient glow overlay */
-.enchanted-glow {
+/* Magical sparkle */
+.sparkle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180, 255, 200, 0.9) 0%, transparent 70%);
+  box-shadow: 0 0 6px rgba(150, 255, 180, 0.5);
+  pointer-events: none;
+}
+
+/* Vignette overlay */
+.forest-vignette {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 50% 50% at 20% 80%, rgba(100, 200, 150, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 40% at 80% 70%, rgba(150, 220, 100, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 60% at 50% 90%, rgba(80, 180, 120, 0.12) 0%, transparent 50%);
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 20%, rgba(0, 10, 5, 0.4) 100%);
   pointer-events: none;
 }
 

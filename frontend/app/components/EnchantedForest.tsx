@@ -3,45 +3,20 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 
-// Magical floating particles
-const Particle = memo(function Particle({ delay, x, size, duration }: { delay: number; x: number; size: number; duration: number }) {
-  return (
-    <motion.div
-      className="enchanted-particle"
-      style={{
-        left: `${x}%`,
-        width: size,
-        height: size,
-      }}
-      animate={{
-        y: ['100vh', '-10vh'],
-        opacity: [0, 1, 1, 0],
-        scale: [0.5, 1, 1, 0.5],
-      }}
-      transition={{
-        duration,
-        delay,
-        repeat: Infinity,
-        ease: 'linear',
-      }}
-    />
-  );
-});
-
-// Firefly/sparkle effect
+// Firefly component with random floating animation
 const Firefly = memo(function Firefly({ delay, x, y }: { delay: number; x: number; y: number }) {
   return (
     <motion.div
-      className="enchanted-firefly"
+      className="firefly"
       style={{ left: `${x}%`, top: `${y}%` }}
       animate={{
         opacity: [0, 1, 0.3, 1, 0],
-        scale: [0.8, 1.2, 0.9, 1.1, 0.8],
-        x: [0, 10, -5, 8, 0],
-        y: [0, -8, 5, -3, 0],
+        scale: [0.5, 1.2, 0.8, 1.1, 0.5],
+        x: [0, 15, -10, 12, 0],
+        y: [0, -12, 8, -5, 0],
       }}
       transition={{
-        duration: 4 + Math.random() * 2,
+        duration: 5 + Math.random() * 3,
         delay,
         repeat: Infinity,
         ease: 'easeInOut',
@@ -50,55 +25,69 @@ const Firefly = memo(function Firefly({ delay, x, y }: { delay: number; x: numbe
   );
 });
 
-// Pre-generate particle positions
-const particles = Array.from({ length: 25 }).map((_, i) => ({
-  id: `particle-${i}`,
-  x: Math.random() * 100,
-  delay: i * 0.8,
-  size: 3 + Math.random() * 5,
-  duration: 15 + Math.random() * 10,
-}));
+// Sparkle component - smaller, faster
+const Sparkle = memo(function Sparkle({ delay, x, y }: { delay: number; x: number; y: number }) {
+  return (
+    <motion.div
+      className="sparkle"
+      style={{ left: `${x}%`, top: `${y}%` }}
+      animate={{
+        opacity: [0, 0.8, 0],
+        scale: [0.3, 1, 0.3],
+      }}
+      transition={{
+        duration: 2 + Math.random() * 2,
+        delay,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
+    />
+  );
+});
 
-// Pre-generate firefly positions
-const fireflies = Array.from({ length: 40 }).map((_, i) => ({
+// Pre-generate firefly positions (mostly in lower half for forest feel)
+const fireflies = Array.from({ length: 30 }).map((_, i) => ({
   id: `firefly-${i}`,
   x: Math.random() * 100,
-  y: 30 + Math.random() * 70, // Keep them mostly in lower/mid area
-  delay: i * 0.5,
+  y: 40 + Math.random() * 55,
+  delay: i * 0.4,
+}));
+
+// Pre-generate sparkle positions (scattered throughout)
+const sparkles = Array.from({ length: 20 }).map((_, i) => ({
+  id: `sparkle-${i}`,
+  x: Math.random() * 100,
+  y: 20 + Math.random() * 70,
+  delay: i * 0.6,
 }));
 
 export const EnchantedForest = memo(function EnchantedForest() {
   return (
     <div className="enchanted-forest">
-      {/* Bottom forest strip - grass/flowers */}
-      <div className="layer-front" />
+      {/* Ambient mist */}
+      <div className="forest-mist" />
 
-      {/* Dark overlay for depth */}
-      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+      {/* Tree layers - back to front for depth */}
+      <div className="forest-trees-back" />
+      <div className="forest-trees-mid" />
+      <div className="forest-trees-front" />
 
-      {/* Magical mist layers for depth */}
-      <div className="enchanted-mist opacity-40 mix-blend-screen" />
-      <div className="enchanted-mist opacity-30 animation-delay-2000 mix-blend-screen" style={{ animationDuration: '25s' }} />
-
-      {/* Floating particles (spores/magic) */}
-      {particles.map((p) => (
-        <Particle key={p.id} x={p.x} delay={p.delay} size={p.size} duration={p.duration} />
-      ))}
+      {/* Ground and grass */}
+      <div className="forest-ground" />
+      <div className="forest-grass" />
 
       {/* Fireflies */}
       {fireflies.map((f) => (
         <Firefly key={f.id} x={f.x} y={f.y} delay={f.delay} />
       ))}
 
-      {/* Ambient glow overlay */}
-      <div className="enchanted-glow mix-blend-soft-light" />
+      {/* Sparkles */}
+      {sparkles.map((s) => (
+        <Sparkle key={s.id} x={s.x} y={s.y} delay={s.delay} />
+      ))}
 
-      {/* Vignette */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at center, transparent 40%, rgba(10, 20, 30, 0.6) 100%)'
-        }}
-      />
+      {/* Vignette for depth */}
+      <div className="forest-vignette" />
     </div>
   );
 });
