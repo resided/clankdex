@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 interface GameboyCartridgeProps {
@@ -173,24 +174,40 @@ export default function GameboyCartridge({
   return cartridgeContent;
 }
 
-// Floating cartridges background component
-export function FloatingCartridges({ count = 12 }: { count?: number }) {
-  const elements = ['Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dragon', 'Poison', 'Fighting', 'Ground', 'Flying', 'Bug'] as const;
+// Pre-generate cartridge data outside component to prevent re-renders
+const CARTRIDGE_ELEMENTS = ['Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dragon', 'Poison', 'Fighting', 'Ground', 'Flying', 'Bug'] as const;
 
-  // Pre-generate positions for consistent rendering
-  const cartridges = Array.from({ length: count }).map((_, i) => ({
-    element: elements[i % elements.length],
-    x: (i * 17 + 5) % 90 + 5, // Spread evenly 5-95%
+const generateCartridgeData = (count: number) =>
+  Array.from({ length: count }).map((_, i) => ({
+    id: `cartridge-${i}`,
+    element: CARTRIDGE_ELEMENTS[i % CARTRIDGE_ELEMENTS.length],
+    x: (i * 17 + 5) % 90 + 5,
     delay: i * 1.5,
-    duration: 20 + (i % 5) * 3, // 20-32s
-    scale: 0.5 + (i % 3) * 0.1, // 0.5-0.7
+    duration: 20 + (i % 5) * 3,
+    scale: 0.5 + (i % 3) * 0.1,
   }));
+
+// Memoized single cartridge for the background
+const MemoizedCartridge = memo(function MemoizedCartridge({
+  element,
+  scale
+}: {
+  element: typeof CARTRIDGE_ELEMENTS[number];
+  scale: number;
+}) {
+  return <GameboyCartridge element={element} scale={scale} animate={false} />;
+});
+
+// Floating cartridges background component - memoized to prevent re-renders
+export const FloatingCartridges = memo(function FloatingCartridges({ count = 12 }: { count?: number }) {
+  // Memoize cartridge data so it never changes
+  const cartridges = useMemo(() => generateCartridgeData(count), [count]);
 
   return (
     <div className="floating-cartridges">
-      {cartridges.map((cart, i) => (
+      {cartridges.map((cart) => (
         <motion.div
-          key={i}
+          key={cart.id}
           className="floating-cartridge"
           style={{
             position: 'absolute',
@@ -209,13 +226,9 @@ export function FloatingCartridges({ count = 12 }: { count?: number }) {
             ease: 'linear',
           }}
         >
-          <GameboyCartridge
-            element={cart.element}
-            scale={cart.scale}
-            animate={false}
-          />
+          <MemoizedCartridge element={cart.element} scale={cart.scale} />
         </motion.div>
       ))}
     </div>
   );
-}
+});
