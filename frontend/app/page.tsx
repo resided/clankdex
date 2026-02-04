@@ -1522,7 +1522,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-pokemon-world flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Floating Cartridge Background */}
-      <FloatingCartridges count={6} />
+      <FloatingCartridges count={15} />
 
       {/* In-app feedback banner (replaces alert) */}
       <AnimatePresence>

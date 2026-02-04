@@ -174,46 +174,48 @@ export default function GameboyCartridge({
 }
 
 // Floating cartridges background component
-export function FloatingCartridges({ count = 5 }: { count?: number }) {
-  const elements = ['Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dragon'] as const;
+export function FloatingCartridges({ count = 12 }: { count?: number }) {
+  const elements = ['Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dragon', 'Poison', 'Fighting', 'Ground', 'Flying', 'Bug'] as const;
+
+  // Pre-generate positions for consistent rendering
+  const cartridges = Array.from({ length: count }).map((_, i) => ({
+    element: elements[i % elements.length],
+    x: (i * 17 + 5) % 90 + 5, // Spread evenly 5-95%
+    delay: i * 1.5,
+    duration: 20 + (i % 5) * 3, // 20-32s
+    scale: 0.5 + (i % 3) * 0.1, // 0.5-0.7
+  }));
 
   return (
     <div className="floating-cartridges">
-      {Array.from({ length: count }).map((_, i) => {
-        const element = elements[i % elements.length];
-        const randomX = Math.random() * 80 + 10; // 10-90%
-        const randomDelay = Math.random() * 5;
-        const randomDuration = 15 + Math.random() * 10; // 15-25s
-
-        return (
-          <motion.div
-            key={i}
-            className="floating-cartridge"
-            style={{
-              position: 'absolute',
-              left: `${randomX}%`,
-              top: '-300px',
-            }}
-            animate={{
-              y: ['0vh', '120vh'],
-              rotate: [0, 15, -15, 0],
-              opacity: [0, 0.6, 0.6, 0],
-            }}
-            transition={{
-              duration: randomDuration,
-              delay: randomDelay,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-          >
-            <GameboyCartridge
-              element={element}
-              scale={0.35 + Math.random() * 0.15}
-              animate={false}
-            />
-          </motion.div>
-        );
-      })}
+      {cartridges.map((cart, i) => (
+        <motion.div
+          key={i}
+          className="floating-cartridge"
+          style={{
+            position: 'absolute',
+            left: `${cart.x}%`,
+            top: '-350px',
+          }}
+          animate={{
+            y: ['0vh', '130vh'],
+            rotate: [0, 10, -10, 5, 0],
+            opacity: [0, 0.85, 0.85, 0.85, 0],
+          }}
+          transition={{
+            duration: cart.duration,
+            delay: cart.delay,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        >
+          <GameboyCartridge
+            element={cart.element}
+            scale={cart.scale}
+            animate={false}
+          />
+        </motion.div>
+      ))}
     </div>
   );
 }
