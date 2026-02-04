@@ -28,6 +28,13 @@ For each lesson:
 
 ---
 
+## Lesson: 3D CSS transforms can break click interactions
+- **What happened**: Added mouse-tracking 3D tilt effect to Game Boy device. Looked cool but made menu clicking janky/unreliable.
+- **Rule**: Test interactive elements thoroughly after adding CSS 3D transforms. The visual effect isn't worth broken UX.
+- **Date**: 2026-02-04
+
+---
+
 ## Lesson: PNG transparency causes checkered pattern
 - **What happened**: Forest PNG layers had transparent areas that showed as checkered pattern. Tried multiple CSS workarounds before realizing the PNGs themselves were the problem.
 - **Rule**: When seeing checkered transparency patterns, the issue is likely PNG images with alpha channels - fix by using solid backgrounds or pure CSS instead.

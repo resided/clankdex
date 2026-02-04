@@ -25,6 +25,63 @@ Use this file for non-trivial tasks (3+ steps or architectural decisions).
 
 ## Current / Recent
 
+### Gamified Tokenomics (Stats → Token Economics) — 2026-02-04
+
+#### Context
+Use creature stats to influence actual token parameters via Clanker SDK v4.
+Makes the creature generation meaningful - stats determine token structure.
+
+#### Plan
+- [ ] **Phase 1: Stats Mapping Design**
+  - Define stat ranges and their token parameter mappings
+  - Power (0-100) → Starting market cap multiplier
+  - Defense (0-100) → Vesting lockup duration (0 = none, 100 = max 90 days)
+  - Speed (0-100) → Vesting unlock speed (linear vs cliff)
+  - Element type → Fee structure preset
+
+- [ ] **Phase 2: Rarity System**
+  - Define rarity tiers: Common (60%), Uncommon (25%), Rare (12%), Legendary (3%)
+  - Rarity calculated from total stat roll
+  - Common: Basic token, no vesting
+  - Uncommon: Can enable vesting vault (optional)
+  - Rare: Vesting vault + community reward split
+  - Legendary: Max vesting + treasury allocation + special metadata
+
+- [ ] **Phase 3: Deploy Integration**
+  - Update `/api/deploy` to accept creature stats
+  - Map stats to Clanker SDK parameters:
+    - `vault.supplyPercentage` based on defense
+    - `vault.lockupDuration` based on defense
+    - `vault.vestingDuration` based on speed
+    - `pool.startingMarketCap` based on power
+    - `fees` based on element type
+  - Add rarity to token metadata/description
+
+- [ ] **Phase 4: Referral Rewards**
+  - Use Clanker's `rewards` array for splits
+  - Creator: 70-80%
+  - Referrer (if exists): 15-20%
+  - ClankDex treasury: 5-10%
+
+- [ ] **Phase 5: Evolution Bonuses**
+  - Merged creatures get stat bonuses
+  - Higher rarity floor for evolved creatures
+  - Better tokenomics (higher market cap, better vesting)
+
+#### Verification
+- [ ] Stats correctly map to token parameters
+- [ ] Rarity distribution matches expected %
+- [ ] Clanker deploy succeeds with all parameter combos
+- [ ] Referral splits work correctly
+- [ ] UI shows stats → tokenomics relationship clearly
+
+#### Questions to Resolve
+- What are sensible market cap ranges? (need to check Clanker defaults)
+- Max vesting duration that makes sense? (7 days min per SDK)
+- Should users see tokenomics BEFORE deploy or is surprise part of fun?
+
+---
+
 ### Game Boy 3D tilt and polish — 2026-02-04
 
 #### Plan
