@@ -319,41 +319,9 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
-  background-color: #0d1b2a !important;
-}
-
-/* Base class for all parallax layers */
-.parallax-layer {
-  position: absolute;
-  inset: 0;
-  image-rendering: pixelated;
-  background-repeat: repeat-x;
-  background-position: bottom left;
-  background-size: auto 100%;
-  /* Fit height, repeat width */
-  will-change: background-position;
-}
-
-/* Layer 1: Back (Slowest) */
-.layer-back {
-  background-image: url('/forest_layer_1.png');
-  z-index: 1;
-  animation: parallax-scroll 120s linear infinite;
-  opacity: 0.8;
-}
-
-/* Layer 2: Mid (Medium) */
-.layer-mid {
-  background-image: url('/forest_layer_2.png');
-  z-index: 2;
-  animation: parallax-scroll 60s linear infinite;
-}
-
-/* Layer 3: Front (Fastest) */
-.layer-front {
-  background-image: url('/forest_layer_3.png');
-  z-index: 3;
-  animation: parallax-scroll 30s linear infinite;
+  /* Full forest background - no transparency */
+  background: url('/forest-bg.png') center/cover no-repeat;
+  background-color: #0d1b2a;
 }
 
 @keyframes parallax-scroll {
