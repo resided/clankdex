@@ -310,7 +310,7 @@
 
 /* ============================================
    ENCHANTED FOREST BACKGROUND
-   Rich pixel art mystical forest with Parallax
+   Solid color with bottom forest strip
    ============================================ */
 
 .enchanted-forest {
@@ -319,60 +319,31 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
-  /* Dark base color behind everything */
-  background-color: #0a1f1a;
+  /* Solid dark forest color */
+  background-color: #1a2f2a;
 }
 
-/* Layer 1: Back (Slowest) - Full background */
+/* Layer 1: Back - Hidden (was causing transparency issues) */
 .layer-back {
-  position: absolute;
-  inset: 0;
-  background: url('/forest-bg.png') center/cover no-repeat;
-  image-rendering: pixelated;
-  z-index: 1;
-  animation: parallax-slow 60s linear infinite;
+  display: none;
 }
 
-/* Layer 2: Mid - Trees overlay with solid bg behind transparency */
+/* Layer 2: Mid - Hidden (was causing transparency issues) */
 .layer-mid {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 80%;
-  background: 
-    url('/forest_layer_2.png') bottom left/auto 100% repeat-x,
-    linear-gradient(to bottom, transparent 0%, #0a1f1a 30%, #0a1f1a 100%);
-  background-color: #0a1f1a;
-  image-rendering: pixelated;
-  z-index: 2;
-  animation: parallax-scroll 40s linear infinite;
+  display: none;
 }
 
-/* Layer 3: Front - Grass/flowers overlay with solid bg behind */
+/* Layer 3: Front - Bottom grass/flowers only */
 .layer-front {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 50%;
-  background: 
-    url('/forest_layer_3.png') bottom left/auto 100% repeat-x,
-    linear-gradient(to bottom, transparent 0%, #0a1f1a 40%, #0a1f1a 100%);
-  background-color: #0a1f1a;
+  height: 180px;
+  background: url('/forest_layer_3.png') bottom left/auto 100% repeat-x;
   image-rendering: pixelated;
   z-index: 3;
   animation: parallax-scroll 20s linear infinite;
-}
-
-@keyframes parallax-slow {
-  from { background-position: 0 center; }
-  to { background-position: -640px center; }
-}
-
-@keyframes parallax-scroll {
-  from { background-position: 0 bottom; }
-  to { background-position: -640px bottom; }
 }
 
 @keyframes parallax-scroll {
@@ -382,7 +353,6 @@
 
   to {
     background-position: -1920px bottom;
-    /* Assumes 1920px width tile, adjust if needed */
   }
 }
 

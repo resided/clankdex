@@ -70,13 +70,7 @@ const fireflies = Array.from({ length: 40 }).map((_, i) => ({
 export const EnchantedForest = memo(function EnchantedForest() {
   return (
     <div className="enchanted-forest">
-      {/* Full solid forest background */}
-      <div className="layer-back" />
-
-      {/* Mid layer - trees with solid bg behind transparent parts */}
-      <div className="layer-mid" />
-
-      {/* Front layer - grass/flowers with solid bg behind transparent parts */}
+      {/* Bottom forest strip - grass/flowers */}
       <div className="layer-front" />
 
       {/* Dark overlay for depth */}
