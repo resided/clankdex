@@ -23,6 +23,20 @@ Use this file for non-trivial tasks (3+ steps or architectural decisions).
 
 ---
 
+## Parked (Come Back Later)
+
+### Treasury & Wallet Setup — PARKED
+- [ ] Create treasury wallet (Rabby/Rainbow)
+- [ ] Save seed phrase securely
+- [ ] Add `CLANKDEX_TREASURY_ADDRESS` to Vercel env vars
+- [ ] Consider Safe multisig when treasury > $10k
+- [ ] Define profit split (suggested: 60% profit, 40% reserve)
+- [ ] Set up monthly treasury review cadence
+
+**Note:** Code is ready, just needs the address. Revenue (5% interface fee) is implemented but going to zero address until this is done.
+
+---
+
 ## Current / Recent
 
 ### ClankDex Revenue Setup — 2026-02-04
