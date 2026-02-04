@@ -7,6 +7,7 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useFarcaster } from './components/FarcasterProvider';
+import { FloatingCartridges } from './components/GameboyCartridge';
 import {
   Sparkles,
   Zap,
@@ -1520,6 +1521,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-pokemon-world flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Floating Cartridge Background */}
+      <FloatingCartridges count={6} />
+
       {/* In-app feedback banner (replaces alert) */}
       <AnimatePresence>
         {feedback && (

@@ -369,6 +369,255 @@
   50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
 }
 
+/* ============================================
+   GAME BOY CARTRIDGE BACKGROUNDS
+   Clanker-themed cartridge decorations
+   ============================================ */
+
+.gameboy-cartridge {
+  --width: 200px;
+  --height: 210px;
+  --border-round: 3px;
+
+  width: var(--width);
+  height: var(--height);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  font-family: system-ui, sans-serif;
+}
+
+.gameboy-cartridge .cartridge-top {
+  width: calc(var(--width) * 0.9);
+  height: calc(var(--height) * 0.05);
+  background: var(--cartridge-color, #8c8c8c);
+  border-radius: var(--border-round) var(--border-round) 0 0;
+  box-shadow: 0 -2px 0px #aaa;
+}
+
+.gameboy-cartridge .cartridge-header {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.gameboy-cartridge .cartridge-header .cartridge-header-overlay {
+  width: var(--width);
+  height: calc(var(--height) * 0.18);
+  background:
+    linear-gradient(var(--cartridge-color) 0 15%, transparent 15% 75%, var(--cartridge-color) 75%),
+    linear-gradient(90deg, transparent 0 1%, #444 1% 5%, #000 50%, #444 95% 99%, transparent 99%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gameboy-cartridge .cartridge-brand {
+  width: 75%;
+  height: 80%;
+  background: linear-gradient(#444 5%, #777 85%);
+  box-shadow:
+    0 5px 15px 10px #4448 inset,
+    0 -1px 0 1px #ddd inset,
+    0 1px 2px 2px #222 inset;
+  border: 3px solid var(--cartridge-color);
+  border-radius: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--cartridge-color);
+  text-shadow: 1px 2px 1px #0005;
+}
+
+.gameboy-cartridge .brand-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.gameboy-cartridge .brand {
+  font-weight: bold;
+  font-size: 0.5em;
+  letter-spacing: 0px;
+}
+
+.gameboy-cartridge .model {
+  font-weight: bold;
+  letter-spacing: -1px;
+  font-size: 0.75em;
+}
+
+.gameboy-cartridge .sign {
+  font-size: 0.3em;
+  vertical-align: super;
+}
+
+.gameboy-cartridge .cartridge-body {
+  width: var(--width);
+  height: calc(var(--height) * 0.7);
+  background: var(--cartridge-color);
+  border-radius: 0 0 var(--border-round) var(--border-round);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background-image: linear-gradient(transparent, #666);
+}
+
+.gameboy-cartridge .cartridge-end {
+  width: 5%;
+  height: 75%;
+  background: #5d5d5d;
+  border-top: 2px solid #444;
+}
+
+.gameboy-cartridge .cartridge-end:first-child {
+  border-radius: 0 0 0 var(--border-round);
+}
+
+.gameboy-cartridge .cartridge-end:last-child {
+  border-radius: 0 0 var(--border-round) 0;
+}
+
+.gameboy-cartridge .cartridge-label-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gameboy-cartridge .cartridge-gap {
+  width: calc(var(--width) * 0.74);
+  height: calc(var(--height) * 0.52);
+  background: linear-gradient(#666, #555);
+  border-radius: var(--border-round);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 2px solid #444;
+  border-bottom: 2px solid #aaa;
+}
+
+.gameboy-cartridge .label {
+  width: 94%;
+  height: 96%;
+  background:
+    linear-gradient(90deg, #afa99b 9%, transparent 9% 91%, #afa99b 91%),
+    var(--fancy-gradient);
+  border-radius: var(--border-round);
+  box-shadow: 2px 2px 0 #333;
+  position: relative;
+  overflow: hidden;
+}
+
+.gameboy-cartridge .label::after {
+  content: "";
+  display: block;
+  position: absolute;
+  background: linear-gradient(225deg, transparent 35%, #fff5 45% 55%, transparent 65%);
+  inset: 0;
+  pointer-events: none;
+}
+
+.gameboy-cartridge .label-title {
+  font-family: 'Press Start 2P', system-ui, monospace;
+  font-size: 0.7em;
+  letter-spacing: -1px;
+  color: #fff;
+  text-shadow: 1px 1px 4px #0005, 2px 2px 5px #0008;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 20%;
+}
+
+.gameboy-cartridge .label-slogan {
+  font-family: system-ui, sans-serif;
+  font-weight: bold;
+  font-size: 0.4em;
+  letter-spacing: 0px;
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 2px #0005;
+  position: absolute;
+  top: 45%;
+}
+
+.gameboy-cartridge .base-seal {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0052ff, #0066ff);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.2em;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.gameboy-cartridge .base-seal .seal-subtitle {
+  font-size: 0.6em;
+  opacity: 0.8;
+}
+
+.gameboy-cartridge .clanker-seal {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700, #ffaa00);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.gameboy-cartridge .clanker-seal .seal-inner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff, #f0f0f0);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  font-size: 0.18em;
+  font-weight: bold;
+}
+
+.gameboy-cartridge .clanker-seal .seal-subtitle {
+  font-size: 0.6em;
+  color: #666;
+}
+
+.gameboy-cartridge .arrow-down {
+  border-top: 15px solid #555;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-radius: 5px;
+  margin: 5px 0 8px 0;
+  filter: drop-shadow(0 1px 0 #999) drop-shadow(0 -1px 0 #444);
+}
+
+/* Floating cartridges container */
+.floating-cartridges {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.floating-cartridge {
+  pointer-events: none;
+}
+
 /* Power indicator LED */
 .gameboy-power {
   @apply flex items-center gap-2 z-10 relative;
