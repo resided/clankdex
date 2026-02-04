@@ -852,6 +852,38 @@ const ELEMENT_COLORS: Record<string, string> = {
   Dragon: 'bg-violet-600',
 };
 
+// Pokédex-style gradient backgrounds for card headers
+const ELEMENT_GRADIENTS: Record<string, string> = {
+  Fire: 'from-orange-500 via-red-500 to-red-600',
+  Water: 'from-blue-400 via-blue-500 to-blue-600',
+  Grass: 'from-green-400 via-green-500 to-emerald-600',
+  Electric: 'from-yellow-300 via-yellow-400 to-amber-500',
+  Ice: 'from-cyan-300 via-cyan-400 to-blue-400',
+  Fighting: 'from-amber-600 via-orange-700 to-red-800',
+  Poison: 'from-purple-400 via-purple-500 to-violet-600',
+  Ground: 'from-amber-500 via-orange-600 to-amber-700',
+  Flying: 'from-sky-300 via-blue-300 to-indigo-400',
+  Psychic: 'from-pink-400 via-pink-500 to-fuchsia-600',
+  Bug: 'from-lime-400 via-green-500 to-emerald-500',
+  Dragon: 'from-violet-500 via-purple-600 to-indigo-700',
+};
+
+// Hex colors for inline styles (matching Figma Pokédex)
+const ELEMENT_HEX_COLORS: Record<string, string> = {
+  Fire: '#FF5722',
+  Water: '#2196F3',
+  Grass: '#4CAF50',
+  Electric: '#FFEB3B',
+  Ice: '#00BCD4',
+  Fighting: '#795548',
+  Poison: '#9C27B0',
+  Ground: '#8D6E63',
+  Flying: '#90CAF9',
+  Psychic: '#E91E63',
+  Bug: '#8BC34A',
+  Dragon: '#673AB7',
+};
+
 const RARITY_COLORS: Record<string, string> = {
   common: 'text-gray-400',
   uncommon: 'text-green-400',
@@ -2087,105 +2119,153 @@ function StatsPanel({
     return rarities[element] || 'common';
   };
 
+  const elementGradient = ELEMENT_GRADIENTS[creature.element] || ELEMENT_GRADIENTS.Fire;
+  const elementHex = ELEMENT_HEX_COLORS[creature.element] || ELEMENT_HEX_COLORS.Fire;
+
   return (
     <motion.div
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 50, opacity: 0 }}
-      className="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700"
+      className="pokedex-card rounded-2xl overflow-hidden border border-gray-700 shadow-2xl"
     >
-      {/* Farcaster Profile */}
-      {farcasterData && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-6 p-4 bg-purple-900/20 rounded-lg border border-purple-500/30"
-        >
-          {farcasterData.pfpUrl && (
-            <motion.img 
-              src={farcasterData.pfpUrl} 
-              alt={farcasterData.username}
-              className="w-16 h-16 rounded-full border-2 border-purple-500"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-            />
-          )}
+      {/* Pokédex-style Colored Header */}
+      <div className={`relative bg-gradient-to-br ${elementGradient} p-6 pb-16`}>
+        {/* Pokeball pattern background */}
+        <div className="absolute inset-0 overflow-hidden opacity-10">
+          <div className="absolute -right-16 -top-16 w-48 h-48 rounded-full border-[16px] border-white/50" />
+          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/20" />
+        </div>
+
+        {/* Header content */}
+        <div className="relative z-10 flex items-start justify-between">
           <div>
-            <h3 className="font-bold text-white">@{farcasterData.username}</h3>
-            <p className="text-gray-200 text-sm">{farcasterData.displayName}</p>
-            <div className="flex gap-4 mt-2 text-sm">
-              <span className="text-purple-400">{farcasterData.followerCount} followers</span>
-              <span className="text-gray-300">{farcasterData.castCount} casts</span>
+            <motion.h2
+              className="font-pixel text-2xl text-white mb-1 drop-shadow-lg"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              {creature.name}
+            </motion.h2>
+            <motion.p
+              className="text-white/80 text-sm font-sans"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {creature.species}
+            </motion.p>
+          </div>
+          <motion.div
+            className="flex flex-col items-end gap-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <span className="font-pixel text-lg text-white/90 drop-shadow">#{creature.level.toString().padStart(3, '0')}</span>
+            <div className="flex gap-2">
+              <span
+                className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg"
+                style={{ backgroundColor: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)' }}
+              >
+                {creature.element}
+              </span>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Farcaster Profile (if available) */}
+        {farcasterData && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative z-10 flex items-center gap-3 mt-4 p-3 bg-white/10 backdrop-blur-sm rounded-lg"
+          >
+            {farcasterData.pfpUrl && (
+              <motion.img
+                src={farcasterData.pfpUrl}
+                alt={farcasterData.username}
+                className="w-10 h-10 rounded-full border-2 border-white/50"
+                whileHover={{ scale: 1.1 }}
+              />
+            )}
+            <div className="text-white">
+              <p className="font-bold text-sm">@{farcasterData.username}</p>
+              <p className="text-white/70 text-xs">{farcasterData.archetype}</p>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Card Body - White/Dark section */}
+      <div className="bg-gray-900 p-6 -mt-8 rounded-t-3xl relative z-20">
+        {/* Rarity Badge */}
+        <div className="flex justify-center -mt-10 mb-4">
+          <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase shadow-lg ${
+            getRarity(creature.element) === 'legendary' ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black' :
+            getRarity(creature.element) === 'rare' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white' :
+            getRarity(creature.element) === 'uncommon' ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white' :
+            'bg-gray-600 text-white'
+          }`}>
+            {getRarity(creature.element)}
+          </span>
+        </div>
+
+        {/* About Section - Pokédex style */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-6"
+        >
+          <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">About</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
+              <div className="flex items-center justify-center gap-1 text-gray-200 mb-1">
+                <Coins className="w-4 h-4" />
+                <span className="font-pixel text-sm">{creature.level * 0.5}</span>
+              </div>
+              <p className="text-gray-500 text-xs">Est. MCap (ETH)</p>
+            </div>
+            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
+              <div className="flex items-center justify-center gap-1 text-gray-200 mb-1">
+                <Droplet className="w-4 h-4" />
+                <span className="font-pixel text-sm">{(creature.hp + creature.attack) / 20}</span>
+              </div>
+              <p className="text-gray-500 text-xs">Liquidity (ETH)</p>
+            </div>
+            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
+              <div className="flex items-center justify-center gap-1 text-gray-200 mb-1">
+                <Activity className="w-4 h-4" />
+                <span className="font-pixel text-sm">{creature.speed}%</span>
+              </div>
+              <p className="text-gray-500 text-xs">Volatility</p>
             </div>
           </div>
         </motion.div>
-      )}
 
-      {/* Creature Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <motion.h2 
-            className="font-pixel text-2xl text-white mb-1"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            {creature.name}
-          </motion.h2>
-          <motion.p 
-            className="text-gray-200 text-sm font-sans"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {creature.species}
-          </motion.p>
-          {farcasterData && (
-            <motion.p 
-              className="text-purple-400 text-xs mt-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              {farcasterData.archetype} • {farcasterData.personality?.dominant}
-            </motion.p>
-          )}
-        </div>
-        <motion.div 
-          className="flex flex-col items-end gap-2"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Badge color={creature.element.toLowerCase() === 'fire' ? 'red' : creature.element.toLowerCase() === 'water' ? 'blue' : creature.element.toLowerCase() === 'grass' ? 'green' : 'blue'}>
-            {ELEMENT_ICONS[creature.element]}
-            {creature.element}
-          </Badge>
-          <span className={`text-xs font-bold uppercase ${RARITY_COLORS[getRarity(creature.element)]}`}>
-            {getRarity(creature.element)}
-          </span>
-        </motion.div>
-      </div>
-
-      {/* Description with typewriter effect */}
-      <motion.div 
-        className="bg-pokedex-screen/20 rounded-lg p-4 mb-6 border border-pokedex-screen/30"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <p className="text-gray-100 text-sm sm:text-base leading-relaxed font-sans">
-          {creature.description}
-        </p>
-      </motion.div>
-
-      {/* Evolution Preview */}
-      {!deployResult && (
+        {/* Description */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-4 rounded-xl"
+          style={{ backgroundColor: `${elementHex}15`, borderLeft: `3px solid ${elementHex}` }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="mb-6 p-4 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-lg border border-purple-500/30"
         >
+          <p className="text-gray-200 text-sm leading-relaxed font-sans">
+            {creature.description}
+          </p>
+        </motion.div>
+
+        {/* Evolution Preview */}
+        {!deployResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/20"
+          >
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="w-4 h-4 text-purple-400" />
             <h4 className="text-sm font-bold text-purple-400">EVOLUTION PATH</h4>
@@ -2218,40 +2298,59 @@ function StatsPanel({
           <p className="text-sm text-gray-200 mt-3 text-center font-sans">
             Your creature will evolve as market cap grows!
           </p>
+          </motion.div>
+        )}
+
+        {/* Base Stats - Pokédex style */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">Base Stats</h3>
+          <div className="space-y-3">
+            <PokedexStatBar label="HP" value={creature.hp} max={100} color={elementHex} />
+            <PokedexStatBar label="ATK" value={creature.attack} max={100} color={elementHex} />
+            <PokedexStatBar label="DEF" value={creature.defense} max={100} color={elementHex} />
+            <PokedexStatBar label="SPD" value={creature.speed} max={100} color={elementHex} />
+            <PokedexStatBar label="SPC" value={creature.special} max={100} color={elementHex} />
+          </div>
+
+          {/* Total Stats */}
+          <div className="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center">
+            <span className="text-gray-400 text-sm font-sans">Total</span>
+            <span
+              className="font-pixel text-lg px-3 py-1 rounded-lg"
+              style={{ backgroundColor: `${elementHex}20`, color: elementHex }}
+            >
+              {creature.hp + creature.attack + creature.defense + creature.speed + creature.special}
+            </span>
+          </div>
         </motion.div>
-      )}
 
-      {/* Stats */}
-      <div className="space-y-3">
-        <StatBar label="HP" value={creature.hp} max={100} color="bg-green-500" />
-        <StatBar label="ATK" value={creature.attack} max={100} color="bg-red-500" />
-        <StatBar label="DEF" value={creature.defense} max={100} color="bg-blue-500" />
-        <StatBar label="SPD" value={creature.speed} max={100} color="bg-yellow-400" />
-        <StatBar label="SPC" value={creature.special} max={100} color="bg-purple-500" />
-      </div>
+        {/* DNA & Token Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6 p-4 bg-gray-800/50 rounded-xl grid grid-cols-2 gap-4"
+        >
+          <div>
+            <p className="text-gray-500 text-xs mb-1">LEVEL</p>
+            <p className="font-pixel text-lg text-white">{creature.level}</p>
+          </div>
+          <div>
+            <p className="text-gray-500 text-xs mb-1">DNA HASH</p>
+            <p className="font-mono text-sm text-gray-300 truncate">
+              0x{creature.dna.slice(-8)}
+            </p>
+          </div>
+        </motion.div>
 
-      {/* Total Stats */}
-      <div className="mt-4 p-3 bg-gray-700/50 rounded-lg">
-        <div className="flex justify-between items-center">
-          <span className="text-gray-200 text-sm font-sans">Total Stats</span>
-          <span className="font-pixel text-lg text-white">
-            {creature.hp + creature.attack + creature.defense + creature.speed + creature.special}
-          </span>
-        </div>
-      </div>
-
-      {/* DNA & Level */}
-      <div className="mt-4 pt-4 border-t border-gray-700 grid grid-cols-2 gap-4">
-        <div className="text-center">
-          <p className="text-gray-300 text-sm mb-1 font-sans">LEVEL</p>
-          <p className="font-pixel text-xl text-white">{creature.level}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-gray-300 text-sm mb-1 font-sans">DNA</p>
-          <p className="font-mono text-sm text-gray-200 truncate">
-            0x{creature.dna.slice(-8)}
-          </p>
-        </div>
+        {/* Success Message */}
+        {deployResult && (
+          <DeploySuccess deployResult={deployResult} creature={creature} onShare={onShare} />
+        )}
       </div>
 
       {/* Launch Animation Overlay */}
@@ -2264,11 +2363,6 @@ function StatsPanel({
         >
           <LaunchAnimation step={mintStep as 'generating' | 'deploying' | 'success'} />
         </motion.div>
-      )}
-
-      {/* Success Message */}
-      {deployResult && (
-        <DeploySuccess deployResult={deployResult} creature={creature} onShare={onShare} />
       )}
     </motion.div>
   );
@@ -2375,6 +2469,27 @@ function StatBar({ label, value, max, color }: { label: string; value: number; m
         />
       </div>
       <span className="font-pixel text-xs text-white w-10 text-right">{value}</span>
+    </div>
+  );
+}
+
+// Pokédex-style Stat Bar Component
+function PokedexStatBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const percentage = Math.min((value / max) * 100, 100);
+
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-gray-400 text-xs font-medium w-10">{label}</span>
+      <span className="font-pixel text-xs text-white w-8 text-right">{value}</span>
+      <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${percentage}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="h-full rounded-full"
+          style={{ backgroundColor: color }}
+        />
+      </div>
     </div>
   );
 }
