@@ -10,6 +10,8 @@
   body {
     @apply antialiased font-sans;
     color: #e5e7eb;
+    background-color: #111827;
+    /* Force bg-gray-900 equivalent */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -317,7 +319,7 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
-  background-color: #0d1b2a;
+  background-color: #0d1b2a !important;
 }
 
 /* Base class for all parallax layers */
