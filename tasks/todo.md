@@ -25,6 +25,50 @@ Use this file for non-trivial tasks (3+ steps or architectural decisions).
 
 ## Current / Recent
 
+### Boot screen with logo animation — 2026-02-04
+
+#### Plan
+- [x] Copy logo image to public folder
+- [x] Add `isBooting` state with 2.8s timer
+- [x] Create boot screen with logo, glow effect, progress bar
+- [x] Add `!isBooting` guard to all screen mode conditions
+- [x] Smooth fade transition to main menu
+
+#### Verification
+- [x] Logo displays correctly on page load
+- [x] Animation plays smoothly (glow pulse, progress bar fill)
+- [x] Transitions to menu after boot completes
+- [x] No flash of menu content during boot
+
+#### Review
+- **Summary**: Added Game Boy-style power-on sequence showing ClankDex logo with pulsing glow, "LOADING..." text, and progress bar. 2.8s duration before fade to main menu.
+- **Files changed**: `page.tsx` (boot state + boot screen JSX), `public/clankdex-logo.png` (added)
+- **Follow-ups**: Could add sound effect, skip on tap/click
+
+---
+
+### Background redesign — 2026-02-04
+
+#### Plan
+- [x] Remove PNG-based parallax layers (causing transparency/checkered pattern)
+- [x] Attempt 1: Pure CSS tree silhouettes + animations (too cartoon)
+- [x] Attempt 2: Zelda-style with fairies, orbs, leaves (too busy/childish)
+- [x] Attempt 3: Clean modern dark aesthetic (approved)
+- [x] Delete unused forest PNG files
+
+#### Verification
+- [x] No checkered transparency pattern visible
+- [x] Background blends smoothly with page
+- [x] Animations are subtle, not distracting
+- [x] Professional/sleek appearance
+
+#### Review
+- **Summary**: Removed all PNG-based forest layers that had transparency issues. After two rejected iterations (cartoon trees, then Zelda-style busy animations), settled on clean Stripe/Linear-inspired dark gradient with soft bokeh orbs and minimal particles.
+- **Files changed**: `globals.css` (background styles), `EnchantedForest.tsx` (simplified component), deleted `forest-bg.png`, `forest_layer_1.png`, `forest_layer_2.png`
+- **Lessons**: User wanted sleek/professional, not playful. Should have asked for style references earlier.
+
+---
+
 ### UX audit & end-user improvements — 2025-02-03
 
 #### Plan
