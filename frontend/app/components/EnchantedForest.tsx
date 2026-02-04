@@ -51,47 +51,42 @@ const Firefly = memo(function Firefly({ delay, x, y }: { delay: number; x: numbe
 });
 
 // Pre-generate particle positions
-const particles = Array.from({ length: 20 }).map((_, i) => ({
+const particles = Array.from({ length: 25 }).map((_, i) => ({
   id: `particle-${i}`,
   x: Math.random() * 100,
   delay: i * 0.8,
-  size: 4 + Math.random() * 6,
+  size: 3 + Math.random() * 5,
   duration: 15 + Math.random() * 10,
 }));
 
 // Pre-generate firefly positions
-const fireflies = Array.from({ length: 30 }).map((_, i) => ({
+const fireflies = Array.from({ length: 40 }).map((_, i) => ({
   id: `firefly-${i}`,
   x: Math.random() * 100,
-  y: 20 + Math.random() * 60,
+  y: 30 + Math.random() * 70, // Keep them mostly in lower/mid area
   delay: i * 0.5,
 }));
 
 export const EnchantedForest = memo(function EnchantedForest() {
   return (
     <div className="enchanted-forest">
-      {/* Sky gradient layer */}
-      <div className="enchanted-sky" />
+      {/* Parallax Layer 1: Distant Background (Slowest) */}
+      <div className="parallax-layer layer-back" />
 
-      {/* Stars/distant sparkles */}
-      <div className="enchanted-stars" />
+      {/* Parallax Layer 2: Midground Forest (Medium Speed) */}
+      <div className="parallax-layer layer-mid" />
 
-      {/* Background mountains/hills */}
-      <div className="enchanted-mountains" />
+      {/* Parallax Layer 3: Foreground Detail (Fastest) */}
+      <div className="parallax-layer layer-front" />
 
-      {/* Mid-ground forest silhouette */}
-      <div className="enchanted-trees-back" />
+      {/* Dark overlay for depth */}
+      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-      {/* Main forest layer */}
-      <div className="enchanted-trees-mid" />
+      {/* Magical mist layers for depth */}
+      <div className="enchanted-mist opacity-40 mix-blend-screen" />
+      <div className="enchanted-mist opacity-30 animation-delay-2000 mix-blend-screen" style={{ animationDuration: '25s' }} />
 
-      {/* Foreground bushes/grass */}
-      <div className="enchanted-foliage" />
-
-      {/* Magical mist */}
-      <div className="enchanted-mist" />
-
-      {/* Floating particles */}
+      {/* Floating particles (spores/magic) */}
       {particles.map((p) => (
         <Particle key={p.id} x={p.x} delay={p.delay} size={p.size} duration={p.duration} />
       ))}
@@ -102,7 +97,14 @@ export const EnchantedForest = memo(function EnchantedForest() {
       ))}
 
       {/* Ambient glow overlay */}
-      <div className="enchanted-glow" />
+      <div className="enchanted-glow mix-blend-soft-light" />
+
+      {/* Vignette */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at center, transparent 40%, rgba(10, 20, 30, 0.6) 100%)'
+        }}
+      />
     </div>
   );
 });

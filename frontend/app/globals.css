@@ -43,7 +43,7 @@
   @apply relative mx-auto;
   width: min(480px, 95vw);
   /* Premium off-white ABS plastic shell */
-  background: 
+  background:
     /* Surface texture */
     linear-gradient(165deg,
       #e8e4dc 0%,
@@ -51,8 +51,7 @@
       #d4cfc4 40%,
       #c9c4b8 60%,
       #bfbab0 80%,
-      #b5b0a6 100%
-    );
+      #b5b0a6 100%);
   border-radius: 24px 24px 85px 85px;
   padding: 26px 28px 55px;
   box-shadow:
@@ -94,11 +93,10 @@
   right: 15px;
   height: 40%;
   background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.2) 20%,
-    rgba(255, 255, 255, 0.08) 40%,
-    transparent 70%
-  );
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.08) 40%,
+      transparent 70%);
   border-radius: 20px 20px 60% 60%;
   pointer-events: none;
   z-index: 2;
@@ -107,14 +105,13 @@
 /* Screen area bezel - dark smoked plastic */
 .gameboy-bezel {
   @apply relative rounded-lg p-5 z-10;
-  background: 
+  background:
     /* Metallic dark finish */
     linear-gradient(145deg,
       #2a2a32 0%,
       #1e1e24 30%,
       #16161a 60%,
-      #121216 100%
-    );
+      #121216 100%);
   box-shadow:
     /* Bevel highlight */
     inset 0 2px 4px rgba(255, 255, 255, 0.15),
@@ -150,20 +147,19 @@
   letter-spacing: 3px;
   color: rgba(180, 150, 120, 0.9);
   text-transform: uppercase;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.1);
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Authentic LCD Screen - Classic pea green */
 .gameboy-lcd {
   @apply relative rounded overflow-hidden;
   /* Classic Game Boy LCD green */
-  background: 
-    linear-gradient(145deg, 
-      #9bbc0f 0%, 
-      #8bac0f 40%, 
-      #7a9c0e 60%, 
-      #6b8c0d 100%
-    );
+  background:
+    linear-gradient(145deg,
+      #9bbc0f 0%,
+      #8bac0f 40%,
+      #7a9c0e 60%,
+      #6b8c0d 100%);
   aspect-ratio: 10/9;
   box-shadow:
     /* Inner shadow for screen recess */
@@ -181,8 +177,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   background-size: 3px 3px;
   pointer-events: none;
   z-index: 10;
@@ -196,15 +192,13 @@
   left: -30%;
   width: 160%;
   height: 160%;
-  background: linear-gradient(
-    125deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 25%,
-    transparent 40%,
-    transparent 60%,
-    rgba(255, 255, 255, 0.03) 75%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: linear-gradient(125deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.05) 25%,
+      transparent 40%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.03) 75%,
+      rgba(255, 255, 255, 0.08) 100%);
   pointer-events: none;
   z-index: 11;
   transform: rotate(-15deg);
@@ -246,14 +240,12 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.03) 45%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.03) 55%,
-    transparent 60%
-  );
+  background: linear-gradient(105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.03) 45%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.03) 55%,
+      transparent 60%);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
   pointer-events: none;
@@ -287,8 +279,15 @@
 }
 
 @keyframes legendary-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+  }
 }
 
 .rarity-rare {
@@ -296,13 +295,20 @@
 }
 
 @keyframes rare-glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
-  50% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  }
 }
 
 /* ============================================
    ENCHANTED FOREST BACKGROUND
-   Pokemon/MapleStory inspired magical forest
+   Rich pixel art mystical forest with Parallax
    ============================================ */
 
 .enchanted-forest {
@@ -311,127 +317,82 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
+  background-color: #0d1b2a;
 }
 
-/* Gradient sky - dusk/magical atmosphere */
-.enchanted-sky {
+/* Base class for all parallax layers */
+.parallax-layer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    #0d1b2a 0%,
-    #1b263b 15%,
-    #2d4a3e 35%,
-    #3a5a40 50%,
-    #4a7c59 70%,
-    #2d4a3e 85%,
-    #1a3330 100%
-  );
+  image-rendering: pixelated;
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  background-size: auto 100%;
+  /* Fit height, repeat width */
+  will-change: background-position;
 }
 
-/* Twinkling stars */
-.enchanted-stars {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(2px 2px at 20% 10%, #fffacd 100%, transparent),
-    radial-gradient(2px 2px at 40% 5%, #fff8dc 100%, transparent),
-    radial-gradient(1px 1px at 60% 15%, #fffacd 100%, transparent),
-    radial-gradient(2px 2px at 80% 8%, #fff8dc 100%, transparent),
-    radial-gradient(1px 1px at 10% 20%, #fffacd 100%, transparent),
-    radial-gradient(2px 2px at 90% 18%, #fff8dc 100%, transparent),
-    radial-gradient(1px 1px at 50% 12%, #fffacd 100%, transparent),
-    radial-gradient(1px 1px at 30% 22%, #fff8dc 100%, transparent),
-    radial-gradient(2px 2px at 70% 3%, #fffacd 100%, transparent),
-    radial-gradient(1px 1px at 15% 8%, #fff8dc 100%, transparent);
-  animation: twinkle 4s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-/* Distant mountains/hills */
-.enchanted-mountains {
-  position: absolute;
-  bottom: 30%;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background:
-    /* Far mountain */
-    radial-gradient(ellipse 80% 100% at 20% 100%, #2d4a3e 0%, transparent 70%),
-    radial-gradient(ellipse 60% 80% at 50% 100%, #3a5a40 0%, transparent 60%),
-    radial-gradient(ellipse 70% 90% at 80% 100%, #2d4a3e 0%, transparent 65%);
-}
-
-/* Back layer trees - silhouettes */
-.enchanted-trees-back {
-  position: absolute;
-  bottom: 15%;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background:
-    /* Tree silhouettes */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cellipse cx='30' cy='100' rx='25' ry='60' fill='%23264d3d'/%3E%3Cellipse cx='80' cy='100' rx='30' ry='70' fill='%232a5442'/%3E%3Cellipse cx='140' cy='100' rx='28' ry='65' fill='%23264d3d'/%3E%3Cellipse cx='180' cy='100' rx='22' ry='55' fill='%232a5442'/%3E%3C/svg%3E") repeat-x;
-  background-size: 400px 200px;
-  background-position: bottom;
+/* Layer 1: Back (Slowest) */
+.layer-back {
+  background-image: url('/forest_layer_1.png');
+  z-index: 1;
+  animation: parallax-scroll 120s linear infinite;
   opacity: 0.8;
 }
 
-/* Mid layer trees - main forest */
-.enchanted-trees-mid {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  background:
-    /* Cartoon trees with rounded tops */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 150'%3E%3C!-- Tree 1 --%3E%3Crect x='40' y='100' width='12' height='50' fill='%234a3728'/%3E%3Cellipse cx='46' cy='70' rx='35' ry='45' fill='%232d5a40'/%3E%3Cellipse cx='46' cy='60' rx='28' ry='35' fill='%233d7a50'/%3E%3Cellipse cx='46' cy='52' rx='20' ry='25' fill='%234a9a60'/%3E%3C!-- Tree 2 --%3E%3Crect x='140' y='110' width='15' height='40' fill='%23553d2a'/%3E%3Cellipse cx='148' cy='85' rx='40' ry='50' fill='%23305542'/%3E%3Cellipse cx='148' cy='72' rx='32' ry='40' fill='%23408055'/%3E%3Cellipse cx='148' cy='62' rx='24' ry='30' fill='%2350a068'/%3E%3C!-- Tree 3 --%3E%3Crect x='250' y='105' width='10' height='45' fill='%234a3728'/%3E%3Cellipse cx='255' cy='75' rx='32' ry='42' fill='%232a5038'/%3E%3Cellipse cx='255' cy='65' rx='26' ry='34' fill='%23387048'/%3E%3Cellipse cx='255' cy='57' rx='18' ry='24' fill='%23489058'/%3E%3C/svg%3E") repeat-x;
-  background-size: 500px 250px;
-  background-position: bottom;
+/* Layer 2: Mid (Medium) */
+.layer-mid {
+  background-image: url('/forest_layer_2.png');
+  z-index: 2;
+  animation: parallax-scroll 60s linear infinite;
 }
 
-/* Foreground foliage - bushes and grass */
-.enchanted-foliage {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 20%;
-  background:
-    /* Grass blades */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Cpath d='M5 50 Q8 30 5 20 Q2 30 5 50' fill='%23508050'/%3E%3Cpath d='M15 50 Q20 25 15 10 Q10 25 15 50' fill='%23609060'/%3E%3Cpath d='M25 50 Q28 35 25 25 Q22 35 25 50' fill='%23407040'/%3E%3Cpath d='M35 50 Q40 20 35 5 Q30 20 35 50' fill='%23508050'/%3E%3Cpath d='M50 50 Q55 30 50 15 Q45 30 50 50' fill='%23609060'/%3E%3Cpath d='M65 50 Q68 35 65 22 Q62 35 65 50' fill='%23508050'/%3E%3Cpath d='M75 50 Q80 25 75 8 Q70 25 75 50' fill='%23407040'/%3E%3Cpath d='M90 50 Q93 32 90 18 Q87 32 90 50' fill='%23609060'/%3E%3C/svg%3E") repeat-x,
-    /* Bushes */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60'%3E%3Cellipse cx='30' cy='50' rx='35' ry='25' fill='%23306038'/%3E%3Cellipse cx='30' cy='45' rx='28' ry='20' fill='%23408048'/%3E%3Cellipse cx='100' cy='55' rx='45' ry='30' fill='%23285030'/%3E%3Cellipse cx='100' cy='48' rx='35' ry='22' fill='%23387040'/%3E%3Cellipse cx='170' cy='52' rx='38' ry='26' fill='%23306038'/%3E%3Cellipse cx='170' cy='46' rx='30' ry='20' fill='%23408048'/%3E%3C/svg%3E") repeat-x;
-  background-size: 150px 75px, 350px 100px;
-  background-position: bottom, bottom;
+/* Layer 3: Front (Fastest) */
+.layer-front {
+  background-image: url('/forest_layer_3.png');
+  z-index: 3;
+  animation: parallax-scroll 30s linear infinite;
 }
 
-/* Magical mist layer */
+@keyframes parallax-scroll {
+  from {
+    background-position: 0 bottom;
+  }
+
+  to {
+    background-position: -1920px bottom;
+    /* Assumes 1920px width tile, adjust if needed */
+  }
+}
+
+/* Magical mist layer - refined for image overlay */
 .enchanted-mist {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 40%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(150, 200, 150, 0.05) 30%,
-    rgba(100, 180, 130, 0.1) 60%,
-    rgba(80, 160, 120, 0.15) 80%,
-    rgba(60, 140, 100, 0.2) 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(150, 200, 150, 0.05) 30%,
+      rgba(100, 180, 130, 0.1) 60%,
+      rgba(80, 160, 120, 0.15) 80%,
+      rgba(60, 140, 100, 0.2) 100%);
   animation: mist-drift 20s ease-in-out infinite;
 }
 
 @keyframes mist-drift {
-  0%, 100% { transform: translateX(0); opacity: 0.8; }
-  50% { transform: translateX(2%); opacity: 1; }
+
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: translateX(2%);
+    opacity: 1;
+  }
 }
 
 /* Floating magical particles */
@@ -491,8 +452,17 @@
 }
 
 @keyframes power-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff0000, 0 0 16px rgba(255, 0, 0, 0.5); }
-  50% { opacity: 0.85; box-shadow: 0 0 5px #ff0000, 0 0 10px rgba(255, 0, 0, 0.3); }
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 8px #ff0000, 0 0 16px rgba(255, 0, 0, 0.5);
+  }
+
+  50% {
+    opacity: 0.85;
+    box-shadow: 0 0 5px #ff0000, 0 0 10px rgba(255, 0, 0, 0.3);
+  }
 }
 
 .gameboy-power-text {
@@ -532,16 +502,15 @@
 .d-pad-base {
   position: absolute;
   inset: 0;
-  background: 
+  background:
     linear-gradient(145deg,
       #2a2a30 0%,
       #1e1e24 50%,
-      #18181c 100%
-    );
+      #18181c 100%);
   border-radius: 50%;
   box-shadow:
-    0 4px 8px rgba(0,0,0,0.3),
-    inset 0 1px 2px rgba(255,255,255,0.1);
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .d-pad-cross {
@@ -557,15 +526,14 @@
 .d-pad-cross::after {
   content: '';
   position: absolute;
-  background: 
+  background:
     linear-gradient(145deg,
       #222228 0%,
-      #1a1a20 100%
-    );
+      #1a1a20 100%);
   box-shadow:
-    inset 0 1px 1px rgba(255,255,255,0.08),
-    inset 0 -1px 1px rgba(0,0,0,0.3),
-    0 2px 4px rgba(0,0,0,0.2);
+    inset 0 1px 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .d-pad-cross::before {
@@ -592,15 +560,14 @@
   transform: translate(-50%, -50%);
   width: 28px;
   height: 28px;
-  background: 
+  background:
     radial-gradient(circle,
       #1a1a20 0%,
-      #15151a 100%
-    );
+      #15151a 100%);
   border-radius: 50%;
   box-shadow:
-    inset 0 1px 2px rgba(255,255,255,0.1),
-    0 1px 2px rgba(0,0,0,0.3);
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.3);
   z-index: 2;
 }
 
@@ -617,29 +584,28 @@
   border-radius: 50%;
   width: 54px;
   height: 54px;
-  background: 
+  background:
     radial-gradient(circle at 35% 35%,
       #9a355a 0%,
       #7a2545 40%,
-      #5a1835 100%
-    );
+      #5a1835 100%);
   box-shadow:
     /* Button shadow */
-    0 5px 10px rgba(0,0,0,0.4),
-    0 3px 5px rgba(0,0,0,0.3),
+    0 5px 10px rgba(0, 0, 0, 0.4),
+    0 3px 5px rgba(0, 0, 0, 0.3),
     /* Button edge highlight */
-    inset 0 1px 2px rgba(255,255,255,0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
     /* Button recess shadow */
-    inset 0 -2px 4px rgba(0,0,0,0.3);
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
   transition: all 0.1s ease;
 }
 
 .ab-button:active {
   transform: translateY(2px);
   box-shadow:
-    0 3px 6px rgba(0,0,0,0.3),
-    inset 0 1px 2px rgba(255,255,255,0.2),
-    inset 0 -1px 2px rgba(0,0,0,0.2);
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .ab-button::after {
@@ -650,9 +616,8 @@
   width: 30%;
   height: 25%;
   background: linear-gradient(135deg,
-    rgba(255,255,255,0.3) 0%,
-    transparent 100%
-  );
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 100%);
   border-radius: 50%;
 }
 
@@ -680,17 +645,16 @@
   position: relative;
   width: 58px;
   height: 18px;
-  background: 
+  background:
     linear-gradient(180deg,
       #8a8580 0%,
       #6a6560 50%,
-      #5a5550 100%
-    );
+      #5a5550 100%);
   border-radius: 12px;
   box-shadow:
-    0 4px 8px rgba(0,0,0,0.4),
-    inset 0 1px 1px rgba(255,255,255,0.25),
-    inset 0 -1px 1px rgba(0,0,0,0.3);
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.3);
   transform: rotate(-15deg);
   transition: all 0.1s ease;
   cursor: pointer;
@@ -699,8 +663,8 @@
 .menu-button:active {
   transform: rotate(-15deg) translateY(1px);
   box-shadow:
-    0 2px 4px rgba(0,0,0,0.3),
-    inset 0 1px 1px rgba(255,255,255,0.15);
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 .menu-button-label {
@@ -734,15 +698,14 @@
 .speaker-hole {
   width: 8px;
   height: 8px;
-  background: 
+  background:
     linear-gradient(145deg,
       #1a1a20 0%,
-      #0f0f12 100%
-    );
+      #0f0f12 100%);
   border-radius: 50%;
   box-shadow:
-    inset 0 1px 1px rgba(0,0,0,0.5),
-    0 1px 1px rgba(255,255,255,0.1);
+    inset 0 1px 1px rgba(0, 0, 0, 0.5),
+    0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Decorative stripes */
@@ -758,9 +721,8 @@
   width: 3px;
   height: 38px;
   background: linear-gradient(180deg,
-    rgba(180, 50, 80, 0.6) 0%,
-    rgba(180, 50, 80, 0.3) 100%
-  );
+      rgba(180, 50, 80, 0.6) 0%,
+      rgba(180, 50, 80, 0.3) 100%);
   border-radius: 1px;
 }
 
@@ -775,7 +737,7 @@
   font-style: italic;
   color: rgba(100, 95, 140, 0.9);
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .device-branding span {
@@ -795,49 +757,109 @@
 
 /* Original styles for creature cards etc */
 @keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes scan {
-  0% { top: 0; }
-  50% { top: 100%; }
-  100% { top: 0; }
+  0% {
+    top: 0;
+  }
+
+  50% {
+    top: 100%;
+  }
+
+  100% {
+    top: 0;
+  }
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateX(-20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 .animate-blink {
@@ -867,11 +889,10 @@
 
 /* Scan mode */
 .scan-overlay {
-  background: linear-gradient(180deg, 
-    transparent 0%, 
-    rgba(155, 188, 15, 0.3) 50%, 
-    transparent 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(155, 188, 15, 0.3) 50%,
+      transparent 100%);
   animation: scan 2s linear infinite;
 }
 
@@ -967,15 +988,39 @@
   background-color: #306230;
 }
 
-.dpad-up { top: 0; left: 30px; width: 20px; height: 30px; }
-.dpad-down { bottom: 0; left: 30px; width: 20px; height: 30px; }
-.dpad-left { top: 30px; left: 0; width: 30px; height: 20px; }
-.dpad-right { top: 30px; right: 0; width: 30px; height: 20px; }
-.dpad-center { 
-  top: 30px; 
-  left: 30px; 
-  width: 20px; 
-  height: 20px; 
+.dpad-up {
+  top: 0;
+  left: 30px;
+  width: 20px;
+  height: 30px;
+}
+
+.dpad-down {
+  bottom: 0;
+  left: 30px;
+  width: 20px;
+  height: 30px;
+}
+
+.dpad-left {
+  top: 30px;
+  left: 0;
+  width: 30px;
+  height: 20px;
+}
+
+.dpad-right {
+  top: 30px;
+  right: 0;
+  width: 30px;
+  height: 20px;
+}
+
+.dpad-center {
+  top: 30px;
+  left: 30px;
+  width: 20px;
+  height: 20px;
   background-color: #0f380f;
 }
 
