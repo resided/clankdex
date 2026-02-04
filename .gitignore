@@ -42,3 +42,5 @@ coverage/
 *.pid.lock
 Thumbs.db
 .grepai/
+.vercel
+.env*.local
