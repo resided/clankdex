@@ -333,37 +333,7 @@
   animation: parallax-slow 60s linear infinite;
 }
 
-/* Layer 2: Mid (Medium) - Bottom overlay */
-.layer-mid {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 60%;
-  background-image: url('/forest_layer_2.png');
-  background-size: auto 100%;
-  background-repeat: repeat-x;
-  background-position: bottom left;
-  image-rendering: pixelated;
-  z-index: 2;
-  animation: parallax-scroll 40s linear infinite;
-}
-
-/* Layer 3: Front (Fastest) - Bottom overlay */
-.layer-front {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 40%;
-  background-image: url('/forest_layer_3.png');
-  background-size: auto 100%;
-  background-repeat: repeat-x;
-  background-position: bottom left;
-  image-rendering: pixelated;
-  z-index: 3;
-  animation: parallax-scroll 20s linear infinite;
-}
+/* Removed transparent overlay layers - they caused checkerboard effect */
 
 @keyframes parallax-slow {
   from { background-position: 0 center; }

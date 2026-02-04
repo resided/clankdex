@@ -70,14 +70,8 @@ const fireflies = Array.from({ length: 40 }).map((_, i) => ({
 export const EnchantedForest = memo(function EnchantedForest() {
   return (
     <div className="enchanted-forest">
-      {/* Parallax Layer 1: Full Background */}
-      <div className="parallax-layer layer-back" />
-
-      {/* Parallax Layer 2: Midground (bottom overlay) */}
-      <div className="parallax-layer layer-mid" />
-
-      {/* Parallax Layer 3: Foreground (bottom overlay) */}
-      <div className="parallax-layer layer-front" />
+      {/* Full solid forest background - no transparency */}
+      <div className="layer-back" />
 
       {/* Dark overlay for depth */}
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
