@@ -15,6 +15,10 @@ const DATA_SUFFIX = Attribution.toDataSuffix({
   codes: ['bc_pung2696'],
 });
 
+// ClankDex Treasury - receives 5% of LP rewards from all deployed tokens
+const CLANKDEX_TREASURY = process.env.CLANKDEX_TREASURY_ADDRESS as `0x${string}` || '0x0000000000000000000000000000000000000000';
+const CREATOR_REWARD_PERCENTAGE = 95; // Creator gets 95%, ClankDex gets 5%
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -34,6 +38,11 @@ export async function POST(request: NextRequest) {
         { error: 'Deployer private key not configured' },
         { status: 500 }
       );
+    }
+
+    // Warn if treasury not configured (still deploys, but no revenue)
+    if (!process.env.CLANKDEX_TREASURY_ADDRESS) {
+      console.warn('⚠️ CLANKDEX_TREASURY_ADDRESS not set - interface rewards will go to zero address!');
     }
     
     // Setup wallet with private key
@@ -74,6 +83,14 @@ export async function POST(request: NextRequest) {
         interface: 'ClankDex',
         platform: 'ClankDex',
       },
+      // Revenue split: 95% creator, 5% ClankDex treasury
+      rewardsConfig: {
+        creatorReward: CREATOR_REWARD_PERCENTAGE,
+        creatorAdmin: creatorAddress as `0x${string}`,
+        creatorRewardRecipient: creatorAddress as `0x${string}`,
+        interfaceAdmin: CLANKDEX_TREASURY,
+        interfaceRewardRecipient: CLANKDEX_TREASURY,
+      },
     };
 
     // Deploy the token with Base builder attribution
@@ -106,6 +123,10 @@ export async function POST(request: NextRequest) {
         symbol: finalSymbol,
         marketCap: '0.5',
         creator: creatorAddress,
+      },
+      rewards: {
+        creatorPercentage: CREATOR_REWARD_PERCENTAGE,
+        interfacePercentage: 100 - CREATOR_REWARD_PERCENTAGE,
       },
       simulated: false,
     });
