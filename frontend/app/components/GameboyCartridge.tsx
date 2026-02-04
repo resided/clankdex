@@ -192,12 +192,12 @@ export function FloatingCartridges({ count = 5 }: { count?: number }) {
             style={{
               position: 'absolute',
               left: `${randomX}%`,
-              top: '-200px',
+              top: '-300px',
             }}
             animate={{
               y: ['0vh', '120vh'],
-              rotate: [0, 360],
-              opacity: [0, 0.15, 0.15, 0],
+              rotate: [0, 15, -15, 0],
+              opacity: [0, 0.6, 0.6, 0],
             }}
             transition={{
               duration: randomDuration,
@@ -208,7 +208,7 @@ export function FloatingCartridges({ count = 5 }: { count?: number }) {
           >
             <GameboyCartridge
               element={element}
-              scale={0.15 + Math.random() * 0.1}
+              scale={0.35 + Math.random() * 0.15}
               animate={false}
             />
           </motion.div>
