@@ -25,6 +25,26 @@ Use this file for non-trivial tasks (3+ steps or architectural decisions).
 
 ## Current / Recent
 
+### ClankDex Revenue Setup — 2026-02-04
+
+#### Plan
+- [x] Add `rewardsConfig` to Clanker deploy
+- [x] Set 95% creator / 5% ClankDex split
+- [x] Add `CLANKDEX_TREASURY_ADDRESS` env var
+- [x] Add warning if treasury not configured
+- [x] Return reward split in API response
+
+#### Verification
+- [x] Code compiles without errors
+- [ ] Test deploy with treasury address set
+- [ ] Verify rewards config in deployed token
+
+#### Review
+- **Summary**: Added `rewardsConfig` to all token deployments. Creator gets 95% of LP fees, ClankDex treasury gets 5%. Passive revenue on every token forever.
+- **Action required**: Set `CLANKDEX_TREASURY_ADDRESS` in Vercel env vars!
+
+---
+
 ### Gamified Tokenomics (Stats → Token Economics) — 2026-02-04
 
 #### Context
