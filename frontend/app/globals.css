@@ -333,7 +333,37 @@
   animation: parallax-slow 60s linear infinite;
 }
 
-/* Removed transparent overlay layers - they caused checkerboard effect */
+/* Layer 2: Mid - Trees overlay with solid bg behind transparency */
+.layer-mid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80%;
+  background: 
+    url('/forest_layer_2.png') bottom left/auto 100% repeat-x,
+    linear-gradient(to bottom, transparent 0%, #0a1f1a 30%, #0a1f1a 100%);
+  background-color: #0a1f1a;
+  image-rendering: pixelated;
+  z-index: 2;
+  animation: parallax-scroll 40s linear infinite;
+}
+
+/* Layer 3: Front - Grass/flowers overlay with solid bg behind */
+.layer-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+  background: 
+    url('/forest_layer_3.png') bottom left/auto 100% repeat-x,
+    linear-gradient(to bottom, transparent 0%, #0a1f1a 40%, #0a1f1a 100%);
+  background-color: #0a1f1a;
+  image-rendering: pixelated;
+  z-index: 3;
+  animation: parallax-scroll 20s linear infinite;
+}
 
 @keyframes parallax-slow {
   from { background-position: 0 center; }
