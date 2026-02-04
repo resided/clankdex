@@ -323,42 +323,45 @@
   background-color: #0a1f1a;
 }
 
-/* Base class for all parallax layers */
-.parallax-layer {
-  position: absolute;
-  inset: 0;
-  image-rendering: pixelated;
-  will-change: background-position;
-}
-
 /* Layer 1: Back (Slowest) - Full background */
 .layer-back {
+  position: absolute;
+  inset: 0;
   background: url('/forest-bg.png') center/cover no-repeat;
+  image-rendering: pixelated;
   z-index: 1;
   animation: parallax-slow 60s linear infinite;
 }
 
-/* Layer 2: Mid (Medium) - Bottom overlay with transparency */
+/* Layer 2: Mid (Medium) - Bottom overlay */
 .layer-mid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60%;
   background-image: url('/forest_layer_2.png');
   background-size: auto 100%;
   background-repeat: repeat-x;
-  background-position: bottom;
+  background-position: bottom left;
+  image-rendering: pixelated;
   z-index: 2;
-  top: auto;
-  height: 70%;
   animation: parallax-scroll 40s linear infinite;
 }
 
-/* Layer 3: Front (Fastest) - Bottom overlay with transparency */
+/* Layer 3: Front (Fastest) - Bottom overlay */
 .layer-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
   background-image: url('/forest_layer_3.png');
   background-size: auto 100%;
   background-repeat: repeat-x;
-  background-position: bottom;
+  background-position: bottom left;
+  image-rendering: pixelated;
   z-index: 3;
-  top: auto;
-  height: 50%;
   animation: parallax-scroll 20s linear infinite;
 }
 
