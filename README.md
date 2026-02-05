@@ -1,55 +1,60 @@
-# 🎮 Claudex - Wallet Pokedex × Clanker
+# 🎮 Claudex - Wallet DNA Analyzer × Clanker Launchpad
 
-A Base L2 miniapp that analyzes your wallet, generates a unique pixel Pokemon-style creature, and launches it as a **Clanker token** with bonding curves!
+**Claudex** is a Base L2 miniapp that analyzes your on-chain DNA (wallet history or Farcaster activity) and generates a unique, pixel-art creature. Your creature is then launched as a **tradeable token** via [Clanker](https://clanker.world) with instant bonding curves.
+
+Think of it as a **Pokédex for wallets** — every wallet has a unique creature waiting to be discovered.
 
 ![Claudex](https://claudex.io/og-image.png)
 
-## ✨ What is Claudex + Clanker?
+## ✨ What It Is
 
-**Claudex** analyzes your wallet DNA to create a unique Pokemon-style creature. Instead of deploying a basic ERC20, we launch your creature as a **Clanker token** with:
+Claudex reads your wallet's transaction history, token holdings, NFT activity, and DeFi interactions to generate a unique "DNA fingerprint." This DNA determines:
 
-- 🔗 **Instant Bonding Curve** - Trade from day one
-- 💰 **70% Creator Rewards** - Earn from trading fees  
-- ⚡ **Base L2** - Fast, cheap transactions
-- 🎨 **Pixel Art** - Retro Pokemon-style creatures
-- 🎮 **12 Element Types** - Fire, Water, Grass, Electric, Ice, Fighting, Poison, Ground, Flying, Psychic, Bug, Dragon
+- **🎨 Visual Appearance** — Pixel art creature with colors and traits based on your activity
+- **📊 Battle Stats** — HP, Attack, Defense, Speed, Special (1-100 each)
+- **🧬 Archetype** — One of 10 personality types (Builder, Degen, Oracle, Whale, etc.)
+- **💎 Rarity** — Based on wallet age, diversity, and transaction patterns
 
-## Architecture
+Your creature is then **minted as a Clanker token** — instantly tradeable with:
+- **Instant Liquidity** — Bonding curve from day one
+- **Creator Rewards** — Earn from trading fees
+- **On-Chain Registry** — Permanently recorded in the ClaudexRegistry contract
+
+## 🏗️ Architecture
 
 ```
 claudex/
 ├── contracts/          
-│   └── ClaudexRegistry.sol    # Tracks creatures launched via Clanker
+│   └── ClaudexRegistry.sol    # On-chain creature registry
 ├── backend/            
 │   ├── walletAnalyzer.js      # Wallet DNA analysis
 │   ├── creatureGenerator.js   # Pixel art generation
 │   └── clankerService.js      # Clanker SDK integration
 └── frontend/           
-    ├── Pokedex UI
-    └── Clanker integration
+    ├── Next.js + React        # Pokedex-style UI
+    └── Farcaster Frame        # Miniapp support
 ```
 
-## How It Works
+## 🔄 How It Works
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   Wallet    │────▶│    DNA       │────▶│   Creature  │
-│  Analysis   │     │  Generation  │     │   Stats     │
-└─────────────┘     └──────────────┘     └─────────────┘
-                                                │
-                                                ▼
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   Clanker   │◀────│   IPFS       │◀────│  Pixel Art  │
-│   Launch    │     │   Upload     │     │  Generation │
-└─────────────┘     └──────────────┘     └─────────────┘
-       │
-       ▼
-┌─────────────────────────────────────────────────────┐
-│  • Bonding curve token                               │
-│  • 70% creator rewards                               │
-│  • Listed on clanker.world                          │
-│  • Tradeable on Base DEXs                           │
-└─────────────────────────────────────────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Wallet/Farcaster│────▶│   DNA Analysis  │────▶│  Creature Stats │
+│    Analysis      │     │   & Scoring     │     │  & Archetype    │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                        │
+                         ┌─────────────────┐           ▼
+                         │  Clanker Token  │◀────┌─────────────────┐
+                         │    Launch       │     │  Pixel Art Gen  │
+                         │  (Bonding Curve)│     │  & IPFS Upload  │
+                         └─────────────────┘     └─────────────────┘
+                                  │
+                                  ▼
+                         ┌─────────────────┐
+                         │ On-Chain        │
+                         │ Registry        │
+                         │ (Permanent)     │
+                         └─────────────────┘
 ```
 
 ## 🚀 Quick Start
@@ -123,111 +128,83 @@ Visit `http://localhost:3000` 🎮
 | **Speed** | NFT activity | 1-100 |
 | **Special** | Unique interactions | 1-100 |
 
-**Total Stats** determine initial market cap on Clanker:
-- 300-400: 5 ETH market cap
-- 400-450: 8 ETH market cap  
-- 450+: 10 ETH market cap
+**Evolution Tiers** (based on market cap):
+- 🥚 **Egg** ($0-1K) → 👶 **Baby** ($1K-10K) → ⭐ **Basic** ($10K-50K)
+- ✨ **Stage 1** ($50K-100K) → ⚡ **Stage 2** ($100K-500K)
+- 🔥 **Mega** ($500K-1M) → 👑 **Legendary** ($1M+)
 
-## 🔥 Element Types & Rarity
+## 🧬 Archetypes
 
-| Element | Rarity | Market Cap Boost |
-|---------|--------|------------------|
-| Fire, Water, Grass, Fighting, Ground, Bug | Common | - |
-| Electric, Poison, Flying | Uncommon | +0.5 ETH |
-| Ice, Psychic | Rare | +1 ETH |
-| **Dragon** | **Legendary** | **+2 ETH** |
+| Archetype | Description | Visual Trait |
+|-----------|-------------|--------------|
+| **Builder** | Heavy contract interactions | Blue tones, geometric shapes |
+| **Degen** | High-risk trading activity | Red tones, lightning motifs |
+| **Oracle** | Governance/Long-term holder | Purple tones, eye symbols |
+| **Whale** | Large holdings, few moves | Cyan tones, wave patterns |
+| **Connector** | Social/bridge transactions | Green tones, network nodes |
+| **Influencer** | Popular/Farcaster active | Yellow tones, star motifs |
 
-## Clanker Configuration
+## 🔗 Clanker Integration
 
-When deploying via Clanker, each creature token gets:
+Each creature launches as a Clanker token with:
 
 ```javascript
 {
-  // Token basics
-  name: "Sparkmon #a3f2",
-  symbol: "FISPA",
+  name: "Creature Name",
+  symbol: "CREATURE",
   image: "ipfs://...",
-  
-  // Bonding curve
   pool: {
     quoteToken: WETH,
     initialMarketCap: "5-12 ETH" // Based on rarity
   },
-  
-  // Vesting (5% to creator, 30 days)
-  vault: {
-    percentage: 5,
-    durationInDays: 30
-  },
-  
-  // Revenue sharing
   rewardsConfig: {
-    creatorReward: 70,      // 70% to you
+    creatorReward: 70,      // 70% to creator
     interfaceReward: 30     // 30% to Claudex
   }
 }
 ```
 
-## API Endpoints
+## 📡 API Endpoints
 
 ### POST `/api/analyze`
-Analyzes wallet and returns creature data
+Analyzes wallet or Farcaster and returns creature data
+
+**Body:** `{ "address": "0x..." }` or `{ "farcasterUsername": "..." }`
 
 ### POST `/api/generate-image`
-Generates creature image and uploads to IPFS
+Generates creature pixel art and uploads to IPFS
 
 ### POST `/api/deploy`
 Launches creature as Clanker token
 
-```json
-{
-  "creature": { ... },
-  "creatorAddress": "0x...",
-  "simulate": false
-}
-```
-
-Response:
-```json
-{
-  "success": true,
-  "tokenAddress": "0x...",
-  "config": {
-    "symbol": "FISPA",
-    "marketCap": "8.5"
-  }
-}
-```
-
 ### POST `/api/summon`
 Full flow: analyze + generate + deploy
 
-## Smart Contracts
+## 📜 Smart Contracts
 
 ### ClaudexRegistry
 
-Stores creature metadata and links to Clanker tokens:
+Stores creature metadata on-chain:
 
 ```solidity
 struct Creature {
     address tokenAddress;    // Clanker token
     address creator;
     string name;
-    string species;
-    uint256 dna;
     uint8[6] stats;          // level, hp, attack, defense, speed, special
     string element;
+    string archetype;
     string imageURI;
-    bool isClanker;          // Always true
+    uint256 createdAt;
 }
 ```
 
-Key functions:
-- `registerCreature()` - Links Clanker token to creature data
-- `getCreaturesByCreator()` - Get all creatures by wallet
-- `getLeaderboardByStat()` - Global rankings
+**Key Functions:**
+- `registerCreature()` — Links Clanker token to creature data
+- `getCreaturesByCreator()` — Get all creatures by wallet
+- `getLeaderboardByStat()` — Global rankings
 
-## Environment Variables
+## 🔧 Environment Variables
 
 ### Backend (.env)
 ```env
@@ -236,7 +213,6 @@ RPC_URL=https://sepolia.base.org
 DEPLOYER_PRIVATE_KEY=0x...
 PINATA_JWT=...
 CLADEX_ADMIN=0x...
-SIMULATE_DEPLOY=false
 ```
 
 ### Frontend (.env.local)
@@ -246,40 +222,40 @@ NEXT_PUBLIC_REGISTRY_ADDRESS=0x...
 NEXT_PUBLIC_CLANKER_URL=https://clanker.world
 ```
 
-## Frame Miniapp
+## 🖼️ Farcaster Frame
 
-Works as a Farcaster Frame:
+Claudex works as a Farcaster miniapp:
 
 ```json
 {
   "frame": {
     "name": "Claudex",
-    "buttonTitle": "🎮 Launch Creature",
+    "buttonTitle": "🎮 Summon Creature",
     "homeUrl": "https://claudex.io",
     "splashBackgroundColor": "#DC0A2D"
   }
 }
 ```
 
-## Deployment Checklist
+## ✅ Deployment Checklist
 
 - [ ] Deploy ClaudexRegistry contract
-- [ ] Set up backend with Clanker SDK
-- [ ] Configure IPFS (Pinata)
-- [ ] Set up frontend with WalletConnect
-- [ ] Test on baseSepolia
-- [ ] Deploy to base mainnet
+- [ ] Configure backend with Clanker SDK
+- [ ] Set up IPFS (Pinata)
+- [ ] Configure frontend with WalletConnect
+- [ ] Test on Base Sepolia
+- [ ] Deploy to Base Mainnet
 - [ ] Verify contracts on Basescan
 - [ ] Submit to Clanker directory
 
-## Links
+## 🔗 Links
 
 - **Website**: https://claudex.io
 - **Clanker**: https://clanker.world
-- **BaseScan**: https://basescan.org
+- **Base**: https://base.org
 - **Farcaster**: @claudex
 
-## License
+## 📄 License
 
 MIT License
 
