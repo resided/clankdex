@@ -798,11 +798,11 @@
   width: 70px;
   height: 70px;
   object-fit: contain;
-  /* Blend with the housing - no glow, no borders */
-  opacity: 0.9;
-  /* Slight multiply effect to look like printed ink on plastic */
-  mix-blend-mode: multiply;
-  filter: contrast(1.1) saturate(0.9);
+  /* Screen blend makes black background disappear, keeps green logo */
+  mix-blend-mode: screen;
+  /* Slight adjustments to blend with olive housing */
+  filter: brightness(0.9) contrast(1.2) saturate(0.8);
+  opacity: 0.85;
 }
 
 /* Control hint text below device */
