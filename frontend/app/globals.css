@@ -44,16 +44,16 @@
 .gameboy-device {
   @apply relative mx-auto;
   width: min(480px, 95vw);
-  /* Premium off-white ABS plastic shell */
+  /* CLANKDEX Special Edition - Olive Army Green ABS plastic */
   background:
-    /* Surface texture */
+    /* Surface texture with olive tones */
     linear-gradient(165deg,
-      #e8e4dc 0%,
-      #ddd8ce 20%,
-      #d4cfc4 40%,
-      #c9c4b8 60%,
-      #bfbab0 80%,
-      #b5b0a6 100%);
+      #9ba86c 0%,
+      #8a9659 20%,
+      #7a854d 40%,
+      #6b7543 60%,
+      #5c6539 80%,
+      #4d552f 100%);
   border-radius: 24px 24px 85px 85px;
   padding: 26px 28px 55px;
   box-shadow:
@@ -62,15 +62,15 @@
     0 35px 70px rgba(0, 0, 0, 0.35),
     /* Contact shadow */
     0 15px 30px rgba(0, 0, 0, 0.25),
-    /* Soft glow from screen */
-    0 0 80px rgba(155, 188, 15, 0.15),
+    /* Subtle green glow from screen */
+    0 0 80px rgba(139, 172, 15, 0.2),
     /* Shell edge highlight */
-    inset 0 2px 3px rgba(255, 255, 255, 0.95),
+    inset 0 2px 3px rgba(255, 255, 255, 0.4),
     /* Shell edge shadow */
-    inset 0 -2px 4px rgba(0, 0, 0, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
     /* Side depth shadows */
-    inset 2px 0 4px rgba(0, 0, 0, 0.06),
-    inset -2px 0 4px rgba(0, 0, 0, 0.06);
+    inset 2px 0 4px rgba(0, 0, 0, 0.1),
+    inset -2px 0 4px rgba(0, 0, 0, 0.1);
   overflow: visible;
 }
 
@@ -478,7 +478,7 @@
 .gameboy-power-text {
   font-size: 8px;
   letter-spacing: 0.5px;
-  color: rgba(180, 150, 120, 0.7);
+  color: rgba(60, 50, 30, 0.7);
   text-transform: uppercase;
   font-family: 'Verdana', sans-serif;
 }
@@ -490,7 +490,7 @@
   right: 16px;
   font-size: 8px;
   letter-spacing: 0.5px;
-  color: rgba(180, 150, 120, 0.6);
+  color: rgba(60, 50, 30, 0.6);
   text-transform: uppercase;
   font-family: 'Verdana', sans-serif;
 }
@@ -779,112 +779,30 @@
   width: 3px;
   height: 38px;
   background: linear-gradient(180deg,
-      rgba(180, 50, 80, 0.6) 0%,
-      rgba(180, 50, 80, 0.3) 100%);
+      rgba(48, 98, 48, 0.5) 0%,
+      rgba(48, 98, 48, 0.25) 100%);
   border-radius: 1px;
 }
 
 /* Branding text */
+/* Branding - logo printed directly on housing like Hello Kitty edition */
 .device-branding {
   position: absolute;
-  bottom: 50px;
-  left: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-/* Special Edition badge - like collector's edition consoles */
-.device-edition-badge {
-  font-family: 'Verdana', sans-serif;
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: rgba(139, 172, 15, 0.9);
-  text-transform: uppercase;
-  padding: 3px 8px;
-  background: linear-gradient(135deg, 
-    rgba(15, 56, 15, 0.9) 0%,
-    rgba(48, 98, 48, 0.95) 100%);
-  border-radius: 4px;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(139, 172, 15, 0.4);
-}
-
-.device-branding-inner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  /* Special edition style - colored accent plate */
-  background: linear-gradient(145deg, 
-    rgba(139, 172, 15, 0.12) 0%,
-    rgba(48, 98, 48, 0.18) 50%,
-    rgba(15, 56, 15, 0.22) 100%);
-  padding: 10px 16px;
-  border-radius: 14px;
-  /* Inset plate effect - like special edition consoles */
-  box-shadow: 
-    inset 0 2px 6px rgba(0, 0, 0, 0.12),
-    inset 0 1px 2px rgba(0, 0, 0, 0.08),
-    0 1px 0 rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(139, 172, 15, 0.25);
-  /* Subtle military/tech texture */
-  background-image: 
-    linear-gradient(145deg, 
-      rgba(139, 172, 15, 0.12) 0%,
-      rgba(48, 98, 48, 0.18) 50%,
-      rgba(15, 56, 15, 0.22) 100%),
-    url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1h1v1H1V1zm2 2h1v1H3V3z' fill='%23306230' fill-opacity='0.05'/%3E%3C/svg%3E");
+  bottom: 95px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* No background, no borders - just the logo on the plastic */
 }
 
 .device-branding-logo {
-  width: 44px;
-  height: 44px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
-  border-radius: 10px;
-  /* Glow effect to match the logo's green aesthetic */
-  filter: drop-shadow(0 0 10px rgba(139, 172, 15, 0.5)) 
-          drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
-  /* Subtle embossed border */
-  box-shadow: 
-    0 0 0 2px rgba(139, 172, 15, 0.2),
-    inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.device-branding-text-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.device-branding-text {
-  font-family: 'Verdana', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  font-style: italic;
-  color: rgba(48, 98, 48, 0.95);
-  letter-spacing: 0.5px;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
-  line-height: 1;
-}
-
-.device-branding-text span {
-  font-weight: 400;
-  color: rgba(48, 98, 48, 0.7);
-}
-
-/* Model number - like authentic Game Boy labels */
-.device-model-number {
-  font-family: 'Verdana', sans-serif;
-  font-size: 6px;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-  color: rgba(100, 95, 80, 0.7);
-  text-transform: uppercase;
+  /* Blend with the housing - no glow, no borders */
+  opacity: 0.9;
+  /* Slight multiply effect to look like printed ink on plastic */
+  mix-blend-mode: multiply;
+  filter: contrast(1.1) saturate(0.9);
 }
 
 /* Control hint text below device */

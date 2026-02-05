@@ -2109,20 +2109,13 @@ export default function Home() {
               <div className="device-stripe" />
             </div>
 
-            {/* Device branding with CLANKDEX logo */}
+            {/* Device branding - printed directly on housing like special editions */}
             <div className="device-branding">
-              <div className="device-edition-badge">SPECIAL EDITION</div>
-              <div className="device-branding-inner">
-                <img 
-                  src="/clankdex-logo.png" 
-                  alt="CLANKDEX"
-                  className="device-branding-logo"
-                />
-                <div className="device-branding-text-wrap">
-                  <span className="device-branding-text">CLANK<span>DEX</span></span>
-                  <span className="device-model-number">MODEL CGB-001</span>
-                </div>
-              </div>
+              <img 
+                src="/clankdex-logo.png" 
+                alt="CLANKDEX"
+                className="device-branding-logo"
+              />
             </div>
 
             {/* Speaker grill */}
